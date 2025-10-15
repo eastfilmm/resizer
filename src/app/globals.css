@@ -24,6 +24,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Styled Components SSR support */
+.styled-components-wrapper {
+  min-height: 100vh;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
