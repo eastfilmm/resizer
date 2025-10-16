@@ -2,6 +2,7 @@
 
 import styled from 'styled-components';
 import { RefObject } from 'react';
+import { resetCanvasToWhite } from '@/utils/canvas';
 
 
 
@@ -20,6 +21,9 @@ export default function ActionButtons({ canvasRef, onReset }: ActionButtonsProps
     // Download as high quality PNG
     link.href = canvas.toDataURL('image/png', 1.0);
     link.click();
+
+    // Reset canvas to white background after download
+    resetCanvasToWhite(canvas);
   };
 
   return (

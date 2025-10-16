@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { resetCanvasToWhite } from '@/utils/canvas';
 import { Container, Main, Title } from '@/components/styled/Layout';
 import ImageUploader from '@/components/ImageUploader';
 import ImageCanvas from '@/components/ImageCanvas';
@@ -27,7 +28,9 @@ export default function Home() {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    // Keep canvas unchanged (don't clear)
+    if (canvasRef.current) {
+      resetCanvasToWhite(canvasRef.current);
+    }
   };
 
   return (
