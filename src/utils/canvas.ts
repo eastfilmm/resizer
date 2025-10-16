@@ -5,7 +5,7 @@ export function resetCanvasToWhite(
   options?: { actualSize?: number; displaySize?: number }
 ) {
   const actualSize = options?.actualSize ?? 2000;
-  const displaySize = options?.displaySize ?? 300;
+  const displaySize = options?.displaySize ?? 320;
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;

@@ -43,7 +43,7 @@ const ButtonGroup = styled.div`
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
 `;
 
 interface ButtonProps {
