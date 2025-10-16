@@ -27,8 +27,8 @@ export default function ImageCanvas({ canvasRef, imageUrl }: ImageCanvasProps) {
     canvas.height = actualCanvasSize;
 
     // Set display size (scaled down with CSS)
-    canvas.style.width = '300px';
-    canvas.style.height = '300px';
+    canvas.style.width = '320px';
+    canvas.style.height = '320px';
 
     // Enable high quality image rendering
     ctx.imageSmoothingEnabled = true;
@@ -78,8 +78,8 @@ export default function ImageCanvas({ canvasRef, imageUrl }: ImageCanvasProps) {
       if (ctx) {
         canvas.width = 2000;
         canvas.height = 2000;
-        canvas.style.width = '300px';
-        canvas.style.height = '300px';
+        canvas.style.width = '320px';
+        canvas.style.height = '320px';
         
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, 2000, 2000);
@@ -102,8 +102,8 @@ export default function ImageCanvas({ canvasRef, imageUrl }: ImageCanvasProps) {
 }
 
 const CanvasContainer = styled.div`
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -115,7 +115,7 @@ const CanvasContainer = styled.div`
 `;
 
 const Canvas = styled.canvas`
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   object-fit: contain;
 `;

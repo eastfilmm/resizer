@@ -47,7 +47,7 @@ const SelectButton = styled.button`
   transition: background-color 0.2s ease;
   touch-action: manipulation;
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
   
   &:hover {
     background-color: #0056b3;
