@@ -51,6 +51,7 @@ export default function Home() {
 
         <ActionButtons
           canvasRef={canvasRef}
+          imageUrl={imageUrl}
           onReset={handleReset}
         />
       </Main>
