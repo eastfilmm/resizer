@@ -201,6 +201,10 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       imageRef.current = null;
       imagePositionRef.current = null;
       drawImageOnCanvas();
+    } else {
+      // Clear image reference when imageUrl is null (reset)
+      imageRef.current = null;
+      imagePositionRef.current = null;
     }
   }, [imageUrl, drawImageOnCanvas]);
 
