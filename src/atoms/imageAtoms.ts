@@ -5,3 +5,12 @@ export const imageUrlAtom = atom<string | null>(null);
 
 // 캔버스 배경색 ('white' | 'black')
 export const backgroundColorAtom = atom<'white' | 'black'>('white');
+
+// Glass Blur 효과 활성화 여부
+export const glassBlurAtom = atom<boolean>(false);
+
+// Glass Blur 강도 (px 단위, 1-100 범위)
+export const blurIntensityAtom = atom<number>(30);
+
+// 색상 오버레이 투명도 (0-100%, 0.0-1.0)
+export const overlayOpacityAtom = atom<number>(0.3);

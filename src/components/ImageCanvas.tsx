@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
 import { useAtomValue } from 'jotai';
-import { imageUrlAtom, backgroundColorAtom } from '@/atoms/imageAtoms';
+import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom } from '@/atoms/imageAtoms';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -12,12 +12,57 @@ interface ImageCanvasProps {
 export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const imageUrl = useAtomValue(imageUrlAtom);
   const backgroundColor = useAtomValue(backgroundColorAtom);
+  const glassBlur = useAtomValue(glassBlurAtom);
+  const blurIntensity = useAtomValue(blurIntensityAtom);
+  const overlayOpacity = useAtomValue(overlayOpacityAtom);
   const backgroundColorRef = useRef(backgroundColor);
+  const glassBlurRef = useRef(glassBlur);
+  const blurIntensityRef = useRef(blurIntensity);
+  const overlayOpacityRef = useRef(overlayOpacity);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
   // Keep ref in sync with state
   backgroundColorRef.current = backgroundColor;
+  glassBlurRef.current = glassBlur;
+  blurIntensityRef.current = blurIntensity;
+  overlayOpacityRef.current = overlayOpacity;
+
+  // Draw glass blur background: crop center square and fill canvas with blur
+  const drawGlassBlurBackground = (
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    canvasSize: number,
+    intensity: number,
+    overlayColor: string,
+    opacity: number
+  ) => {
+    // Calculate center square crop from source image
+    const minDim = Math.min(img.width, img.height);
+    const sx = (img.width - minDim) / 2;
+    const sy = (img.height - minDim) / 2;
+    
+    // Create a temporary canvas for blur effect
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvasSize;
+    tempCanvas.height = canvasSize;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+    
+    // Draw cropped center square to fill temp canvas
+    tempCtx.drawImage(img, sx, sy, minDim, minDim, 0, 0, canvasSize, canvasSize);
+    
+    // Apply blur filter with configurable intensity
+    ctx.filter = `blur(${intensity}px)`;
+    ctx.drawImage(tempCanvas, 0, 0, canvasSize, canvasSize);
+    ctx.filter = 'none';
+    
+    // Apply color overlay with configurable transparency
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = overlayColor;
+    ctx.fillRect(0, 0, canvasSize, canvasSize);
+    ctx.globalAlpha = 1.0;
+  };
 
   const drawImageOnCanvas = useCallback(() => {
     if (!imageUrl || !canvasRef.current) return;
@@ -47,7 +92,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const newImg = new Image();
     newImg.onload = () => {
       imageRef.current = newImg;
-      drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current);
+      drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current, glassBlurRef.current, blurIntensityRef.current, overlayOpacityRef.current);
     };
     newImg.src = imageUrl;
   }, [imageUrl, canvasRef]);
@@ -57,12 +102,21 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     img: HTMLImageElement,
     actualCanvasSize: number,
     imageAreaSize: number,
-    bgColor: string
+    bgColor: string,
+    useGlassBlur: boolean,
+    intensity: number,
+    opacity: number
   ) => {
     // Initialize canvas with selected background color
     ctx.clearRect(0, 0, actualCanvasSize, actualCanvasSize);
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, actualCanvasSize, actualCanvasSize);
+    
+    // If glass blur is enabled, draw blurred background from image
+    if (useGlassBlur) {
+      drawGlassBlurBackground(ctx, img, actualCanvasSize, intensity, bgColor, opacity);
+    } else {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, actualCanvasSize, actualCanvasSize);
+    }
     
     // Maximum area for image (excluding padding)
     const maxWidth = imageAreaSize;
@@ -128,7 +182,16 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Fill background
+    // If glass blur is enabled, redraw with blur background
+    if (glassBlur && imageRef.current) {
+      const actualCanvasSize = 2000;
+      const padding = 20;
+      const imageAreaSize = actualCanvasSize - (padding * 2);
+      drawImage(ctx, imageRef.current, actualCanvasSize, imageAreaSize, backgroundColor, true, blurIntensity, overlayOpacity);
+      return;
+    }
+
+    // Fill background with solid color
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, 2000, 2000);
 
@@ -138,7 +201,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       const pos = imagePositionRef.current;
       ctx.drawImage(img, pos.x, pos.y, pos.width, pos.height);
     }
-  }, [backgroundColor, canvasRef]);
+  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, canvasRef]);
 
   return (
     <CanvasContainer>
