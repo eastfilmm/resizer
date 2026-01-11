@@ -1,7 +1,8 @@
 'use client';
 
-export function resetCanvasToWhite(
+export function resetCanvas(
   canvas: HTMLCanvasElement,
+  backgroundColor: 'white' | 'black' = 'white',
   options?: { actualSize?: number; displaySize?: number }
 ) {
   const actualSize = options?.actualSize ?? 2000;
@@ -15,7 +16,7 @@ export function resetCanvasToWhite(
   canvas.style.width = `${displaySize}px`;
   canvas.style.height = `${displaySize}px`;
 
-  ctx.fillStyle = 'white';
+  ctx.fillStyle = backgroundColor;
   ctx.fillRect(0, 0, actualSize, actualSize);
 }
 

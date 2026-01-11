@@ -3,8 +3,8 @@
 import styled from 'styled-components';
 import { RefObject } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { imageUrlAtom } from '@/atoms/imageAtoms';
-import { resetCanvasToWhite } from '@/utils/canvas';
+import { imageUrlAtom, backgroundColorAtom } from '@/atoms/imageAtoms';
+import { resetCanvas } from '@/utils/canvas';
 
 interface ActionButtonsProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -14,6 +14,7 @@ interface ActionButtonsProps {
 export default function ActionButtons({ canvasRef, fileInputRef }: ActionButtonsProps) {
   const imageUrl = useAtomValue(imageUrlAtom);
   const setImageUrl = useSetAtom(imageUrlAtom);
+  const backgroundColor = useAtomValue(backgroundColorAtom);
 
   const handleDownload = () => {
     if (!canvasRef.current) return;
@@ -35,7 +36,7 @@ export default function ActionButtons({ canvasRef, fileInputRef }: ActionButtons
       fileInputRef.current.value = '';
     }
     if (canvasRef.current) {
-      resetCanvasToWhite(canvasRef.current);
+      resetCanvas(canvasRef.current, backgroundColor);
     }
   };
 
@@ -44,16 +45,17 @@ export default function ActionButtons({ canvasRef, fileInputRef }: ActionButtons
       <Button disabled={!imageUrl} onClick={handleDownload}>
         Download
       </Button>
-      <Button disabled={!imageUrl} variant="secondary" onClick={handleReset}>
-        Reset
-      </Button>
+      <ResetButton disabled={!imageUrl} variant="secondary" onClick={handleReset}>
+        <Icon src="/refresh_icon.svg" alt="Reset" />
+      </ResetButton>
     </ButtonGroup>
   );
 }
 
 const ButtonGroup = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   gap: 12px;
   width: 100%;
   max-width: 320px;
@@ -73,7 +75,6 @@ const Button = styled.button<ButtonProps>`
   transition: background-color 0.2s ease;
   touch-action: manipulation;
   width: 100%;
-  max-width: 320px;
   height: 40px;
   
   &:hover {
@@ -88,4 +89,21 @@ const Button = styled.button<ButtonProps>`
     background-color: #6c757d;
     cursor: not-allowed;
   }
+`;
+
+const ResetButton = styled(Button)`
+  width: 40px !important;
+  min-width: 40px;
+  max-width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const Icon = styled.img`
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
 `;

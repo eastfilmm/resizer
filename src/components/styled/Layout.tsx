@@ -21,7 +21,7 @@ export const Main = styled.main`
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  gap: 20px;
+  gap: 16px;
 `;
 
 export const Title = styled.h1`
