@@ -2,8 +2,8 @@
 
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
-import { useAtomValue } from 'jotai';
-import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom } from '@/atoms/imageAtoms';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, paddingAtom } from '@/atoms/imageAtoms';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -15,10 +15,13 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const glassBlur = useAtomValue(glassBlurAtom);
   const blurIntensity = useAtomValue(blurIntensityAtom);
   const overlayOpacity = useAtomValue(overlayOpacityAtom);
+  const padding = useAtomValue(paddingAtom);
+  const setPadding = useSetAtom(paddingAtom);
   const backgroundColorRef = useRef(backgroundColor);
   const glassBlurRef = useRef(glassBlur);
   const blurIntensityRef = useRef(blurIntensity);
   const overlayOpacityRef = useRef(overlayOpacity);
+  const paddingRef = useRef(padding);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
@@ -27,6 +30,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   glassBlurRef.current = glassBlur;
   blurIntensityRef.current = blurIntensity;
   overlayOpacityRef.current = overlayOpacity;
+  paddingRef.current = padding;
 
   // Draw glass blur background: crop center square and fill canvas with blur
   const drawGlassBlurBackground = (
@@ -73,8 +77,6 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
 
     // Canvas actual size: 2000px x 2000px
     const actualCanvasSize = 2000;
-    const padding = 20;
-    const imageAreaSize = actualCanvasSize - (padding * 2); // 1960px
 
     // Set canvas actual size
     canvas.width = actualCanvasSize;
@@ -92,10 +94,13 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const newImg = new Image();
     newImg.onload = () => {
       imageRef.current = newImg;
+      // Reset padding to 0 when new image is loaded (image fills canvas edge-to-edge)
+      setPadding(0);
+      const imageAreaSize = actualCanvasSize; // No padding initially
       drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current, glassBlurRef.current, blurIntensityRef.current, overlayOpacityRef.current);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef]);
+  }, [imageUrl, canvasRef, setPadding]);
 
   const drawImage = (
     ctx: CanvasRenderingContext2D,
@@ -182,26 +187,19 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // If glass blur is enabled, redraw with blur background
-    if (glassBlur && imageRef.current) {
-      const actualCanvasSize = 2000;
-      const padding = 20;
-      const imageAreaSize = actualCanvasSize - (padding * 2);
-      drawImage(ctx, imageRef.current, actualCanvasSize, imageAreaSize, backgroundColor, true, blurIntensity, overlayOpacity);
+    const actualCanvasSize = 2000;
+    const imageAreaSize = actualCanvasSize - (padding * 2);
+
+    // If we have an image, redraw it with new settings
+    if (imageRef.current) {
+      drawImage(ctx, imageRef.current, actualCanvasSize, imageAreaSize, backgroundColor, glassBlur, blurIntensity, overlayOpacity);
       return;
     }
 
-    // Fill background with solid color
+    // Fill background with solid color (no image loaded)
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, 2000, 2000);
-
-    // Redraw image if exists
-    if (imageRef.current && imagePositionRef.current) {
-      const img = imageRef.current;
-      const pos = imagePositionRef.current;
-      ctx.drawImage(img, pos.x, pos.y, pos.width, pos.height);
-    }
-  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, canvasRef]);
+  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, padding, canvasRef]);
 
   return (
     <CanvasContainer>

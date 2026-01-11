@@ -14,3 +14,6 @@ export const blurIntensityAtom = atom<number>(30);
 
 // 색상 오버레이 투명도 (0-100%, 0.0-1.0)
 export const overlayOpacityAtom = atom<number>(0.3);
+
+// 캔버스 패딩 (0-200px 범위, 캔버스 기준 2000px)
+export const paddingAtom = atom<number>(0);

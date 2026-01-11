@@ -5,6 +5,7 @@ import { Container, Main, Title } from '@/components/styled/Layout';
 import ImageUploader from '@/components/ImageUploader';
 import CanvasBackgroundSelector from '@/components/CanvasBackgroundSelector';
 import GlassBlurSelector from '@/components/GlassBlurSelector';
+import CanvasPaddingSelector from '@/components/CanvasPaddingSelector';
 import ImageCanvas from '@/components/ImageCanvas';
 import ActionButtons from '@/components/ActionButtons';
 import { styled } from 'styled-components';
@@ -25,6 +26,7 @@ export default function Home() {
         <ImageCanvas canvasRef={canvasRef} />
         <BottonSection>
         {/* 캔버스 관련 속성 */}
+          <CanvasPaddingSelector />
           <CanvasBackgroundSelector />
           <GlassBlurSelector />
         </BottonSection>
