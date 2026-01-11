@@ -7,12 +7,11 @@ export const Container = styled.div`
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   
   @media (min-width: 768px) {
     max-width: 428px;
     margin: 0 auto;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }
 `;
 

@@ -44,7 +44,7 @@ export default function ActionButtons({ canvasRef, fileInputRef }: ActionButtons
       <Button disabled={!imageUrl} onClick={handleDownload}>
         Download
       </Button>
-      <Button variant="secondary" onClick={handleReset}>
+      <Button disabled={!imageUrl} variant="secondary" onClick={handleReset}>
         Reset
       </Button>
     </ButtonGroup>
@@ -67,12 +67,14 @@ const Button = styled.button<ButtonProps>`
   background-color: ${props => props.variant === 'secondary' ? '#6c757d' : '#28a745'};
   color: white;
   border: none;
-  padding: 12px 24px;
   font-size: 1rem;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s ease;
   touch-action: manipulation;
+  width: 100%;
+  max-width: 320px;
+  height: 40px;
   
   &:hover {
     background-color: ${props => props.variant === 'secondary' ? '#5a6268' : '#218838'};

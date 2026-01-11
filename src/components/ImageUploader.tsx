@@ -46,7 +46,6 @@ const SelectButton = styled.button`
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 16px 32px;
   font-size: 1rem;
   border-radius: 8px;
   cursor: pointer;
@@ -54,7 +53,7 @@ const SelectButton = styled.button`
   touch-action: manipulation;
   width: 100%;
   max-width: 320px;
-  
+  height: 40px;
   &:hover {
     background-color: #0056b3;
   }
