@@ -2,31 +2,37 @@
 
 import styled from 'styled-components';
 import { RefObject } from 'react';
-
+import { useAtomValue, useSetAtom } from 'jotai';
+import { imageUrlAtom } from '@/atoms/imageAtoms';
 
 interface ImageUploaderProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
-  onImageSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  hasSelectedImage: boolean;
 }
 
-export default function ImageUploader({ 
-  fileInputRef, 
-  onImageSelect, 
-  hasSelectedImage 
-}: ImageUploaderProps) {
+export default function ImageUploader({ fileInputRef }: ImageUploaderProps) {
+  const imageUrl = useAtomValue(imageUrlAtom);
+  const setImageUrl = useSetAtom(imageUrlAtom);
+
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setImageUrl(url);
+    }
+  };
+
   return (
     <>
       <FileInput
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        onChange={onImageSelect}
+        onChange={handleImageSelect}
         id="image-upload"
       />
       
       <SelectButton onClick={() => fileInputRef.current?.click()}>
-        {hasSelectedImage ? 'Select Another Image' : 'Select Image'}
+        {imageUrl ? 'Select Another Image' : 'Select Image'}
       </SelectButton>
     </>
   );

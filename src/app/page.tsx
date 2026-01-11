@@ -1,59 +1,25 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { resetCanvasToWhite } from '@/utils/canvas';
+import { useRef } from 'react';
 import { Container, Main, Title } from '@/components/styled/Layout';
 import ImageUploader from '@/components/ImageUploader';
 import ImageCanvas from '@/components/ImageCanvas';
 import ActionButtons from '@/components/ActionButtons';
 
 export default function Home() {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      const url = URL.createObjectURL(file);
-      setImageUrl(url);
-    }
-  };
-
-  const handleReset = () => {
-    setSelectedImage(null);
-    setImageUrl(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    if (canvasRef.current) {
-      resetCanvasToWhite(canvasRef.current);
-    }
-  };
 
   return (
     <Container>
       <Main>
         <Title>Image Resizer</Title>
         
-        <ImageUploader
-          fileInputRef={fileInputRef}
-          onImageSelect={handleImageSelect}
-          hasSelectedImage={!!selectedImage}
-        />
+        <ImageUploader fileInputRef={fileInputRef} />
 
-        <ImageCanvas
-          canvasRef={canvasRef}
-          imageUrl={imageUrl}
-        />
+        <ImageCanvas canvasRef={canvasRef} />
 
-        <ActionButtons
-          canvasRef={canvasRef}
-          imageUrl={imageUrl}
-          onReset={handleReset}
-        />
+        <ActionButtons canvasRef={canvasRef} fileInputRef={fileInputRef} />
       </Main>
     </Container>
   );

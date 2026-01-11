@@ -2,14 +2,15 @@
 
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback } from 'react';
-
+import { useAtomValue } from 'jotai';
+import { imageUrlAtom } from '@/atoms/imageAtoms';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  imageUrl: string | null;
 }
 
-export default function ImageCanvas({ canvasRef, imageUrl }: ImageCanvasProps) {
+export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
+  const imageUrl = useAtomValue(imageUrlAtom);
   const drawImageOnCanvas = useCallback(() => {
     if (!imageUrl || !canvasRef.current) return;
 

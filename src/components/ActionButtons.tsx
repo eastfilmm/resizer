@@ -2,16 +2,19 @@
 
 import styled from 'styled-components';
 import { RefObject } from 'react';
-
-
+import { useAtomValue, useSetAtom } from 'jotai';
+import { imageUrlAtom } from '@/atoms/imageAtoms';
+import { resetCanvasToWhite } from '@/utils/canvas';
 
 interface ActionButtonsProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  imageUrl: string | null;
-  onReset: () => void;
+  fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
-export default function ActionButtons({ canvasRef, imageUrl, onReset }: ActionButtonsProps) {
+export default function ActionButtons({ canvasRef, fileInputRef }: ActionButtonsProps) {
+  const imageUrl = useAtomValue(imageUrlAtom);
+  const setImageUrl = useSetAtom(imageUrlAtom);
+
   const handleDownload = () => {
     if (!canvasRef.current) return;
 
@@ -23,7 +26,17 @@ export default function ActionButtons({ canvasRef, imageUrl, onReset }: ActionBu
     link.click();
 
     // Reset all state after download
-    onReset();
+    handleReset();
+  };
+
+  const handleReset = () => {
+    setImageUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    if (canvasRef.current) {
+      resetCanvasToWhite(canvasRef.current);
+    }
   };
 
   return (
@@ -31,7 +44,7 @@ export default function ActionButtons({ canvasRef, imageUrl, onReset }: ActionBu
       <Button disabled={!imageUrl} onClick={handleDownload}>
         Download
       </Button>
-      <Button variant="secondary" onClick={onReset}>
+      <Button variant="secondary" onClick={handleReset}>
         Reset
       </Button>
     </ButtonGroup>
