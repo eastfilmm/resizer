@@ -33,6 +33,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   paddingRef.current = padding;
 
   // Draw glass blur background: crop center square and fill canvas with blur
+  // Uses edge clamp technique to prevent vignetting effect at edges
   const drawGlassBlurBackground = (
     ctx: CanvasRenderingContext2D,
     img: HTMLImageElement,
@@ -46,20 +47,44 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const sx = (img.width - minDim) / 2;
     const sy = (img.height - minDim) / 2;
     
-    // Create a temporary canvas for blur effect
+    // Calculate margin for edge clamping (3x blur intensity)
+    const margin = Math.ceil(intensity * 3);
+    const expandedSize = canvasSize + margin * 2;
+    
+    // Create a temporary canvas with expanded size for edge clamping
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvasSize;
-    tempCanvas.height = canvasSize;
+    tempCanvas.width = expandedSize;
+    tempCanvas.height = expandedSize;
     const tempCtx = tempCanvas.getContext('2d');
     if (!tempCtx) return;
     
-    // Draw cropped center square to fill temp canvas
-    tempCtx.drawImage(img, sx, sy, minDim, minDim, 0, 0, canvasSize, canvasSize);
+    // Draw cropped center square to the center of expanded canvas
+    tempCtx.drawImage(img, sx, sy, minDim, minDim, margin, margin, canvasSize, canvasSize);
+    
+    // Edge clamp: extend edges by copying edge pixels
+    // Top edge
+    tempCtx.drawImage(tempCanvas, margin, margin, canvasSize, 1, margin, 0, canvasSize, margin);
+    // Bottom edge
+    tempCtx.drawImage(tempCanvas, margin, margin + canvasSize - 1, canvasSize, 1, margin, margin + canvasSize, canvasSize, margin);
+    // Left edge (including corners)
+    tempCtx.drawImage(tempCanvas, margin, 0, 1, expandedSize, 0, 0, margin, expandedSize);
+    // Right edge (including corners)
+    tempCtx.drawImage(tempCanvas, margin + canvasSize - 1, 0, 1, expandedSize, margin + canvasSize, 0, margin, expandedSize);
+    
+    // Create another canvas to apply blur
+    const blurCanvas = document.createElement('canvas');
+    blurCanvas.width = expandedSize;
+    blurCanvas.height = expandedSize;
+    const blurCtx = blurCanvas.getContext('2d');
+    if (!blurCtx) return;
     
     // Apply blur filter with configurable intensity
-    ctx.filter = `blur(${intensity}px)`;
-    ctx.drawImage(tempCanvas, 0, 0, canvasSize, canvasSize);
-    ctx.filter = 'none';
+    blurCtx.filter = `blur(${intensity}px)`;
+    blurCtx.drawImage(tempCanvas, 0, 0);
+    blurCtx.filter = 'none';
+    
+    // Copy only the center portion (without margins) to the main canvas
+    ctx.drawImage(blurCanvas, margin, margin, canvasSize, canvasSize, 0, 0, canvasSize, canvasSize);
     
     // Apply color overlay with configurable transparency
     ctx.globalAlpha = opacity;

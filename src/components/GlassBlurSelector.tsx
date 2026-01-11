@@ -36,7 +36,7 @@ export default function GlassBlurSelector() {
       {glassBlur && (
         <>
           <SliderContainer>
-            <SliderLabel>Blur: {blurIntensity}px</SliderLabel>
+            <SliderLabel>Blur: {blurIntensity}%</SliderLabel>
             <Slider
               type="range"
               min="1"

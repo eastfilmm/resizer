@@ -9,7 +9,7 @@ export const backgroundColorAtom = atom<'white' | 'black'>('white');
 // Glass Blur 효과 활성화 여부
 export const glassBlurAtom = atom<boolean>(false);
 
-// Glass Blur 강도 (px 단위, 1-100 범위)
+// Glass Blur 강도 (1-100%, 내부적으로 px로 변환하여 사용)
 export const blurIntensityAtom = atom<number>(30);
 
 // 색상 오버레이 투명도 (0-100%, 0.0-1.0)
