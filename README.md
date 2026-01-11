@@ -63,6 +63,7 @@ src/
 ├── app/              # Next.js App Router 페이지
 ├── components/       # React 컴포넌트
 │   ├── ActionButtons.tsx    # 다운로드/리셋 버튼
+│   ├── BottomSection.tsx    # 하단 설정 섹션 (패딩, 배경색, 블러)
 │   ├── ImageCanvas.tsx      # 이미지 미리보기 캔버스
 │   ├── ImageUploader.tsx    # 이미지 업로드 컴포넌트
 │   └── styled/              # 스타일 컴포넌트

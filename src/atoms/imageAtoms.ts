@@ -17,3 +17,16 @@ export const overlayOpacityAtom = atom<number>(0.3);
 
 // 캔버스 패딩 (0-200px 범위, 캔버스 기준 2000px)
 export const paddingAtom = atom<number>(0);
+
+// Reset 가능 여부 (이미지가 있거나 필터가 초기값과 다를 때)
+export const canResetAtom = atom((get) => {
+  const hasImage = get(imageUrlAtom) !== null;
+  const hasFilterChanges =
+    get(backgroundColorAtom) !== 'white' ||
+    get(paddingAtom) !== 0 ||
+    get(glassBlurAtom) !== false ||
+    get(blurIntensityAtom) !== 30 ||
+    get(overlayOpacityAtom) !== 0.3;
+
+  return hasImage || hasFilterChanges;
+});

@@ -9,6 +9,7 @@ import {
   glassBlurAtom,
   blurIntensityAtom,
   overlayOpacityAtom,
+  canResetAtom,
 } from '@/atoms/imageAtoms';
 import { resetCanvas } from '@/utils/canvas';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
@@ -18,8 +19,9 @@ interface ResetButtonProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
-export default function ResetButton({ canvasRef, fileInputRef }: ResetButtonProps) {
-  const imageUrl = useAtomValue(imageUrlAtom);
+export const ResetButton = ({ canvasRef, fileInputRef }: ResetButtonProps) => {
+  const canReset = useAtomValue(canResetAtom);
+
   const setImageUrl = useSetAtom(imageUrlAtom);
   const setBackgroundColor = useSetAtom(backgroundColorAtom);
   const setPadding = useSetAtom(paddingAtom);
@@ -44,7 +46,7 @@ export default function ResetButton({ canvasRef, fileInputRef }: ResetButtonProp
   };
 
   return (
-    <IconButton $variant="secondary" disabled={!imageUrl} onClick={handleReset}>
+    <IconButton $variant="secondary" disabled={!canReset} onClick={handleReset}>
       <ButtonIcon src="/refresh_icon.svg" alt="Reset" />
     </IconButton>
   );

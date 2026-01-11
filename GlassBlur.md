@@ -47,7 +47,7 @@ blur 적용 시 캔버스 가장자리에서 발생하는 비네팅(어두워짐
 
 | 파일 | 설명 |
 |------|------|
-| `src/atoms/imageAtoms.ts` | glassBlurAtom, blurIntensityAtom, overlayOpacityAtom 정의 |
+| `src/atoms/imageAtoms.ts` | glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, canResetAtom 정의 |
 | `src/components/GlassBlurSelector.tsx` | 토글 및 슬라이더 UI 컴포넌트 |
 | `src/components/ImageCanvas.tsx` | blur 배경 렌더링 로직 (drawGlassBlurBackground) |
-| `src/app/page.tsx` | GlassBlurSelector 컴포넌트 배치 |
+| `src/components/BottomSection.tsx` | GlassBlurSelector 컴포넌트 배치 |

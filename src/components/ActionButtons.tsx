@@ -2,9 +2,9 @@
 
 import styled from 'styled-components';
 import { RefObject } from 'react';
-import ImageUploader from './ImageUploader';
-import DownloadButton from './DownloadButton';
-import ResetButton from './ResetButton';
+import { ImageUploader } from './ImageUploader';
+import { DownloadButton } from './DownloadButton';
+import { ResetButton } from './ResetButton';
 
 interface ActionButtonsProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;

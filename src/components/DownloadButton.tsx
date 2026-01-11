@@ -18,7 +18,7 @@ interface DownloadButtonProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
-export default function DownloadButton({ canvasRef, fileInputRef }: DownloadButtonProps) {
+export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps) => {
   const imageUrl = useAtomValue(imageUrlAtom);
   const setImageUrl = useSetAtom(imageUrlAtom);
   const setBackgroundColor = useSetAtom(backgroundColorAtom);

@@ -17,4 +17,4 @@
 3. **실시간 미리보기**: 슬라이더 조작 시 캔버스에 즉시 반영
 
 ### UI 위치
-`<CanvasBackgroundSelector />`, `<GlassBlurSelector />`와 같은 레벨(BottonSection 내부)에 배치
+`<BottomSection />` 컴포넌트 내부에 `<CanvasBackgroundSelector />`, `<GlassBlurSelector />`와 함께 배치

@@ -2,13 +2,9 @@
 
 import { useRef } from 'react';
 import { Container, Main, Title } from '@/components/styled/Layout';
-import ImageUploader from '@/components/ImageUploader';
-import CanvasBackgroundSelector from '@/components/CanvasBackgroundSelector';
-import GlassBlurSelector from '@/components/GlassBlurSelector';
-import CanvasPaddingSelector from '@/components/CanvasPaddingSelector';
 import ImageCanvas from '@/components/ImageCanvas';
 import ActionButtons from '@/components/ActionButtons';
-import { styled } from 'styled-components';
+import { BottomSection } from '@/components/BottomSection';
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -24,25 +20,11 @@ export default function Home() {
 
         {/* 이미지 캔버스 */}
         <ImageCanvas canvasRef={canvasRef} />
-        <BottonSection>
-        {/* 캔버스 관련 속성 */}
-          <CanvasPaddingSelector />
-          <CanvasBackgroundSelector />
-          <GlassBlurSelector />
-        </BottonSection>
+
+        {/* 하단 섹션 */}
+        <BottomSection />
       </Main>
     </Container>
   );
 }
 
-const BottonSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px;
-  max-width: 320px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-`;

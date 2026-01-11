@@ -9,8 +9,7 @@ interface ImageUploaderProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
-export default function ImageUploader({ fileInputRef }: ImageUploaderProps) {
-  const imageUrl = useAtomValue(imageUrlAtom);
+export const ImageUploader = ({ fileInputRef }: ImageUploaderProps) => {
   const setImageUrl = useSetAtom(imageUrlAtom);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
