@@ -46,7 +46,7 @@ export const ResetButton = ({ canvasRef, fileInputRef }: ResetButtonProps) => {
   };
 
   return (
-    <IconButton $variant="secondary" disabled={!canReset} onClick={handleReset}>
+    <IconButton $variant={canReset ? 'danger' : 'secondary'} disabled={!canReset} onClick={handleReset}>
       <ButtonIcon src="/refresh_icon.svg" alt="Reset" />
     </IconButton>
   );

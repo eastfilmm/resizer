@@ -1,11 +1,33 @@
 import styled from 'styled-components';
 
 interface ButtonProps {
-  $variant?: 'primary' | 'secondary';
+  $variant?: 'primary' | 'secondary' | 'danger';
 }
 
+const getBackgroundColor = (variant?: 'primary' | 'secondary' | 'danger') => {
+  switch (variant) {
+    case 'secondary':
+      return '#6c757d';
+    case 'danger':
+      return '#dc3545';
+    default:
+      return '#28a745';
+  }
+};
+
+const getHoverColor = (variant?: 'primary' | 'secondary' | 'danger') => {
+  switch (variant) {
+    case 'secondary':
+      return '#5a6268';
+    case 'danger':
+      return '#c82333';
+    default:
+      return '#218838';
+  }
+};
+
 export const Button = styled.button<ButtonProps>`
-  background-color: ${props => props.$variant === 'secondary' ? '#6c757d' : '#28a745'};
+  background-color: ${props => getBackgroundColor(props.$variant)};
   color: white;
   border: none;
   font-size: 1rem;
@@ -17,7 +39,7 @@ export const Button = styled.button<ButtonProps>`
   height: 40px;
   
   &:hover {
-    background-color: ${props => props.$variant === 'secondary' ? '#5a6268' : '#218838'};
+    background-color: ${props => getHoverColor(props.$variant)};
   }
   
   &:active {
