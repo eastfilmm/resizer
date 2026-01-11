@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Image Resizer
 
-## Getting Started
+이미지를 업로드하고 리사이즈하여 다운로드할 수 있는 웹 애플리케이션입니다.
 
-First, run the development server:
+## 버전
+
+**v0.1.0**
+
+## 주요 기능
+
+- **이미지 업로드**: 파일 선택을 통한 이미지 업로드
+- **이미지 미리보기**: 2000x2000px 캔버스에 이미지를 표시 (화면에는 320px로 축소 표시)
+- **고품질 다운로드**: PNG 형식으로 고품질 이미지 다운로드
+- **리셋 기능**: 이미지 제거 및 캔버스 초기화
+
+## 기술 스택
+
+- **Next.js** 16.1.1 (App Router)
+- **React** 19.1.0
+- **TypeScript**
+- **Jotai** - 상태 관리
+- **Styled Components** - 스타일링
+
+## 시작하기
+
+### 설치
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 개발 서버 실행
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
 
-## Learn More
+### 빌드
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 프로덕션 실행
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm start
+```
 
-## Deploy on Vercel
+## 사용 방법
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. "Select Image" 버튼을 클릭하여 이미지 파일을 선택합니다
+2. 선택한 이미지가 캔버스에 표시됩니다
+3. "Download" 버튼을 클릭하여 리사이즈된 이미지를 다운로드합니다
+4. "Reset" 버튼을 클릭하여 이미지를 제거하고 새로 시작할 수 있습니다
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 프로젝트 구조
+
+```
+src/
+├── app/              # Next.js App Router 페이지
+├── components/       # React 컴포넌트
+│   ├── ActionButtons.tsx    # 다운로드/리셋 버튼
+│   ├── ImageCanvas.tsx      # 이미지 미리보기 캔버스
+│   ├── ImageUploader.tsx    # 이미지 업로드 컴포넌트
+│   └── styled/              # 스타일 컴포넌트
+├── atoms/            # Jotai 상태 관리
+├── lib/              # 유틸리티 및 설정
+└── utils/            # 헬퍼 함수
+```
+
+## 라이선스
+
+Private
