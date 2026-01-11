@@ -5,6 +5,7 @@ import { RefObject } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { imageUrlAtom, backgroundColorAtom } from '@/atoms/imageAtoms';
 import { resetCanvas } from '@/utils/canvas';
+import ImageUploader from './ImageUploader';
 
 interface ActionButtonsProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -42,6 +43,7 @@ export default function ActionButtons({ canvasRef, fileInputRef }: ActionButtons
 
   return (
     <ButtonGroup>
+      <ImageUploader fileInputRef={fileInputRef} />
       <Button disabled={!imageUrl} onClick={handleDownload}>
         Download
       </Button>
@@ -56,7 +58,7 @@ const ButtonGroup = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   max-width: 320px;
 `;

@@ -32,7 +32,7 @@ export default function ImageUploader({ fileInputRef }: ImageUploaderProps) {
       />
       
       <SelectButton onClick={() => fileInputRef.current?.click()}>
-        {imageUrl ? 'Select Another Image' : 'Select Image'}
+        {'Select Image'}
       </SelectButton>
     </>
   );

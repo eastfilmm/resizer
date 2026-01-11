@@ -33,16 +33,14 @@ const SelectorContainer = styled.div`
 `;
 
 const Label = styled.label`
-  font-size: 0.9rem;
-  color: #333;
-  font-weight: 500;
+  font-size: 1rem;
 `;
 
 const ToggleSwitch = styled.div<{ $isActive: boolean }>`
   position: relative;
   width: 48px;
   height: 24px;
-  background-color: ${props => props.$isActive ? '#007bff' : '#ccc'};
+  background-color: ${props => props.$isActive ? '#000000' : '#6c757d'};
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
