@@ -154,18 +154,11 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     
     let { width, height } = img;
     
-    // Maintain aspect ratio while fitting to maximum area
-    if (width > height) {
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width;
-        width = maxWidth;
-      }
-    } else {
-      if (height > maxHeight) {
-        width = (width * maxHeight) / height;
-        height = maxHeight;
-      }
-    }
+    // Scale image to fit maximum area while maintaining aspect ratio
+    // This handles both upscaling (small images) and downscaling (large images)
+    const scale = Math.min(maxWidth / width, maxHeight / height);
+    width = width * scale;
+    height = height * scale;
     
     // Center image on canvas (considering padding)
     const x = (actualCanvasSize - width) / 2;
