@@ -112,8 +112,9 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     
     // Canvas is 2000px but displayed at 320px, scale factor is 2000/320 = 6.25
     // So 20px on final image = 20px on canvas (not display scaled)
-    const fontSize = 60;
-    const offset = 8; // 4px offset
+    const fontSize = 56;
+    const offset = 8; // gap between image and text
+    const rightMargin = 10; // right margin for text
     const isLandscape = imagePosition.width >= imagePosition.height;
     
     // Set text color based on background
@@ -121,14 +122,14 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     ctx.font = `${fontSize}px sans-serif`;
     
     if (isLandscape) {
-      // Landscape: horizontal text below image, right-aligned
+      // Landscape: horizontal text below image, right-aligned with margin
       ctx.textBaseline = 'top';
       ctx.textAlign = 'right';
-      const textX = imagePosition.x + imagePosition.width;
+      const textX = imagePosition.x + imagePosition.width - rightMargin;
       const textY = imagePosition.y + imagePosition.height + offset;
       ctx.fillText(text, textX, textY);
     } else {
-      // Portrait: rotated 90 degrees, right side of image
+      // Portrait: rotated 90 degrees, right side of image with margin
       ctx.save();
       const textX = imagePosition.x + imagePosition.width + offset;
       const textY = imagePosition.y + imagePosition.height;
@@ -136,7 +137,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       ctx.rotate(Math.PI / 2); // Rotate 90 degrees (text reads from bottom to top)
       ctx.textAlign = 'right';
       ctx.textBaseline = 'bottom';
-      ctx.fillText(text, 0, 0);
+      ctx.fillText(text, -rightMargin, 0);
       ctx.restore();
     }
   };
