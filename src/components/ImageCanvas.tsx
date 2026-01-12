@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, paddingAtom } from '@/atoms/imageAtoms';
+import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, paddingAtom, copyrightEnabledAtom, copyrightTextAtom } from '@/atoms/imageAtoms';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -16,12 +16,16 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const blurIntensity = useAtomValue(blurIntensityAtom);
   const overlayOpacity = useAtomValue(overlayOpacityAtom);
   const padding = useAtomValue(paddingAtom);
+  const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
+  const copyrightText = useAtomValue(copyrightTextAtom);
   const setPadding = useSetAtom(paddingAtom);
   const backgroundColorRef = useRef(backgroundColor);
   const glassBlurRef = useRef(glassBlur);
   const blurIntensityRef = useRef(blurIntensity);
   const overlayOpacityRef = useRef(overlayOpacity);
   const paddingRef = useRef(padding);
+  const copyrightEnabledRef = useRef(copyrightEnabled);
+  const copyrightTextRef = useRef(copyrightText);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
@@ -31,6 +35,8 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   blurIntensityRef.current = blurIntensity;
   overlayOpacityRef.current = overlayOpacity;
   paddingRef.current = padding;
+  copyrightEnabledRef.current = copyrightEnabled;
+  copyrightTextRef.current = copyrightText;
 
   // Draw glass blur background: crop center square and fill canvas with blur
   // Uses edge clamp technique to prevent vignetting effect at edges
@@ -93,6 +99,48 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     ctx.globalAlpha = 1.0;
   };
 
+  // Draw copyright text on the image
+  // For landscape: below the image, right-aligned, 4px below image bottom
+  // For portrait: right side of image, rotated 90 degrees, 4px right of image
+  const drawCopyrightText = (
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    imagePosition: { x: number; y: number; width: number; height: number },
+    bgColor: string
+  ) => {
+    if (!text.trim()) return;
+    
+    // Canvas is 2000px but displayed at 320px, scale factor is 2000/320 = 6.25
+    // So 20px on final image = 20px on canvas (not display scaled)
+    const fontSize = 60;
+    const offset = 8; // 4px offset
+    const isLandscape = imagePosition.width >= imagePosition.height;
+    
+    // Set text color based on background
+    ctx.fillStyle = bgColor === 'white' ? 'black' : 'white';
+    ctx.font = `${fontSize}px sans-serif`;
+    
+    if (isLandscape) {
+      // Landscape: horizontal text below image, right-aligned
+      ctx.textBaseline = 'top';
+      ctx.textAlign = 'right';
+      const textX = imagePosition.x + imagePosition.width;
+      const textY = imagePosition.y + imagePosition.height + offset;
+      ctx.fillText(text, textX, textY);
+    } else {
+      // Portrait: rotated 90 degrees, right side of image
+      ctx.save();
+      const textX = imagePosition.x + imagePosition.width + offset;
+      const textY = imagePosition.y + imagePosition.height;
+      ctx.translate(textX, textY);
+      ctx.rotate(Math.PI / 2); // Rotate 90 degrees (text reads from bottom to top)
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(text, 0, 0);
+      ctx.restore();
+    }
+  };
+
   const drawImageOnCanvas = useCallback(() => {
     if (!imageUrl || !canvasRef.current) return;
 
@@ -122,7 +170,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       // Reset padding to 0 when new image is loaded (image fills canvas edge-to-edge)
       setPadding(0);
       const imageAreaSize = actualCanvasSize; // No padding initially
-      drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current, glassBlurRef.current, blurIntensityRef.current, overlayOpacityRef.current);
+      drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current, glassBlurRef.current, blurIntensityRef.current, overlayOpacityRef.current, copyrightEnabledRef.current, copyrightTextRef.current);
     };
     newImg.src = imageUrl;
   }, [imageUrl, canvasRef, setPadding]);
@@ -135,7 +183,9 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     bgColor: string,
     useGlassBlur: boolean,
     intensity: number,
-    opacity: number
+    opacity: number,
+    showCopyright: boolean,
+    copyrightStr: string
   ) => {
     // Initialize canvas with selected background color
     ctx.clearRect(0, 0, actualCanvasSize, actualCanvasSize);
@@ -169,6 +219,11 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     
     // Draw image with high quality
     ctx.drawImage(img, x, y, width, height);
+    
+    // Draw copyright text if enabled
+    if (showCopyright && copyrightStr && imagePositionRef.current) {
+      drawCopyrightText(ctx, copyrightStr, imagePositionRef.current, bgColor);
+    }
   };
 
   // Initialize canvas on mount
@@ -214,14 +269,14 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
 
     // If we have an image, redraw it with new settings
     if (imageRef.current) {
-      drawImage(ctx, imageRef.current, actualCanvasSize, imageAreaSize, backgroundColor, glassBlur, blurIntensity, overlayOpacity);
+      drawImage(ctx, imageRef.current, actualCanvasSize, imageAreaSize, backgroundColor, glassBlur, blurIntensity, overlayOpacity, copyrightEnabled, copyrightText);
       return;
     }
 
     // Fill background with solid color (no image loaded)
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, 2000, 2000);
-  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, padding, canvasRef]);
+  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, padding, copyrightEnabled, copyrightText, canvasRef]);
 
   return (
     <CanvasContainer>

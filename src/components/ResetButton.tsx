@@ -10,6 +10,7 @@ import {
   blurIntensityAtom,
   overlayOpacityAtom,
   canResetAtom,
+  copyrightEnabledAtom,
 } from '@/atoms/imageAtoms';
 import { resetCanvas } from '@/utils/canvas';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
@@ -28,6 +29,7 @@ export const ResetButton = ({ canvasRef, fileInputRef }: ResetButtonProps) => {
   const setGlassBlur = useSetAtom(glassBlurAtom);
   const setBlurIntensity = useSetAtom(blurIntensityAtom);
   const setOverlayOpacity = useSetAtom(overlayOpacityAtom);
+  const setCopyrightEnabled = useSetAtom(copyrightEnabledAtom);
 
   const handleReset = () => {
     setImageUrl(null);
@@ -40,6 +42,7 @@ export const ResetButton = ({ canvasRef, fileInputRef }: ResetButtonProps) => {
     setGlassBlur(false);
     setBlurIntensity(30);
     setOverlayOpacity(0.3);
+    setCopyrightEnabled(false);
     if (canvasRef.current) {
       resetCanvas(canvasRef.current, 'white');
     }

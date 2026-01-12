@@ -2,6 +2,7 @@ import { styled } from "styled-components";
 import CanvasPaddingSelector from "./CanvasPaddingSelector";
 import CanvasBackgroundSelector from "./CanvasBackgroundSelector";
 import GlassBlurSelector from "./GlassBlurSelector";
+import CopyrightSelector from "./CopyrightSelector";
 
 export const BottomSection = () => {
   return (
@@ -9,6 +10,7 @@ export const BottomSection = () => {
       <CanvasPaddingSelector />
       <CanvasBackgroundSelector />
       <GlassBlurSelector />
+      <CopyrightSelector />
     </Wrapper>
   );
 }

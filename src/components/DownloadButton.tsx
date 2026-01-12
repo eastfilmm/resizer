@@ -9,6 +9,8 @@ import {
   glassBlurAtom,
   blurIntensityAtom,
   overlayOpacityAtom,
+  copyrightEnabledAtom,
+  copyrightTextAtom,
 } from '@/atoms/imageAtoms';
 import { resetCanvas } from '@/utils/canvas';
 import { Button } from '@/components/styled/Button';
@@ -18,6 +20,8 @@ interface DownloadButtonProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
+const COPYRIGHT_STORAGE_KEY = 'resizer-copyright-text';
+
 export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps) => {
   const imageUrl = useAtomValue(imageUrlAtom);
   const setImageUrl = useSetAtom(imageUrlAtom);
@@ -26,9 +30,16 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   const setGlassBlur = useSetAtom(glassBlurAtom);
   const setBlurIntensity = useSetAtom(blurIntensityAtom);
   const setOverlayOpacity = useSetAtom(overlayOpacityAtom);
+  const copyrightText = useAtomValue(copyrightTextAtom);
+  const setCopyrightEnabled = useSetAtom(copyrightEnabledAtom);
 
   const handleDownload = () => {
     if (!canvasRef.current) return;
+
+    // Save copyright text to localStorage
+    if (copyrightText) {
+      localStorage.setItem(COPYRIGHT_STORAGE_KEY, copyrightText);
+    }
 
     const canvas = canvasRef.current;
     const link = document.createElement('a');
@@ -50,6 +61,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     setGlassBlur(false);
     setBlurIntensity(30);
     setOverlayOpacity(0.3);
+    setCopyrightEnabled(false);
     if (canvasRef.current) {
       resetCanvas(canvasRef.current, 'white');
     }
