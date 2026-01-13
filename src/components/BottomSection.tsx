@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, memo } from "react";
 import { styled } from "styled-components";
 import CanvasPaddingSelector from "./CanvasPaddingSelector";
 import CanvasBackgroundSelector from "./CanvasBackgroundSelector";
@@ -10,42 +10,81 @@ const COLLAPSED_HEIGHT = 28;
 const EXPANDED_HEIGHT = 360;
 const CLOSE_SNAP_THRESHOLD = 100;
 
+// 자식 컴포넌트 리렌더링 방지
+const MemoizedContent = memo(() => (
+  <Content>
+    <CanvasPaddingSelector />
+    <CanvasBackgroundSelector />
+    <GlassBlurSelector />
+    <ShadowSelector />
+    <CopyrightSelector />
+  </Content>
+));
+MemoizedContent.displayName = "MemoizedContent";
+
 export const BottomSection = () => {
   const [isDragging, setIsDragging] = useState(false);
-  const [currentHeight, setCurrentHeight] = useState(COLLAPSED_HEIGHT);
-  const [hasOpened, setHasOpened] = useState(false);
+  const [translateY, setTranslateY] = useState(EXPANDED_HEIGHT - COLLAPSED_HEIGHT);
   
   const startYRef = useRef(0);
-  const startHeightRef = useRef(0);
+  const startTranslateYRef = useRef(0);
+  const hasOpenedRef = useRef(false);
+  const rafIdRef = useRef<number | null>(null);
+  const pendingTranslateYRef = useRef(EXPANDED_HEIGHT - COLLAPSED_HEIGHT);
 
-  const handleDragMove = useCallback((clientY: number) => {
-    const deltaY = startYRef.current - clientY;
-    const newHeight = Math.max(
-      COLLAPSED_HEIGHT,
-      Math.min(EXPANDED_HEIGHT, startHeightRef.current + deltaY)
-    );
-    setCurrentHeight(newHeight);
+  const updateTranslateY = useCallback((newTranslateY: number) => {
+    pendingTranslateYRef.current = newTranslateY;
     
-    // 한번이라도 120px 이상 올라가면 열린 상태로 판단
-    if (newHeight >= CLOSE_SNAP_THRESHOLD) {
-      setHasOpened(true);
+    if (rafIdRef.current === null) {
+      rafIdRef.current = requestAnimationFrame(() => {
+        setTranslateY(pendingTranslateYRef.current);
+        rafIdRef.current = null;
+      });
     }
   }, []);
 
-  const handleDragEnd = useCallback(() => {
-    // 열린 상태에서 120px 아래로 내리면 닫힘
-    if (hasOpened && currentHeight < CLOSE_SNAP_THRESHOLD) {
-      setCurrentHeight(COLLAPSED_HEIGHT);
-      setHasOpened(false);
+  const handleDragMove = useCallback((clientY: number) => {
+    const deltaY = clientY - startYRef.current;
+    const newTranslateY = Math.max(
+      0,
+      Math.min(EXPANDED_HEIGHT - COLLAPSED_HEIGHT, startTranslateYRef.current + deltaY)
+    );
+    
+    updateTranslateY(newTranslateY);
+    
+    // 한번이라도 threshold 이상 올라가면 열린 상태로 판단
+    const currentHeight = EXPANDED_HEIGHT - newTranslateY;
+    if (!hasOpenedRef.current && currentHeight >= CLOSE_SNAP_THRESHOLD) {
+      hasOpenedRef.current = true;
     }
+  }, [updateTranslateY]);
+
+  const handleDragEnd = useCallback(() => {
+    // RAF 취소
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    
+    const currentHeight = EXPANDED_HEIGHT - pendingTranslateYRef.current;
+    
+    // 열린 상태에서 threshold 아래로 내리면 닫힘
+    if (hasOpenedRef.current && currentHeight < CLOSE_SNAP_THRESHOLD) {
+      setTranslateY(EXPANDED_HEIGHT - COLLAPSED_HEIGHT);
+      pendingTranslateYRef.current = EXPANDED_HEIGHT - COLLAPSED_HEIGHT;
+      hasOpenedRef.current = false;
+    } else {
+      setTranslateY(pendingTranslateYRef.current);
+    }
+    
     setIsDragging(false);
-  }, [hasOpened, currentHeight]);
+  }, []);
 
   const handlePointerDown = useCallback((clientY: number) => {
     startYRef.current = clientY;
-    startHeightRef.current = currentHeight;
+    startTranslateYRef.current = pendingTranslateYRef.current;
     setIsDragging(true);
-  }, [currentHeight]);
+  }, []);
 
   // Mouse events
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -77,7 +116,7 @@ export const BottomSection = () => {
   }, [handleDragEnd]);
 
   return (
-    <BottomSheet $height={currentHeight} $isDragging={isDragging}>
+    <BottomSheet $translateY={translateY} $isDragging={isDragging}>
       <HandleArea
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
@@ -86,32 +125,29 @@ export const BottomSection = () => {
       >
         <Handle />
       </HandleArea>
-      <Content>
-        <CanvasPaddingSelector />
-        <CanvasBackgroundSelector />
-        <GlassBlurSelector />
-        <ShadowSelector />
-        <CopyrightSelector />
-      </Content>
+      <MemoizedContent />
     </BottomSheet>
   );
 }
 
-const BottomSheet = styled.div<{ $height: number; $isDragging: boolean }>`
+const BottomSheet = styled.div<{ $translateY: number; $isDragging: boolean }>`
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
   margin: 0 auto;
-  height: ${({ $height }) => $height}px;
+  height: ${EXPANDED_HEIGHT}px;
   background-color: #ffffff;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: ${({ $isDragging }) => ($isDragging ? "none" : "height 0.3s ease")};
+  transform: translateY(${({ $translateY }) => $translateY}px);
+  transition: ${({ $isDragging }) => ($isDragging ? "none" : "transform 0.3s ease")};
+  will-change: transform;
   z-index: 100;
 `;
 
@@ -143,6 +179,7 @@ const Content = styled.div`
   gap: 10px;
   padding: 0 20px 20px;
   overflow-y: auto;
+  width: 320px;
   flex: 1;
   min-height: 0;
   
