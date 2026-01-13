@@ -1,17 +1,7 @@
 import 'styled-components';
 
+// Extend DefaultTheme if you add a ThemeProvider in the future
 declare module 'styled-components' {
-  export interface DefaultTheme {
-    colors: {
-      primary: string;
-      secondary: string;
-      background: string;
-      text: string;
-    };
-    breakpoints: {
-      mobile: string;
-      tablet: string;
-      desktop: string;
-    };
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  export interface DefaultTheme {}
 }

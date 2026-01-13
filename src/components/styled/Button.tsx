@@ -30,7 +30,7 @@ const getHoverColor = (variant?: 'primary' | 'secondary' | 'danger' | 'blue') =>
   }
 };
 
-export const Button = styled.button<ButtonProps>`
+const BaseButton = styled.button<ButtonProps>`
   background-color: ${props => getBackgroundColor(props.$variant)};
   color: white;
   border: none;
@@ -56,7 +56,7 @@ export const Button = styled.button<ButtonProps>`
   }
 `;
 
-export const IconButton = styled(Button)`
+export const IconButton = styled(BaseButton)`
   width: 40px !important;
   min-width: 40px;
   max-width: 40px;

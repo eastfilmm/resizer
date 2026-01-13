@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import styled from 'styled-components';
-import { Container, Main, Title } from '@/components/styled/Layout';
+import { Container, Main, Title, SubTitle } from '@/components/styled/Layout';
 import ImageCanvas from '@/components/ImageCanvas';
 import ActionButtons from '@/components/ActionButtons';
 import { NavigationBar } from '@/components/NavigationBar';
@@ -16,8 +16,10 @@ export default function Home() {
   return (
     <Container>
       <Main>
+        <HeaderWrapper>
         <Title>Image Resizer</Title>
-      
+        <SubTitle>for Instagram</SubTitle>
+        </HeaderWrapper>
         {/* 이미지 캔버스 */}
         <ImageCanvas canvasRef={canvasRef} />
 
@@ -40,3 +42,11 @@ const NavSpacer = styled.div`
   flex-shrink: 0;
 `;
 
+const HeaderWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+`;

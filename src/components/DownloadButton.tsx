@@ -1,45 +1,21 @@
 'use client';
 
 import { RefObject } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
-import {
-  imageUrlAtom,
-  backgroundColorAtom,
-  paddingEnabledAtom,
-  paddingAtom,
-  glassBlurAtom,
-  blurIntensityAtom,
-  overlayOpacityAtom,
-  copyrightEnabledAtom,
-  copyrightTextAtom,
-  shadowEnabledAtom,
-  shadowIntensityAtom,
-  shadowOffsetAtom,
-} from '@/atoms/imageAtoms';
-import { resetCanvas } from '@/utils/canvas';
+import { useAtomValue } from 'jotai';
+import { imageUrlAtom, copyrightTextAtom } from '@/atoms/imageAtoms';
+import { useResetState } from '@/hooks/useResetState';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
+import { COPYRIGHT_STORAGE_KEY } from '@/constants/canvas';
 
 interface DownloadButtonProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
-const COPYRIGHT_STORAGE_KEY = 'resizer-copyright-text';
-
 export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps) => {
   const imageUrl = useAtomValue(imageUrlAtom);
-  const setImageUrl = useSetAtom(imageUrlAtom);
-  const setBackgroundColor = useSetAtom(backgroundColorAtom);
-  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
-  const setPadding = useSetAtom(paddingAtom);
-  const setGlassBlur = useSetAtom(glassBlurAtom);
-  const setBlurIntensity = useSetAtom(blurIntensityAtom);
-  const setOverlayOpacity = useSetAtom(overlayOpacityAtom);
   const copyrightText = useAtomValue(copyrightTextAtom);
-  const setCopyrightEnabled = useSetAtom(copyrightEnabledAtom);
-  const setShadowEnabled = useSetAtom(shadowEnabledAtom);
-  const setShadowIntensity = useSetAtom(shadowIntensityAtom);
-  const setShadowOffset = useSetAtom(shadowOffsetAtom);
+  const resetState = useResetState({ canvasRef, fileInputRef });
 
   const handleDownload = () => {
     if (!canvasRef.current) return;
@@ -56,27 +32,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     link.click();
 
     // Reset all state after download
-    handleReset();
-  };
-
-  const handleReset = () => {
-    setImageUrl(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    setBackgroundColor('white');
-    setPaddingEnabled(false);
-    setPadding(100);
-    setGlassBlur(false);
-    setBlurIntensity(30);
-    setOverlayOpacity(0.3);
-    setCopyrightEnabled(false);
-    setShadowEnabled(false);
-    setShadowIntensity(30);
-    setShadowOffset(20);
-    if (canvasRef.current) {
-      resetCanvas(canvasRef.current, 'white');
-    }
+    resetState();
   };
 
   return (
@@ -84,4 +40,4 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
       <ButtonIcon src="/download.svg" alt="Download" />
     </IconButton>
   );
-}
+};

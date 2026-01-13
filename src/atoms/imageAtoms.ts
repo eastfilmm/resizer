@@ -48,7 +48,7 @@ export const canResetAtom = atom((get) => {
   const hasFilterChanges =
     get(backgroundColorAtom) !== 'white' ||
     get(paddingEnabledAtom) !== false ||
-    get(paddingAtom) !== 100 ||
+    get(paddingAtom) !== 40 ||
     get(glassBlurAtom) !== false ||
     get(blurIntensityAtom) !== 30 ||
     get(overlayOpacityAtom) !== 0.3 ||

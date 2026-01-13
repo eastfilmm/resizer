@@ -3,7 +3,22 @@
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, paddingEnabledAtom, paddingAtom, copyrightEnabledAtom, copyrightTextAtom, shadowEnabledAtom, shadowIntensityAtom, shadowOffsetAtom } from '@/atoms/imageAtoms';
+import {
+  imageUrlAtom,
+  backgroundColorAtom,
+  glassBlurAtom,
+  blurIntensityAtom,
+  overlayOpacityAtom,
+  paddingEnabledAtom,
+  paddingAtom,
+  copyrightEnabledAtom,
+  copyrightTextAtom,
+  shadowEnabledAtom,
+  shadowIntensityAtom,
+  shadowOffsetAtom,
+} from '@/atoms/imageAtoms';
+import { drawImageWithEffects, ImagePosition } from '@/utils/canvas';
+import { CANVAS_ACTUAL_SIZE, CANVAS_DISPLAY_SIZE } from '@/constants/canvas';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -23,136 +38,49 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const shadowIntensity = useAtomValue(shadowIntensityAtom);
   const shadowOffset = useAtomValue(shadowOffsetAtom);
   const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
+
+  // Refs to access current values in callbacks without re-triggering effects
   const backgroundColorRef = useRef(backgroundColor);
   const glassBlurRef = useRef(glassBlur);
   const blurIntensityRef = useRef(blurIntensity);
   const overlayOpacityRef = useRef(overlayOpacity);
-  const paddingEnabledRef = useRef(paddingEnabled);
-  const paddingRef = useRef(padding);
   const copyrightEnabledRef = useRef(copyrightEnabled);
   const copyrightTextRef = useRef(copyrightText);
   const shadowEnabledRef = useRef(shadowEnabled);
   const shadowIntensityRef = useRef(shadowIntensity);
   const shadowOffsetRef = useRef(shadowOffset);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const imagePositionRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
+  const imagePositionRef = useRef<ImagePosition | null>(null);
 
-  // Keep ref in sync with state
+  // Keep refs in sync with state
   backgroundColorRef.current = backgroundColor;
   glassBlurRef.current = glassBlur;
   blurIntensityRef.current = blurIntensity;
   overlayOpacityRef.current = overlayOpacity;
-  paddingEnabledRef.current = paddingEnabled;
-  paddingRef.current = padding;
   copyrightEnabledRef.current = copyrightEnabled;
   copyrightTextRef.current = copyrightText;
   shadowEnabledRef.current = shadowEnabled;
   shadowIntensityRef.current = shadowIntensity;
   shadowOffsetRef.current = shadowOffset;
 
-  // Draw glass blur background: crop center square and fill canvas with blur
-  // Uses edge clamp technique to prevent vignetting effect at edges
-  const drawGlassBlurBackground = (
-    ctx: CanvasRenderingContext2D,
-    img: HTMLImageElement,
-    canvasSize: number,
-    intensity: number,
-    overlayColor: string,
-    opacity: number
-  ) => {
-    // Calculate center square crop from source image
-    const minDim = Math.min(img.width, img.height);
-    const sx = (img.width - minDim) / 2;
-    const sy = (img.height - minDim) / 2;
-    
-    // Calculate margin for edge clamping (3x blur intensity)
-    const margin = Math.ceil(intensity * 3);
-    const expandedSize = canvasSize + margin * 2;
-    
-    // Create a temporary canvas with expanded size for edge clamping
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = expandedSize;
-    tempCanvas.height = expandedSize;
-    const tempCtx = tempCanvas.getContext('2d');
-    if (!tempCtx) return;
-    
-    // Draw cropped center square to the center of expanded canvas
-    tempCtx.drawImage(img, sx, sy, minDim, minDim, margin, margin, canvasSize, canvasSize);
-    
-    // Edge clamp: extend edges by copying edge pixels
-    // Top edge
-    tempCtx.drawImage(tempCanvas, margin, margin, canvasSize, 1, margin, 0, canvasSize, margin);
-    // Bottom edge
-    tempCtx.drawImage(tempCanvas, margin, margin + canvasSize - 1, canvasSize, 1, margin, margin + canvasSize, canvasSize, margin);
-    // Left edge (including corners)
-    tempCtx.drawImage(tempCanvas, margin, 0, 1, expandedSize, 0, 0, margin, expandedSize);
-    // Right edge (including corners)
-    tempCtx.drawImage(tempCanvas, margin + canvasSize - 1, 0, 1, expandedSize, margin + canvasSize, 0, margin, expandedSize);
-    
-    // Create another canvas to apply blur
-    const blurCanvas = document.createElement('canvas');
-    blurCanvas.width = expandedSize;
-    blurCanvas.height = expandedSize;
-    const blurCtx = blurCanvas.getContext('2d');
-    if (!blurCtx) return;
-    
-    // Apply blur filter with configurable intensity
-    blurCtx.filter = `blur(${intensity}px)`;
-    blurCtx.drawImage(tempCanvas, 0, 0);
-    blurCtx.filter = 'none';
-    
-    // Copy only the center portion (without margins) to the main canvas
-    ctx.drawImage(blurCanvas, margin, margin, canvasSize, canvasSize, 0, 0, canvasSize, canvasSize);
-    
-    // Apply color overlay with configurable transparency
-    ctx.globalAlpha = opacity;
-    ctx.fillStyle = overlayColor;
-    ctx.fillRect(0, 0, canvasSize, canvasSize);
-    ctx.globalAlpha = 1.0;
-  };
-
-  // Draw copyright text on the image
-  // For landscape: below the image, right-aligned, 4px below image bottom
-  // For portrait: right side of image, rotated 90 degrees, 4px right of image
-  const drawCopyrightText = (
-    ctx: CanvasRenderingContext2D,
-    text: string,
-    imagePosition: { x: number; y: number; width: number; height: number },
-    bgColor: string
-  ) => {
-    if (!text.trim()) return;
-    
-    // Canvas is 2000px but displayed at 320px, scale factor is 2000/320 = 6.25
-    // So 20px on final image = 20px on canvas (not display scaled)
-    const fontSize = 56;
-    const offset = 8; // gap between image and text
-    const rightMargin = 10; // right margin for text
-    const isLandscape = imagePosition.width >= imagePosition.height;
-    
-    // Set text color based on background
-    ctx.fillStyle = bgColor === 'white' ? 'black' : 'white';
-    ctx.font = `${fontSize}px sans-serif`;
-    
-    if (isLandscape) {
-      // Landscape: horizontal text below image, right-aligned with margin
-      ctx.textBaseline = 'top';
-      ctx.textAlign = 'right';
-      const textX = imagePosition.x + imagePosition.width - rightMargin;
-      const textY = imagePosition.y + imagePosition.height + offset;
-      ctx.fillText(text, textX, textY);
-    } else {
-      // Portrait: rotated 90 degrees, right side of image with margin
-      ctx.save();
-      const textX = imagePosition.x + imagePosition.width + offset;
-      const textY = imagePosition.y + imagePosition.height;
-      ctx.translate(textX, textY);
-      ctx.rotate(Math.PI / 2); // Rotate 90 degrees (text reads from bottom to top)
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(text, -rightMargin, 0);
-      ctx.restore();
-    }
-  };
+  const redrawImage = useCallback(
+    (ctx: CanvasRenderingContext2D, img: HTMLImageElement, imageAreaSize: number) => {
+      imagePositionRef.current = drawImageWithEffects(ctx, img, {
+        actualCanvasSize: CANVAS_ACTUAL_SIZE,
+        imageAreaSize,
+        bgColor: backgroundColorRef.current,
+        useGlassBlur: glassBlurRef.current,
+        blurIntensity: blurIntensityRef.current,
+        overlayOpacity: overlayOpacityRef.current,
+        showCopyright: copyrightEnabledRef.current,
+        copyrightText: copyrightTextRef.current,
+        useShadow: shadowEnabledRef.current,
+        shadowIntensity: shadowIntensityRef.current,
+        shadowOffset: shadowOffsetRef.current,
+      });
+    },
+    []
+  );
 
   const drawImageOnCanvas = useCallback(() => {
     if (!imageUrl || !canvasRef.current) return;
@@ -161,16 +89,13 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Canvas actual size: 2000px x 2000px
-    const actualCanvasSize = 2000;
-
     // Set canvas actual size
-    canvas.width = actualCanvasSize;
-    canvas.height = actualCanvasSize;
+    canvas.width = CANVAS_ACTUAL_SIZE;
+    canvas.height = CANVAS_ACTUAL_SIZE;
 
     // Set display size (scaled down with CSS)
-    canvas.style.width = '320px';
-    canvas.style.height = '320px';
+    canvas.style.width = `${CANVAS_DISPLAY_SIZE}px`;
+    canvas.style.height = `${CANVAS_DISPLAY_SIZE}px`;
 
     // Enable high quality image rendering
     ctx.imageSmoothingEnabled = true;
@@ -182,80 +107,11 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       imageRef.current = newImg;
       // Reset padding to disabled when new image is loaded (image fills canvas edge-to-edge)
       setPaddingEnabled(false);
-      const imageAreaSize = actualCanvasSize; // No padding initially
-      drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current, glassBlurRef.current, blurIntensityRef.current, overlayOpacityRef.current, copyrightEnabledRef.current, copyrightTextRef.current, shadowEnabledRef.current, shadowIntensityRef.current, shadowOffsetRef.current);
+      const imageAreaSize = CANVAS_ACTUAL_SIZE; // No padding initially
+      redrawImage(ctx, newImg, imageAreaSize);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, setPaddingEnabled]);
-
-  const drawImage = (
-    ctx: CanvasRenderingContext2D,
-    img: HTMLImageElement,
-    actualCanvasSize: number,
-    imageAreaSize: number,
-    bgColor: string,
-    useGlassBlur: boolean,
-    intensity: number,
-    opacity: number,
-    showCopyright: boolean,
-    copyrightStr: string,
-    useShadow: boolean,
-    shadowBlur: number,
-    shadowOff: number
-  ) => {
-    // Initialize canvas with selected background color
-    ctx.clearRect(0, 0, actualCanvasSize, actualCanvasSize);
-    
-    // If glass blur is enabled, draw blurred background from image
-    if (useGlassBlur) {
-      drawGlassBlurBackground(ctx, img, actualCanvasSize, intensity, bgColor, opacity);
-    } else {
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, actualCanvasSize, actualCanvasSize);
-    }
-    
-    // Maximum area for image (excluding padding)
-    const maxWidth = imageAreaSize;
-    const maxHeight = imageAreaSize;
-    
-    let { width, height } = img;
-    
-    // Scale image to fit maximum area while maintaining aspect ratio
-    // This handles both upscaling (small images) and downscaling (large images)
-    const scale = Math.min(maxWidth / width, maxHeight / height);
-    width = width * scale;
-    height = height * scale;
-    
-    // Center image on canvas (considering padding)
-    // If shadow is enabled, offset image slightly to top-left to make room for shadow
-    const shadowAdjust = useShadow ? shadowOff / 2 : 0;
-    const x = (actualCanvasSize - width) / 2 - shadowAdjust;
-    const y = (actualCanvasSize - height) / 2 - shadowAdjust;
-    
-    // Save position for background updates
-    imagePositionRef.current = { x, y, width, height };
-    
-    // Draw shadow if enabled (draw before image so it appears behind)
-    if (useShadow) {
-      ctx.save();
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-      ctx.shadowBlur = shadowBlur;
-      ctx.shadowOffsetX = shadowOff;
-      ctx.shadowOffsetY = shadowOff;
-      // Draw a filled rectangle as shadow source (same size as image)
-      ctx.fillStyle = 'rgba(0, 0, 0, 1)';
-      ctx.fillRect(x, y, width, height);
-      ctx.restore();
-    }
-    
-    // Draw image with high quality
-    ctx.drawImage(img, x, y, width, height);
-    
-    // Draw copyright text if enabled
-    if (showCopyright && copyrightStr && imagePositionRef.current) {
-      drawCopyrightText(ctx, copyrightStr, imagePositionRef.current, bgColor);
-    }
-  };
+  }, [imageUrl, canvasRef, setPaddingEnabled, redrawImage]);
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -263,13 +119,13 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        canvas.width = 2000;
-        canvas.height = 2000;
-        canvas.style.width = '320px';
-        canvas.style.height = '320px';
-        
+        canvas.width = CANVAS_ACTUAL_SIZE;
+        canvas.height = CANVAS_ACTUAL_SIZE;
+        canvas.style.width = `${CANVAS_DISPLAY_SIZE}px`;
+        canvas.style.height = `${CANVAS_DISPLAY_SIZE}px`;
+
         ctx.fillStyle = backgroundColorRef.current;
-        ctx.fillRect(0, 0, 2000, 2000);
+        ctx.fillRect(0, 0, CANVAS_ACTUAL_SIZE, CANVAS_ACTUAL_SIZE);
       }
     }
   }, [canvasRef]);
@@ -287,28 +143,41 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     }
   }, [imageUrl, drawImageOnCanvas]);
 
-  // Update background color only (no image reload)
+  // Update canvas when any effect settings change
   useEffect(() => {
     if (!canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const actualCanvasSize = 2000;
     const effectivePadding = paddingEnabled ? padding : 0;
-    const imageAreaSize = actualCanvasSize - (effectivePadding * 2);
+    const imageAreaSize = CANVAS_ACTUAL_SIZE - effectivePadding * 2;
 
     // If we have an image, redraw it with new settings
     if (imageRef.current) {
-      drawImage(ctx, imageRef.current, actualCanvasSize, imageAreaSize, backgroundColor, glassBlur, blurIntensity, overlayOpacity, copyrightEnabled, copyrightText, shadowEnabled, shadowIntensity, shadowOffset);
+      redrawImage(ctx, imageRef.current, imageAreaSize);
       return;
     }
 
     // Fill background with solid color (no image loaded)
     ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, 2000, 2000);
-  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, paddingEnabled, padding, copyrightEnabled, copyrightText, shadowEnabled, shadowIntensity, shadowOffset, canvasRef]);
+    ctx.fillRect(0, 0, CANVAS_ACTUAL_SIZE, CANVAS_ACTUAL_SIZE);
+  }, [
+    backgroundColor,
+    glassBlur,
+    blurIntensity,
+    overlayOpacity,
+    paddingEnabled,
+    padding,
+    copyrightEnabled,
+    copyrightText,
+    shadowEnabled,
+    shadowIntensity,
+    shadowOffset,
+    canvasRef,
+    redrawImage,
+  ]);
 
   return (
     <CanvasContainer>
@@ -318,8 +187,8 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
 }
 
 const CanvasContainer = styled.div`
-  width: 320px;
-  height: 320px;
+  width: ${CANVAS_DISPLAY_SIZE}px;
+  height: ${CANVAS_DISPLAY_SIZE}px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -331,7 +200,7 @@ const CanvasContainer = styled.div`
 `;
 
 const Canvas = styled.canvas`
-  width: 320px;
-  height: 320px;
+  width: ${CANVAS_DISPLAY_SIZE}px;
+  height: ${CANVAS_DISPLAY_SIZE}px;
   object-fit: contain;
 `;
