@@ -5,6 +5,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import {
   imageUrlAtom,
   backgroundColorAtom,
+  paddingEnabledAtom,
   paddingAtom,
   glassBlurAtom,
   blurIntensityAtom,
@@ -28,6 +29,7 @@ export const ResetButton = ({ canvasRef, fileInputRef }: ResetButtonProps) => {
 
   const setImageUrl = useSetAtom(imageUrlAtom);
   const setBackgroundColor = useSetAtom(backgroundColorAtom);
+  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
   const setPadding = useSetAtom(paddingAtom);
   const setGlassBlur = useSetAtom(glassBlurAtom);
   const setBlurIntensity = useSetAtom(blurIntensityAtom);
@@ -44,7 +46,8 @@ export const ResetButton = ({ canvasRef, fileInputRef }: ResetButtonProps) => {
     }
     // Reset all settings to initial values
     setBackgroundColor('white');
-    setPadding(0);
+    setPaddingEnabled(false);
+    setPadding(100);
     setGlassBlur(false);
     setBlurIntensity(30);
     setOverlayOpacity(0.3);

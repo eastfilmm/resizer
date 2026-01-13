@@ -2,8 +2,9 @@
 
 import styled from 'styled-components';
 import { RefObject } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useSetAtom } from 'jotai';
 import { imageUrlAtom } from '@/atoms/imageAtoms';
+import { IconButton, ButtonIcon } from '@/components/styled/Button';
 
 interface ImageUploaderProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
@@ -30,34 +31,13 @@ export const ImageUploader = ({ fileInputRef }: ImageUploaderProps) => {
         id="image-upload"
       />
       
-      <SelectButton onClick={() => fileInputRef.current?.click()}>
-        {'Select Image'}
-      </SelectButton>
+      <IconButton $variant="blue" onClick={() => fileInputRef.current?.click()}>
+        <ButtonIcon src="/upload.svg" alt="Upload" />
+      </IconButton>
     </>
   );
 }
 
 const FileInput = styled.input`
   display: none;
-`;
-
-const SelectButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  border: none;
-  font-size: 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  touch-action: manipulation;
-  width: 100%;
-  max-width: 320px;
-  height: 40px;
-  &:hover {
-    background-color: #0056b3;
-  }
-  
-  &:active {
-    transform: scale(0.98);
-  }
 `;

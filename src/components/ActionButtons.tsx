@@ -24,8 +24,9 @@ export default function ActionButtons({ canvasRef, fileInputRef }: ActionButtons
 const ButtonGroup = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  gap: 10px;
+  align-items: center;
+  justify-content: right;
+  gap: 8px;
   width: 100%;
   max-width: 320px;
 `;

@@ -1,26 +1,30 @@
 import styled from 'styled-components';
 
 interface ButtonProps {
-  $variant?: 'primary' | 'secondary' | 'danger';
+  $variant?: 'primary' | 'secondary' | 'danger' | 'blue';
 }
 
-const getBackgroundColor = (variant?: 'primary' | 'secondary' | 'danger') => {
+const getBackgroundColor = (variant?: 'primary' | 'secondary' | 'danger' | 'blue') => {
   switch (variant) {
     case 'secondary':
       return '#6c757d';
     case 'danger':
       return '#dc3545';
+    case 'blue':
+      return '#007bff';
     default:
       return '#28a745';
   }
 };
 
-const getHoverColor = (variant?: 'primary' | 'secondary' | 'danger') => {
+const getHoverColor = (variant?: 'primary' | 'secondary' | 'danger' | 'blue') => {
   switch (variant) {
     case 'secondary':
       return '#5a6268';
     case 'danger':
       return '#c82333';
+    case 'blue':
+      return '#0056b3';
     default:
       return '#218838';
   }

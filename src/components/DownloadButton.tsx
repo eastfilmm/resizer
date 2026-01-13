@@ -5,6 +5,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import {
   imageUrlAtom,
   backgroundColorAtom,
+  paddingEnabledAtom,
   paddingAtom,
   glassBlurAtom,
   blurIntensityAtom,
@@ -16,7 +17,7 @@ import {
   shadowOffsetAtom,
 } from '@/atoms/imageAtoms';
 import { resetCanvas } from '@/utils/canvas';
-import { Button } from '@/components/styled/Button';
+import { IconButton, ButtonIcon } from '@/components/styled/Button';
 
 interface DownloadButtonProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -29,6 +30,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   const imageUrl = useAtomValue(imageUrlAtom);
   const setImageUrl = useSetAtom(imageUrlAtom);
   const setBackgroundColor = useSetAtom(backgroundColorAtom);
+  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
   const setPadding = useSetAtom(paddingAtom);
   const setGlassBlur = useSetAtom(glassBlurAtom);
   const setBlurIntensity = useSetAtom(blurIntensityAtom);
@@ -63,7 +65,8 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
       fileInputRef.current.value = '';
     }
     setBackgroundColor('white');
-    setPadding(0);
+    setPaddingEnabled(false);
+    setPadding(100);
     setGlassBlur(false);
     setBlurIntensity(30);
     setOverlayOpacity(0.3);
@@ -77,8 +80,8 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   };
 
   return (
-    <Button disabled={!imageUrl} onClick={handleDownload}>
-      Download
-    </Button>
+    <IconButton $variant="primary" disabled={!imageUrl} onClick={handleDownload}>
+      <ButtonIcon src="/download.svg" alt="Download" />
+    </IconButton>
   );
 }

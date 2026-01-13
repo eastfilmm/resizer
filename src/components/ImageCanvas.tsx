@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, paddingAtom, copyrightEnabledAtom, copyrightTextAtom, shadowEnabledAtom, shadowIntensityAtom, shadowOffsetAtom } from '@/atoms/imageAtoms';
+import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, paddingEnabledAtom, paddingAtom, copyrightEnabledAtom, copyrightTextAtom, shadowEnabledAtom, shadowIntensityAtom, shadowOffsetAtom } from '@/atoms/imageAtoms';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -15,17 +15,19 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const glassBlur = useAtomValue(glassBlurAtom);
   const blurIntensity = useAtomValue(blurIntensityAtom);
   const overlayOpacity = useAtomValue(overlayOpacityAtom);
+  const paddingEnabled = useAtomValue(paddingEnabledAtom);
   const padding = useAtomValue(paddingAtom);
   const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
   const copyrightText = useAtomValue(copyrightTextAtom);
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
   const shadowIntensity = useAtomValue(shadowIntensityAtom);
   const shadowOffset = useAtomValue(shadowOffsetAtom);
-  const setPadding = useSetAtom(paddingAtom);
+  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
   const backgroundColorRef = useRef(backgroundColor);
   const glassBlurRef = useRef(glassBlur);
   const blurIntensityRef = useRef(blurIntensity);
   const overlayOpacityRef = useRef(overlayOpacity);
+  const paddingEnabledRef = useRef(paddingEnabled);
   const paddingRef = useRef(padding);
   const copyrightEnabledRef = useRef(copyrightEnabled);
   const copyrightTextRef = useRef(copyrightText);
@@ -40,6 +42,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   glassBlurRef.current = glassBlur;
   blurIntensityRef.current = blurIntensity;
   overlayOpacityRef.current = overlayOpacity;
+  paddingEnabledRef.current = paddingEnabled;
   paddingRef.current = padding;
   copyrightEnabledRef.current = copyrightEnabled;
   copyrightTextRef.current = copyrightText;
@@ -177,13 +180,13 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const newImg = new Image();
     newImg.onload = () => {
       imageRef.current = newImg;
-      // Reset padding to 0 when new image is loaded (image fills canvas edge-to-edge)
-      setPadding(0);
+      // Reset padding to disabled when new image is loaded (image fills canvas edge-to-edge)
+      setPaddingEnabled(false);
       const imageAreaSize = actualCanvasSize; // No padding initially
       drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current, glassBlurRef.current, blurIntensityRef.current, overlayOpacityRef.current, copyrightEnabledRef.current, copyrightTextRef.current, shadowEnabledRef.current, shadowIntensityRef.current, shadowOffsetRef.current);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, setPadding]);
+  }, [imageUrl, canvasRef, setPaddingEnabled]);
 
   const drawImage = (
     ctx: CanvasRenderingContext2D,
@@ -293,7 +296,8 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     if (!ctx) return;
 
     const actualCanvasSize = 2000;
-    const imageAreaSize = actualCanvasSize - (padding * 2);
+    const effectivePadding = paddingEnabled ? padding : 0;
+    const imageAreaSize = actualCanvasSize - (effectivePadding * 2);
 
     // If we have an image, redraw it with new settings
     if (imageRef.current) {
@@ -304,7 +308,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     // Fill background with solid color (no image loaded)
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, 2000, 2000);
-  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, padding, copyrightEnabled, copyrightText, shadowEnabled, shadowIntensity, shadowOffset, canvasRef]);
+  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, paddingEnabled, padding, copyrightEnabled, copyrightText, shadowEnabled, shadowIntensity, shadowOffset, canvasRef]);
 
   return (
     <CanvasContainer>

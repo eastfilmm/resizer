@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import { Container, Main, Title } from '@/components/styled/Layout';
 import ImageCanvas from '@/components/ImageCanvas';
 import ActionButtons from '@/components/ActionButtons';
-import { BottomSection } from '@/components/BottomSection';
+import { NavigationBar } from '@/components/NavigationBar';
 
-const BOTTOM_SHEET_COLLAPSED_HEIGHT = 48;
+const NAV_HEIGHT = 200;
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,26 +17,26 @@ export default function Home() {
     <Container>
       <Main>
         <Title>Image Resizer</Title>
-        
-        {/* 이미지 업로드 및 다운로드 버튼 */}
-        <ActionButtons canvasRef={canvasRef} fileInputRef={fileInputRef} />
-
+      
         {/* 이미지 캔버스 */}
         <ImageCanvas canvasRef={canvasRef} />
 
+        {/* 이미지 업로드 및 다운로드 버튼 */}
+        <ActionButtons canvasRef={canvasRef} fileInputRef={fileInputRef} />
+
        
-        {/* 바텀시트 공간 확보 */}
-        <BottomSpacer />
+      {/* 네비게이션 바 공간 확보 */}
+      <NavSpacer />
       </Main>
       
-      {/* 바텀시트 */}
-      <BottomSection />
+      {/* 네비게이션 바 */}
+      <NavigationBar />
     </Container>
   );
 }
 
-const BottomSpacer = styled.div`
-  height: ${BOTTOM_SHEET_COLLAPSED_HEIGHT}px;
+const NavSpacer = styled.div`
+  height: ${NAV_HEIGHT}px;
   flex-shrink: 0;
 `;
 
