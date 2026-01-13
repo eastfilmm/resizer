@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  min-height: 100vh;
+  height: 100vh;
   width: 100vw;
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
@@ -22,6 +22,8 @@ export const Main = styled.main`
   align-items: center;
   padding: 20px;
   gap: 12px;
+  overflow: hidden;
+  min-height: 0;
 `;
 
 export const Title = styled.h1`

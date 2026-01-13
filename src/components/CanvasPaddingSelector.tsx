@@ -15,7 +15,7 @@ export default function CanvasPaddingSelector() {
   return (
     <Container>
       <SliderContainer>
-        <SliderLabel>Padding: {padding}px</SliderLabel>
+        <SliderLabel>Padding: <span style={{ fontSize: '0.875rem', color: '#666' }}>{padding}px</span></SliderLabel>
         <Slider
           type="range"
           min="0"
@@ -45,8 +45,7 @@ const SliderContainer = styled.div`
 `;
 
 const SliderLabel = styled.span`
-  font-size: 0.875rem;
-  color: #666;
+  font-size: 1rem;
   min-width: 100px;
 `;
 
