@@ -1,5 +1,6 @@
 'use client';
 
+import { canvasRGB } from 'stackblur-canvas';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_DISPLAY_SIZE,
@@ -41,6 +42,7 @@ export function resetCanvas(
 /**
  * Draw glass blur background: crop center square and fill canvas with blur
  * Uses edge clamp technique to prevent vignetting effect at edges
+ * Safari uses JavaScript-based stackblur, Chrome/Firefox use CSS filter
  */
 export function drawGlassBlurBackground(
   ctx: CanvasRenderingContext2D,
@@ -48,7 +50,8 @@ export function drawGlassBlurBackground(
   canvasSize: number,
   intensity: number,
   overlayColor: string,
-  opacity: number
+  opacity: number,
+  isSafari: boolean = false
 ): void {
   // Calculate center square crop from source image
   const minDim = Math.min(img.width, img.height);
@@ -99,20 +102,26 @@ export function drawGlassBlurBackground(
     expandedSize
   );
 
-  // Create another canvas to apply blur
-  const blurCanvas = document.createElement('canvas');
-  blurCanvas.width = expandedSize;
-  blurCanvas.height = expandedSize;
-  const blurCtx = blurCanvas.getContext('2d');
-  if (!blurCtx) return;
+  if (isSafari) {
+    // Safari: Use JavaScript-based stackblur (CSS filter has caching issues)
+    canvasRGB(tempCanvas, 0, 0, expandedSize, expandedSize, Math.round(intensity));
+    // Copy only the center portion (without margins) to the main canvas
+    ctx.drawImage(tempCanvas, margin, margin, canvasSize, canvasSize, 0, 0, canvasSize, canvasSize);
+  } else {
+    // Chrome/Firefox: Use fast CSS filter blur
+    const blurCanvas = document.createElement('canvas');
+    blurCanvas.width = expandedSize;
+    blurCanvas.height = expandedSize;
+    const blurCtx = blurCanvas.getContext('2d');
+    if (!blurCtx) return;
 
-  // Apply blur filter with configurable intensity
-  blurCtx.filter = `blur(${intensity}px)`;
-  blurCtx.drawImage(tempCanvas, 0, 0);
-  blurCtx.filter = 'none';
+    blurCtx.filter = `blur(${intensity}px)`;
+    blurCtx.drawImage(tempCanvas, 0, 0);
+    blurCtx.filter = 'none';
 
-  // Copy only the center portion (without margins) to the main canvas
-  ctx.drawImage(blurCanvas, margin, margin, canvasSize, canvasSize, 0, 0, canvasSize, canvasSize);
+    // Copy only the center portion (without margins) to the main canvas
+    ctx.drawImage(blurCanvas, margin, margin, canvasSize, canvasSize, 0, 0, canvasSize, canvasSize);
+  }
 
   // Apply color overlay with configurable transparency
   ctx.globalAlpha = opacity;
@@ -173,6 +182,7 @@ export interface DrawImageOptions {
   useShadow: boolean;
   shadowIntensity: number;
   shadowOffset: number;
+  isSafari?: boolean;
 }
 
 /**
@@ -196,6 +206,7 @@ export function drawImageWithEffects(
     useShadow,
     shadowIntensity,
     shadowOffset,
+    isSafari = false,
   } = options;
 
   // Initialize canvas with selected background color
@@ -203,7 +214,7 @@ export function drawImageWithEffects(
 
   // If glass blur is enabled, draw blurred background from image
   if (useGlassBlur) {
-    drawGlassBlurBackground(ctx, img, actualCanvasSize, blurIntensity, bgColor, overlayOpacity);
+    drawGlassBlurBackground(ctx, img, actualCanvasSize, blurIntensity, bgColor, overlayOpacity, isSafari);
   } else {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, actualCanvasSize, actualCanvasSize);
