@@ -11,6 +11,9 @@ import {
   overlayOpacityAtom,
   copyrightEnabledAtom,
   copyrightTextAtom,
+  shadowEnabledAtom,
+  shadowIntensityAtom,
+  shadowOffsetAtom,
 } from '@/atoms/imageAtoms';
 import { resetCanvas } from '@/utils/canvas';
 import { Button } from '@/components/styled/Button';
@@ -32,6 +35,9 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   const setOverlayOpacity = useSetAtom(overlayOpacityAtom);
   const copyrightText = useAtomValue(copyrightTextAtom);
   const setCopyrightEnabled = useSetAtom(copyrightEnabledAtom);
+  const setShadowEnabled = useSetAtom(shadowEnabledAtom);
+  const setShadowIntensity = useSetAtom(shadowIntensityAtom);
+  const setShadowOffset = useSetAtom(shadowOffsetAtom);
 
   const handleDownload = () => {
     if (!canvasRef.current) return;
@@ -62,6 +68,9 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     setBlurIntensity(30);
     setOverlayOpacity(0.3);
     setCopyrightEnabled(false);
+    setShadowEnabled(false);
+    setShadowIntensity(30);
+    setShadowOffset(20);
     if (canvasRef.current) {
       resetCanvas(canvasRef.current, 'white');
     }

@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, paddingAtom, copyrightEnabledAtom, copyrightTextAtom } from '@/atoms/imageAtoms';
+import { imageUrlAtom, backgroundColorAtom, glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, paddingAtom, copyrightEnabledAtom, copyrightTextAtom, shadowEnabledAtom, shadowIntensityAtom, shadowOffsetAtom } from '@/atoms/imageAtoms';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -18,6 +18,9 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const padding = useAtomValue(paddingAtom);
   const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
   const copyrightText = useAtomValue(copyrightTextAtom);
+  const shadowEnabled = useAtomValue(shadowEnabledAtom);
+  const shadowIntensity = useAtomValue(shadowIntensityAtom);
+  const shadowOffset = useAtomValue(shadowOffsetAtom);
   const setPadding = useSetAtom(paddingAtom);
   const backgroundColorRef = useRef(backgroundColor);
   const glassBlurRef = useRef(glassBlur);
@@ -26,6 +29,9 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const paddingRef = useRef(padding);
   const copyrightEnabledRef = useRef(copyrightEnabled);
   const copyrightTextRef = useRef(copyrightText);
+  const shadowEnabledRef = useRef(shadowEnabled);
+  const shadowIntensityRef = useRef(shadowIntensity);
+  const shadowOffsetRef = useRef(shadowOffset);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
@@ -37,6 +43,9 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   paddingRef.current = padding;
   copyrightEnabledRef.current = copyrightEnabled;
   copyrightTextRef.current = copyrightText;
+  shadowEnabledRef.current = shadowEnabled;
+  shadowIntensityRef.current = shadowIntensity;
+  shadowOffsetRef.current = shadowOffset;
 
   // Draw glass blur background: crop center square and fill canvas with blur
   // Uses edge clamp technique to prevent vignetting effect at edges
@@ -171,7 +180,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       // Reset padding to 0 when new image is loaded (image fills canvas edge-to-edge)
       setPadding(0);
       const imageAreaSize = actualCanvasSize; // No padding initially
-      drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current, glassBlurRef.current, blurIntensityRef.current, overlayOpacityRef.current, copyrightEnabledRef.current, copyrightTextRef.current);
+      drawImage(ctx, newImg, actualCanvasSize, imageAreaSize, backgroundColorRef.current, glassBlurRef.current, blurIntensityRef.current, overlayOpacityRef.current, copyrightEnabledRef.current, copyrightTextRef.current, shadowEnabledRef.current, shadowIntensityRef.current, shadowOffsetRef.current);
     };
     newImg.src = imageUrl;
   }, [imageUrl, canvasRef, setPadding]);
@@ -186,7 +195,10 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     intensity: number,
     opacity: number,
     showCopyright: boolean,
-    copyrightStr: string
+    copyrightStr: string,
+    useShadow: boolean,
+    shadowBlur: number,
+    shadowOff: number
   ) => {
     // Initialize canvas with selected background color
     ctx.clearRect(0, 0, actualCanvasSize, actualCanvasSize);
@@ -212,11 +224,26 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     height = height * scale;
     
     // Center image on canvas (considering padding)
-    const x = (actualCanvasSize - width) / 2;
-    const y = (actualCanvasSize - height) / 2;
+    // If shadow is enabled, offset image slightly to top-left to make room for shadow
+    const shadowAdjust = useShadow ? shadowOff / 2 : 0;
+    const x = (actualCanvasSize - width) / 2 - shadowAdjust;
+    const y = (actualCanvasSize - height) / 2 - shadowAdjust;
     
     // Save position for background updates
     imagePositionRef.current = { x, y, width, height };
+    
+    // Draw shadow if enabled (draw before image so it appears behind)
+    if (useShadow) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = shadowBlur;
+      ctx.shadowOffsetX = shadowOff;
+      ctx.shadowOffsetY = shadowOff;
+      // Draw a filled rectangle as shadow source (same size as image)
+      ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+      ctx.fillRect(x, y, width, height);
+      ctx.restore();
+    }
     
     // Draw image with high quality
     ctx.drawImage(img, x, y, width, height);
@@ -270,14 +297,14 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
 
     // If we have an image, redraw it with new settings
     if (imageRef.current) {
-      drawImage(ctx, imageRef.current, actualCanvasSize, imageAreaSize, backgroundColor, glassBlur, blurIntensity, overlayOpacity, copyrightEnabled, copyrightText);
+      drawImage(ctx, imageRef.current, actualCanvasSize, imageAreaSize, backgroundColor, glassBlur, blurIntensity, overlayOpacity, copyrightEnabled, copyrightText, shadowEnabled, shadowIntensity, shadowOffset);
       return;
     }
 
     // Fill background with solid color (no image loaded)
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, 2000, 2000);
-  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, padding, copyrightEnabled, copyrightText, canvasRef]);
+  }, [backgroundColor, glassBlur, blurIntensity, overlayOpacity, padding, copyrightEnabled, copyrightText, shadowEnabled, shadowIntensity, shadowOffset, canvasRef]);
 
   return (
     <CanvasContainer>

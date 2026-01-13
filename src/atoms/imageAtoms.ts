@@ -24,6 +24,15 @@ export const copyrightEnabledAtom = atom<boolean>(false);
 // Copyright 텍스트
 export const copyrightTextAtom = atom<string>('');
 
+// Shadow 효과 활성화 여부
+export const shadowEnabledAtom = atom<boolean>(false);
+
+// Shadow 강도 (blur radius, 1-100px)
+export const shadowIntensityAtom = atom<number>(30);
+
+// Shadow 오프셋 (이미지 오른쪽/아래 방향, 1-50px)
+export const shadowOffsetAtom = atom<number>(20);
+
 // Reset 가능 여부 (이미지가 있거나 필터가 초기값과 다를 때)
 export const canResetAtom = atom((get) => {
   const hasImage = get(imageUrlAtom) !== null;
@@ -33,7 +42,10 @@ export const canResetAtom = atom((get) => {
     get(glassBlurAtom) !== false ||
     get(blurIntensityAtom) !== 30 ||
     get(overlayOpacityAtom) !== 0.3 ||
-    get(copyrightEnabledAtom) !== false;
+    get(copyrightEnabledAtom) !== false ||
+    get(shadowEnabledAtom) !== false ||
+    get(shadowIntensityAtom) !== 30 ||
+    get(shadowOffsetAtom) !== 20;
 
   return hasImage || hasFilterChanges;
 });
