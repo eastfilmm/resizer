@@ -51,7 +51,7 @@ const BaseButton = styled.button<ButtonProps>`
   }
   
   &:disabled {
-    background-color: #6c757d;
+    background-color: #cccccc;
     cursor: not-allowed;
   }
 `;

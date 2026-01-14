@@ -24,18 +24,18 @@ export default function Home() {
         <SubTitle>for Instagram</SubTitle>
         </HeaderWrapper>
         {/* 이미지 캔버스 - Safari는 최적화된 버전 사용 */}
-        {isSafari ? (
+        <CanvasWrapper>
+          {isSafari ? (
           <SafariImageCanvas canvasRef={canvasRef} />
-        ) : (
-          <ImageCanvas canvasRef={canvasRef} />
-        )}
-
+          ) : (
+            <ImageCanvas canvasRef={canvasRef} />
+          )}
+        </CanvasWrapper>
         {/* 이미지 업로드 및 다운로드 버튼 */}
         <ActionButtons canvasRef={canvasRef} fileInputRef={fileInputRef} />
 
-       
-      {/* 네비게이션 바 공간 확보 */}
-      <NavSpacer />
+        {/* 네비게이션 바 공간 확보 */}
+        <NavSpacer />
       </Main>
       
       {/* 네비게이션 바 */}
@@ -43,6 +43,10 @@ export default function Home() {
     </Container>
   );
 }
+
+const CanvasWrapper = styled.div`
+  flex-shrink:0;
+`
 
 const NavSpacer = styled.div`
   height: ${NAV_HEIGHT}px;
