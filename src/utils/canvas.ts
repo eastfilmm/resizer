@@ -134,38 +134,41 @@ export function drawGlassBlurBackground(
  * Draw copyright text on the image
  * For landscape: below the image, right-aligned, with offset below image bottom
  * For portrait: right side of image, rotated 90 degrees, with offset right of image
+ * Text color is automatically determined based on background color
  */
 export function drawCopyrightText(
   ctx: CanvasRenderingContext2D,
   text: string,
   imagePosition: ImagePosition,
-  bgColor: string
+  backgroundColor: 'white' | 'black',
+  scaleFactor: number = 1
 ): void {
   if (!text.trim()) return;
 
   const isLandscape = imagePosition.width >= imagePosition.height;
 
-  // Set text color based on background
-  ctx.fillStyle = bgColor === 'white' ? 'black' : 'white';
-  ctx.font = `${COPYRIGHT_FONT_SIZE}px sans-serif`;
+  // Auto-detect text color based on background (white bg = black text, black bg = white text)
+  const textColor = backgroundColor === 'white' ? 'black' : 'white';
+  ctx.fillStyle = textColor;
+  ctx.font = `${COPYRIGHT_FONT_SIZE * scaleFactor}px sans-serif`;
 
   if (isLandscape) {
     // Landscape: horizontal text below image, right-aligned with margin
     ctx.textBaseline = 'top';
     ctx.textAlign = 'right';
-    const textX = imagePosition.x + imagePosition.width - COPYRIGHT_RIGHT_MARGIN;
-    const textY = imagePosition.y + imagePosition.height + COPYRIGHT_OFFSET;
+    const textX = imagePosition.x + imagePosition.width - COPYRIGHT_RIGHT_MARGIN * scaleFactor;
+    const textY = imagePosition.y + imagePosition.height + COPYRIGHT_OFFSET * scaleFactor;
     ctx.fillText(text, textX, textY);
   } else {
     // Portrait: rotated 90 degrees, right side of image with margin
     ctx.save();
-    const textX = imagePosition.x + imagePosition.width + COPYRIGHT_OFFSET;
+    const textX = imagePosition.x + imagePosition.width + COPYRIGHT_OFFSET * scaleFactor;
     const textY = imagePosition.y + imagePosition.height;
     ctx.translate(textX, textY);
     ctx.rotate(Math.PI / 2); // Rotate 90 degrees (text reads from bottom to top)
     ctx.textAlign = 'right';
     ctx.textBaseline = 'bottom';
-    ctx.fillText(text, -COPYRIGHT_RIGHT_MARGIN, 0);
+    ctx.fillText(text, -COPYRIGHT_RIGHT_MARGIN * scaleFactor, 0);
     ctx.restore();
   }
 }
@@ -183,6 +186,7 @@ export interface DrawImageOptions {
   shadowIntensity: number;
   shadowOffset: number;
   isSafari?: boolean;
+  scaleFactor?: number;
 }
 
 /**
@@ -207,6 +211,7 @@ export function drawImageWithEffects(
     shadowIntensity,
     shadowOffset,
     isSafari = false,
+    scaleFactor = 1,
   } = options;
 
   // Initialize canvas with selected background color
@@ -258,7 +263,9 @@ export function drawImageWithEffects(
 
   // Draw copyright text if enabled
   if (showCopyright && copyrightText) {
-    drawCopyrightText(ctx, copyrightText, imagePosition, bgColor);
+    // Determine background color from bgColor string
+    const backgroundColor: 'white' | 'black' = bgColor === 'white' || bgColor === '#ffffff' ? 'white' : 'black';
+    drawCopyrightText(ctx, copyrightText, imagePosition, backgroundColor, scaleFactor);
   }
 
   return imagePosition;

@@ -18,7 +18,6 @@ export const BackgroundPanel = () => {
       <PanelLabel>Background Color</PanelLabel>
       <ToggleSwitch
         $isActive={backgroundColor === 'black'}
-        $activeColor="#000000"
         onClick={toggleBackgroundColor}
       />
     </PanelContainer>

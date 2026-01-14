@@ -37,7 +37,6 @@ export const CopyrightPanel = () => {
         <PanelLabel>Copyright</PanelLabel>
         <ToggleSwitch $isActive={copyrightEnabled} onClick={toggleCopyright} />
       </PanelRow>
-
       <TextInput
         type="text"
         placeholder="© Your Name"

@@ -1,11 +1,26 @@
 'use client';
 
-import { RefObject } from 'react';
+import { RefObject, useCallback } from 'react';
 import { useAtomValue } from 'jotai';
-import { imageUrlAtom, copyrightTextAtom } from '@/atoms/imageAtoms';
+import {
+  imageUrlAtom,
+  backgroundColorAtom,
+  paddingEnabledAtom,
+  paddingAtom,
+  glassBlurAtom,
+  blurIntensityAtom,
+  overlayOpacityAtom,
+  shadowEnabledAtom,
+  shadowIntensityAtom,
+  shadowOffsetAtom,
+  copyrightEnabledAtom,
+  copyrightTextAtom,
+} from '@/atoms/imageAtoms';
 import { useResetState } from '@/hooks/useResetState';
+import { useIsSafari } from '@/hooks/useIsSafari';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
-import { COPYRIGHT_STORAGE_KEY } from '@/constants/canvas';
+import { COPYRIGHT_STORAGE_KEY, CANVAS_ACTUAL_SIZE, CANVAS_DISPLAY_SIZE } from '@/constants/canvas';
+import { drawImageWithEffects } from '@/utils/canvas';
 
 interface DownloadButtonProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -15,25 +30,96 @@ interface DownloadButtonProps {
 export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps) => {
   const imageUrl = useAtomValue(imageUrlAtom);
   const copyrightText = useAtomValue(copyrightTextAtom);
-  const resetState = useResetState({ canvasRef, fileInputRef });
+  const backgroundColor = useAtomValue(backgroundColorAtom);
+  const paddingEnabled = useAtomValue(paddingEnabledAtom);
+  const padding = useAtomValue(paddingAtom);
+  const glassBlur = useAtomValue(glassBlurAtom);
+  const blurIntensity = useAtomValue(blurIntensityAtom);
+  const overlayOpacity = useAtomValue(overlayOpacityAtom);
+  const shadowEnabled = useAtomValue(shadowEnabledAtom);
+  const shadowIntensity = useAtomValue(shadowIntensityAtom);
+  const shadowOffset = useAtomValue(shadowOffsetAtom);
+  const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
+  const resetState = useResetState({ canvasRef, fileInputRef});
+  const isSafari = useIsSafari();
 
-  const handleDownload = () => {
-    if (!canvasRef.current) return;
+  const handleDownload = useCallback(async () => {
+    if (!imageUrl) return;
 
     // Save copyright text to localStorage
     if (copyrightText) {
       localStorage.setItem(COPYRIGHT_STORAGE_KEY, copyrightText);
     }
 
-    const canvas = canvasRef.current;
+    let dataUrl: string;
+
+    if (isSafari) {
+      // Safari: Create full-resolution canvas for download
+      const img = new Image();
+      img.src = imageUrl;
+      await new Promise<void>((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+
+      const fullResCanvas = document.createElement('canvas');
+      fullResCanvas.width = CANVAS_ACTUAL_SIZE;
+      fullResCanvas.height = CANVAS_ACTUAL_SIZE;
+      const ctx = fullResCanvas.getContext('2d');
+      if (!ctx) return;
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      const effectivePadding = paddingEnabled ? padding : 0;
+      const imageAreaSize = CANVAS_ACTUAL_SIZE - effectivePadding * 2;
+
+      drawImageWithEffects(ctx, img, {
+        actualCanvasSize: CANVAS_ACTUAL_SIZE,
+        imageAreaSize,
+        bgColor: backgroundColor,
+        useGlassBlur: glassBlur,
+        blurIntensity,
+        overlayOpacity,
+        showCopyright: copyrightEnabled,
+        copyrightText,
+        useShadow: shadowEnabled,
+        shadowIntensity,
+        shadowOffset,
+        isSafari: true,
+      });
+
+      dataUrl = fullResCanvas.toDataURL('image/png', 1.0);
+    } else {
+      // Chrome/Firefox: Use existing canvas
+      if (!canvasRef.current) return;
+      dataUrl = canvasRef.current.toDataURL('image/png', 1.0);
+    }
+
     const link = document.createElement('a');
     link.download = `resized-image-${Date.now()}.png`;
-    link.href = canvas.toDataURL('image/png', 1.0);
+    link.href = dataUrl;
     link.click();
 
     // Reset all state after download
     resetState();
-  };
+  }, [
+    imageUrl,
+    copyrightText,
+    backgroundColor,
+    paddingEnabled,
+    padding,
+    glassBlur,
+    blurIntensity,
+    overlayOpacity,
+    shadowEnabled,
+    shadowIntensity,
+    shadowOffset,
+    copyrightEnabled,
+    isSafari,
+    canvasRef,
+    resetState,
+  ]);
 
   return (
     <IconButton $variant="primary" disabled={!imageUrl} onClick={handleDownload}>

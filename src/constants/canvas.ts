@@ -1,6 +1,7 @@
 // Canvas dimension constants
 export const CANVAS_ACTUAL_SIZE = 2000;
 export const CANVAS_DISPLAY_SIZE = 320;
+export const CANVAS_PREVIEW_SIZE = 800; // Safari preview size for better performance
 
 // Copyright text constants
 export const COPYRIGHT_FONT_SIZE = 56;

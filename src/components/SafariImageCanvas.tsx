@@ -18,13 +18,16 @@ import {
   shadowOffsetAtom,
 } from '@/atoms/imageAtoms';
 import { drawImageWithEffects, ImagePosition } from '@/utils/canvas';
-import { CANVAS_ACTUAL_SIZE, CANVAS_DISPLAY_SIZE } from '@/constants/canvas';
+import { CANVAS_DISPLAY_SIZE, CANVAS_PREVIEW_SIZE } from '@/constants/canvas';
 
-interface ImageCanvasProps {
+interface SafariImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
 }
 
-export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
+/**
+ * Safari-optimized canvas component with reduced resolution for better performance
+ */
+export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps) {
   const imageUrl = useAtomValue(imageUrlAtom);
   const backgroundColor = useAtomValue(backgroundColorAtom);
   const glassBlur = useAtomValue(glassBlurAtom);
@@ -52,6 +55,13 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<ImagePosition | null>(null);
 
+  // Safari RAF throttle refs
+  const rafIdRef = useRef<number | null>(null);
+  const pendingRenderRef = useRef(false);
+
+  // Scale factor: 1000/2000 = 0.5
+  const SCALE_FACTOR = CANVAS_PREVIEW_SIZE / 2000;
+
   // Keep refs in sync with state
   backgroundColorRef.current = backgroundColor;
   glassBlurRef.current = glassBlur;
@@ -66,21 +76,22 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const redrawImage = useCallback(
     (ctx: CanvasRenderingContext2D, img: HTMLImageElement, imageAreaSize: number) => {
       imagePositionRef.current = drawImageWithEffects(ctx, img, {
-        actualCanvasSize: CANVAS_ACTUAL_SIZE,
+        actualCanvasSize: CANVAS_PREVIEW_SIZE,
         imageAreaSize,
         bgColor: backgroundColorRef.current,
         useGlassBlur: glassBlurRef.current,
-        blurIntensity: blurIntensityRef.current,
+        blurIntensity: blurIntensityRef.current * SCALE_FACTOR,
         overlayOpacity: overlayOpacityRef.current,
         showCopyright: copyrightEnabledRef.current,
         copyrightText: copyrightTextRef.current,
         useShadow: shadowEnabledRef.current,
-        shadowIntensity: shadowIntensityRef.current,
-        shadowOffset: shadowOffsetRef.current,
-        isSafari: false,
+        shadowIntensity: shadowIntensityRef.current * SCALE_FACTOR,
+        shadowOffset: shadowOffsetRef.current * SCALE_FACTOR,
+        scaleFactor: SCALE_FACTOR,
+        isSafari: true,
       });
     },
-    []
+    [SCALE_FACTOR]
   );
 
   const drawImageOnCanvas = useCallback(() => {
@@ -90,9 +101,9 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas actual size
-    canvas.width = CANVAS_ACTUAL_SIZE;
-    canvas.height = CANVAS_ACTUAL_SIZE;
+    // Set canvas to preview size
+    canvas.width = CANVAS_PREVIEW_SIZE;
+    canvas.height = CANVAS_PREVIEW_SIZE;
 
     // Set display size (scaled down with CSS)
     canvas.style.width = `${CANVAS_DISPLAY_SIZE}px`;
@@ -108,7 +119,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       imageRef.current = newImg;
       // Reset padding to disabled when new image is loaded (image fills canvas edge-to-edge)
       setPaddingEnabled(false);
-      const imageAreaSize = CANVAS_ACTUAL_SIZE; // No padding initially
+      const imageAreaSize = CANVAS_PREVIEW_SIZE; // No padding initially
       redrawImage(ctx, newImg, imageAreaSize);
     };
     newImg.src = imageUrl;
@@ -120,13 +131,13 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        canvas.width = CANVAS_ACTUAL_SIZE;
-        canvas.height = CANVAS_ACTUAL_SIZE;
+        canvas.width = CANVAS_PREVIEW_SIZE;
+        canvas.height = CANVAS_PREVIEW_SIZE;
         canvas.style.width = `${CANVAS_DISPLAY_SIZE}px`;
         canvas.style.height = `${CANVAS_DISPLAY_SIZE}px`;
 
         ctx.fillStyle = backgroundColorRef.current;
-        ctx.fillRect(0, 0, CANVAS_ACTUAL_SIZE, CANVAS_ACTUAL_SIZE);
+        ctx.fillRect(0, 0, CANVAS_PREVIEW_SIZE, CANVAS_PREVIEW_SIZE);
       }
     }
   }, [canvasRef]);
@@ -144,7 +155,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     }
   }, [imageUrl, drawImageOnCanvas]);
 
-  // Update canvas when any effect settings change
+  // Update canvas when any effect settings change (RAF throttle for Safari performance)
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -152,18 +163,40 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const effectivePadding = paddingEnabled ? padding : 0;
-    const imageAreaSize = CANVAS_ACTUAL_SIZE - effectivePadding * 2;
+    const performRender = () => {
+      const effectivePadding = paddingEnabled ? padding * SCALE_FACTOR : 0;
+      const imageAreaSize = CANVAS_PREVIEW_SIZE - effectivePadding * 2;
 
-    // If we have an image, redraw it with new settings
-    if (imageRef.current) {
-      redrawImage(ctx, imageRef.current, imageAreaSize);
-      return;
+      // If we have an image, redraw it with new settings
+      if (imageRef.current) {
+        redrawImage(ctx, imageRef.current, imageAreaSize);
+        return;
+      }
+
+      // Fill background with solid color (no image loaded)
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, CANVAS_PREVIEW_SIZE, CANVAS_PREVIEW_SIZE);
+    };
+
+    // Use RAF to defer rendering to next frame (prioritizes UI responsiveness)
+    pendingRenderRef.current = true;
+    if (rafIdRef.current === null) {
+      rafIdRef.current = requestAnimationFrame(() => {
+        rafIdRef.current = null;
+        if (pendingRenderRef.current) {
+          pendingRenderRef.current = false;
+          performRender();
+        }
+      });
     }
 
-    // Fill background with solid color (no image loaded)
-    ctx.fillStyle = backgroundColor;
-    ctx.fillRect(0, 0, CANVAS_ACTUAL_SIZE, CANVAS_ACTUAL_SIZE);
+    // Cleanup RAF on unmount or before next effect
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
   }, [
     backgroundColor,
     glassBlur,
@@ -178,6 +211,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     shadowOffset,
     canvasRef,
     redrawImage,
+    SCALE_FACTOR,
   ]);
 
   return (
@@ -198,6 +232,7 @@ const CanvasContainer = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
+  will-change: transform;
 `;
 
 const Canvas = styled.canvas`

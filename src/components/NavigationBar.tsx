@@ -47,7 +47,7 @@ const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
   background: 80,
   glassblur: 160,
   shadow: 160,
-  copyright: 120,
+  copyright: 160,
 };
 
 interface NavButtonProps {
