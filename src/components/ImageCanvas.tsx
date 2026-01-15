@@ -121,10 +121,9 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-    // 항상 최신 padding 값을 사용
-    const effectivePadding = padding;
-    const imageAreaWidth = canvasWidth - effectivePadding * 2;
-    const imageAreaHeight = canvasHeight - effectivePadding * 2;
+    // 패딩은 styled.div에서만 관리하므로 draw에는 영향 없음
+    const imageAreaWidth = canvasWidth;
+    const imageAreaHeight = canvasHeight;
 
     // Set canvas actual size
     canvas.width = canvasWidth;
@@ -143,13 +142,12 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     newImg.onload = () => {
       imageRef.current = newImg;
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-      const effectivePadding = padding;
-      const imageAreaWidth = canvasWidth - effectivePadding * 2;
-      const imageAreaHeight = canvasHeight - effectivePadding * 2;
+      const imageAreaWidth = canvasWidth;
+      const imageAreaHeight = canvasHeight;
       redrawImage(ctx, newImg, imageAreaWidth, imageAreaHeight);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions, padding]);
+  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions]);
 
   // Initialize canvas on mount
   useEffect(() => {

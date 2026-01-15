@@ -71,9 +71,10 @@ export const LayoutPanel = () => {
     (ratio: '1:1' | '4:5' | '9:16') => {
       if (aspectRatio !== ratio) {
         updateAspectRatio(ratio);
+        setPadding(0); // 비율 변경 시 패딩 0으로 초기화
       }
     },
-    [aspectRatio, updateAspectRatio]
+    [aspectRatio, updateAspectRatio, setPadding]
   );
 
   return (

@@ -132,10 +132,9 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-    // 항상 최신 padding 값 반영
-    const effectivePadding = padding * SCALE_FACTOR;
-    const imageAreaWidth = canvasWidth - effectivePadding * 2;
-    const imageAreaHeight = canvasHeight - effectivePadding * 2;
+    // 패딩은 styled.div에서만 관리
+    const imageAreaWidth = canvasWidth;
+    const imageAreaHeight = canvasHeight;
 
     // Set canvas to preview size
     canvas.width = canvasWidth;
@@ -154,13 +153,12 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     newImg.onload = () => {
       imageRef.current = newImg;
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-      const effectivePadding = padding * SCALE_FACTOR;
-      const imageAreaWidth = canvasWidth - effectivePadding * 2;
-      const imageAreaHeight = canvasHeight - effectivePadding * 2;
+      const imageAreaWidth = canvasWidth;
+      const imageAreaHeight = canvasHeight;
       redrawImage(ctx, newImg, imageAreaWidth, imageAreaHeight);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions, padding, SCALE_FACTOR]);
+  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions]);
 
   // Initialize canvas on mount
   useEffect(() => {
