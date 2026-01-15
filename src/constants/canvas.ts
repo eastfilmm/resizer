@@ -9,6 +9,12 @@ export const CANVAS_ACTUAL_SIZE_4_5_HEIGHT = 2000;
 export const CANVAS_PREVIEW_SIZE_4_5_WIDTH = 640;
 export const CANVAS_PREVIEW_SIZE_4_5_HEIGHT = 800;
 
+// 9:16 Aspect ratio dimensions (vertical fixed, 2000px height)
+export const CANVAS_ACTUAL_SIZE_9_16_WIDTH = 1125;
+export const CANVAS_ACTUAL_SIZE_9_16_HEIGHT = 2000;
+export const CANVAS_PREVIEW_SIZE_9_16_WIDTH = 450;
+export const CANVAS_PREVIEW_SIZE_9_16_HEIGHT = 800;
+
 // Copyright text constants
 export const COPYRIGHT_FONT_SIZE = 56;
 export const COPYRIGHT_OFFSET = 8;

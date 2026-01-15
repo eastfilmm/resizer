@@ -8,6 +8,10 @@ import {
   CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
   CANVAS_PREVIEW_SIZE_4_5_WIDTH,
   CANVAS_PREVIEW_SIZE_4_5_HEIGHT,
+  CANVAS_ACTUAL_SIZE_9_16_WIDTH,
+  CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
+  CANVAS_PREVIEW_SIZE_9_16_WIDTH,
+  CANVAS_PREVIEW_SIZE_9_16_HEIGHT,
   COPYRIGHT_FONT_SIZE,
   COPYRIGHT_OFFSET,
   COPYRIGHT_RIGHT_MARGIN,
@@ -26,11 +30,21 @@ export interface ImagePosition {
 export function resetCanvas(
   canvas: HTMLCanvasElement,
   backgroundColor: 'white' | 'black' = 'white',
-  options?: { actualSize?: number; displaySize?: number; aspectRatio?: '1:1' | '4:5' }
+  options?: { actualSize?: number; displaySize?: number; aspectRatio?: '1:1' | '4:5' | '9:16' }
 ) {
   const aspectRatio = options?.aspectRatio ?? '1:1';
-  const actualWidth = aspectRatio === '4:5' ? CANVAS_ACTUAL_SIZE_4_5_WIDTH : CANVAS_ACTUAL_SIZE;
-  const actualHeight = aspectRatio === '4:5' ? CANVAS_ACTUAL_SIZE_4_5_HEIGHT : CANVAS_ACTUAL_SIZE;
+  let actualWidth: number;
+  let actualHeight: number;
+  if (aspectRatio === '4:5') {
+    actualWidth = CANVAS_ACTUAL_SIZE_4_5_WIDTH;
+    actualHeight = CANVAS_ACTUAL_SIZE_4_5_HEIGHT;
+  } else if (aspectRatio === '9:16') {
+    actualWidth = CANVAS_ACTUAL_SIZE_9_16_WIDTH;
+    actualHeight = CANVAS_ACTUAL_SIZE_9_16_HEIGHT;
+  } else {
+    actualWidth = CANVAS_ACTUAL_SIZE;
+    actualHeight = CANVAS_ACTUAL_SIZE;
+  }
   const displaySize = options?.displaySize ?? CANVAS_DISPLAY_SIZE;
 
   const ctx = canvas.getContext('2d');

@@ -47,8 +47,8 @@ const AspectRatioButton = styled.button<{ $isActive: boolean }>`
   }
 `;
 
-const RatioIcon = styled.div<{ $ratio: '1:1' | '4:5'; $isActive: boolean }>`
-  width: ${props => props.$ratio === '1:1' ? '20px' : '16px'};
+const RatioIcon = styled.div<{ $ratio: '1:1' | '4:5' | '9:16'; $isActive: boolean }>`
+  width: ${props => props.$ratio === '1:1' ? '20px' : props.$ratio === '4:5' ? '16px' : '11px'};
   height: 20px;
   border: 2px solid ${props => props.$isActive ? '#007bff' : '#999'};
   border-radius: 3px;
@@ -68,7 +68,7 @@ export const LayoutPanel = () => {
   );
 
   const handleAspectRatioChange = useCallback(
-    (ratio: '1:1' | '4:5') => {
+    (ratio: '1:1' | '4:5' | '9:16') => {
       if (aspectRatio !== ratio) {
         updateAspectRatio(ratio);
       }
@@ -96,6 +96,13 @@ export const LayoutPanel = () => {
         >
           <RatioIcon $ratio="4:5" $isActive={aspectRatio === '4:5'} />
           4:5
+        </AspectRatioButton>
+        <AspectRatioButton
+          $isActive={aspectRatio === '9:16'}
+          onClick={() => handleAspectRatioChange('9:16')}
+        >
+          <RatioIcon $ratio="9:16" $isActive={aspectRatio === '9:16'} />
+          9:16
         </AspectRatioButton>
       </AspectRatioOptions>
 

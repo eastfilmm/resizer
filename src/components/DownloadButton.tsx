@@ -25,6 +25,8 @@ import {
   CANVAS_DISPLAY_SIZE,
   CANVAS_ACTUAL_SIZE_4_5_WIDTH,
   CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
+  CANVAS_ACTUAL_SIZE_9_16_WIDTH,
+  CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
 } from '@/constants/canvas';
 import { drawImageWithEffects } from '@/utils/canvas';
 
@@ -64,6 +66,12 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
         return {
           width: CANVAS_ACTUAL_SIZE_4_5_WIDTH,
           height: CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
+        };
+      }
+      if (aspectRatio === '9:16') {
+        return {
+          width: CANVAS_ACTUAL_SIZE_9_16_WIDTH,
+          height: CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
         };
       }
       return {

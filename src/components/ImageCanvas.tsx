@@ -22,6 +22,8 @@ import {
   CANVAS_DISPLAY_SIZE,
   CANVAS_ACTUAL_SIZE_4_5_WIDTH,
   CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
+  CANVAS_ACTUAL_SIZE_9_16_WIDTH,
+  CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
 } from '@/constants/canvas';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 
@@ -69,18 +71,24 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   shadowOffsetRef.current = shadowOffset;
   aspectRatioRef.current = aspectRatio;
 
-  const getCanvasDimensions = useCallback(() => {
-    if (aspectRatioRef.current === '4:5') {
-      return {
-        width: CANVAS_ACTUAL_SIZE_4_5_WIDTH,
-        height: CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
-      };
-    }
-    return {
-      width: CANVAS_ACTUAL_SIZE,
-      height: CANVAS_ACTUAL_SIZE,
-    };
-  }, []);
+   const getCanvasDimensions = useCallback(() => {
+     if (aspectRatioRef.current === '4:5') {
+       return {
+         width: CANVAS_ACTUAL_SIZE_4_5_WIDTH,
+         height: CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
+       };
+     }
+     if (aspectRatioRef.current === '9:16') {
+       return {
+         width: CANVAS_ACTUAL_SIZE_9_16_WIDTH,
+         height: CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
+       };
+     }
+     return {
+       width: CANVAS_ACTUAL_SIZE,
+       height: CANVAS_ACTUAL_SIZE,
+     };
+   }, []);
 
   const redrawImage = useCallback(
     (ctx: CanvasRenderingContext2D, img: HTMLImageElement, imageAreaWidth: number, imageAreaHeight: number) => {
@@ -206,14 +214,18 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   ]);
 
   return (
-    <CanvasContainer $aspectRatio={aspectRatio}>
+    <CanvasContainer $aspectRatio={aspectRatio as '1:1' | '4:5' | '9:16'}>
       <Canvas ref={canvasRef} />
     </CanvasContainer>
   );
 }
 
-const CanvasContainer = styled.div<{ $aspectRatio: '1:1' | '4:5' }>`
-  width: ${props => props.$aspectRatio === '4:5' ? '256px' : `${CANVAS_DISPLAY_SIZE}px`};
+const CanvasContainer = styled.div<{ $aspectRatio: '1:1' | '4:5' | '9:16' }>`
+  width: ${props => props.$aspectRatio === '4:5'
+    ? '256px'
+    : props.$aspectRatio === '9:16'
+    ? '180px' // 320 * 9/16 for display (rounded)
+    : `${CANVAS_DISPLAY_SIZE}px`};
   height: ${CANVAS_DISPLAY_SIZE}px;
   background-color: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);

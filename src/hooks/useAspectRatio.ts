@@ -10,12 +10,13 @@ export const useAspectRatio = () => {
 
   useEffect(() => {
     const saved = localStorage.getItem(ASPECT_RATIO_STORAGE_KEY);
-    if (saved === '1:1' || saved === '4:5') {
+     if (saved === '1:1' || saved === '4:5' || saved === '9:16') {
       setAspectRatio(saved);
     }
+
   }, [setAspectRatio]);
 
-  const updateAspectRatio = (newRatio: '1:1' | '4:5') => {
+  const updateAspectRatio = (newRatio: '1:1' | '4:5' | '9:16') => {
     setAspectRatio(newRatio);
     localStorage.setItem(ASPECT_RATIO_STORAGE_KEY, newRatio);
   };

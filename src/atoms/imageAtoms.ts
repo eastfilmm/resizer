@@ -40,7 +40,7 @@ export const shadowIntensityAtom = atom<number>(30);
 export const shadowOffsetAtom = atom<number>(20);
 
 // 캔버스 가로세로 비율 ('1:1' | '4:5')
-export const canvasAspectRatioAtom = atom<'1:1' | '4:5'>('1:1');
+export const canvasAspectRatioAtom = atom<'1:1' | '4:5' | '9:16'>('1:1');
 
 // Reset 가능 여부 (이미지가 있거나 필터가 초기값과 다를 때)
 export const canResetAtom = atom((get) => {
