@@ -132,6 +132,10 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+    // 항상 최신 padding 값 반영
+    const effectivePadding = padding * SCALE_FACTOR;
+    const imageAreaWidth = canvasWidth - effectivePadding * 2;
+    const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
     // Set canvas to preview size
     canvas.width = canvasWidth;
@@ -150,10 +154,13 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     newImg.onload = () => {
       imageRef.current = newImg;
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-      redrawImage(ctx, newImg, canvasWidth, canvasHeight);
+      const effectivePadding = padding * SCALE_FACTOR;
+      const imageAreaWidth = canvasWidth - effectivePadding * 2;
+      const imageAreaHeight = canvasHeight - effectivePadding * 2;
+      redrawImage(ctx, newImg, imageAreaWidth, imageAreaHeight);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions]);
+  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions, padding, SCALE_FACTOR]);
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -173,7 +180,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     }
   }, [canvasRef, getCanvasDimensions]);
 
-  // Draw image when imageUrl changes (not backgroundColor)
+  // Draw image when imageUrl or aspectRatio changes
   useEffect(() => {
     if (imageUrl) {
       imageRef.current = null;
@@ -184,7 +191,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
       imageRef.current = null;
       imagePositionRef.current = null;
     }
-  }, [imageUrl, drawImageOnCanvas]);
+  }, [imageUrl, aspectRatio, drawImageOnCanvas]);
 
   // Update canvas when any effect settings change (RAF throttle for Safari performance)
   useEffect(() => {

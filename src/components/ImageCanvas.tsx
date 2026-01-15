@@ -121,6 +121,10 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+    // 항상 최신 padding 값을 사용
+    const effectivePadding = padding;
+    const imageAreaWidth = canvasWidth - effectivePadding * 2;
+    const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
     // Set canvas actual size
     canvas.width = canvasWidth;
@@ -139,10 +143,13 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     newImg.onload = () => {
       imageRef.current = newImg;
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-      redrawImage(ctx, newImg, canvasWidth, canvasHeight);
+      const effectivePadding = padding;
+      const imageAreaWidth = canvasWidth - effectivePadding * 2;
+      const imageAreaHeight = canvasHeight - effectivePadding * 2;
+      redrawImage(ctx, newImg, imageAreaWidth, imageAreaHeight);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions]);
+  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions, padding]);
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -162,7 +169,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     }
   }, [canvasRef, getCanvasDimensions]);
 
-  // Draw image when imageUrl changes (not backgroundColor)
+  // Draw image when imageUrl or aspectRatio changes
   useEffect(() => {
     if (imageUrl) {
       imageRef.current = null;
@@ -173,7 +180,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       imageRef.current = null;
       imagePositionRef.current = null;
     }
-  }, [imageUrl, drawImageOnCanvas]);
+  }, [imageUrl, aspectRatio, drawImageOnCanvas]);
 
   // Update canvas when any effect settings change
   useEffect(() => {
