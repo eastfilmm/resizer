@@ -18,7 +18,13 @@ import {
   shadowOffsetAtom,
 } from '@/atoms/imageAtoms';
 import { drawImageWithEffects, ImagePosition } from '@/utils/canvas';
-import { CANVAS_DISPLAY_SIZE, CANVAS_PREVIEW_SIZE } from '@/constants/canvas';
+import {
+  CANVAS_DISPLAY_SIZE,
+  CANVAS_PREVIEW_SIZE,
+  CANVAS_PREVIEW_SIZE_4_5_WIDTH,
+  CANVAS_PREVIEW_SIZE_4_5_HEIGHT,
+} from '@/constants/canvas';
+import { useAspectRatio } from '@/hooks/useAspectRatio';
 
 interface SafariImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -41,6 +47,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
   const shadowIntensity = useAtomValue(shadowIntensityAtom);
   const shadowOffset = useAtomValue(shadowOffsetAtom);
   const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
+  const { aspectRatio } = useAspectRatio();
 
   // Refs to access current values in callbacks without re-triggering effects
   const backgroundColorRef = useRef(backgroundColor);
@@ -52,6 +59,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
   const shadowEnabledRef = useRef(shadowEnabled);
   const shadowIntensityRef = useRef(shadowIntensity);
   const shadowOffsetRef = useRef(shadowOffset);
+  const aspectRatioRef = useRef(aspectRatio);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<ImagePosition | null>(null);
 
@@ -72,12 +80,29 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
   shadowEnabledRef.current = shadowEnabled;
   shadowIntensityRef.current = shadowIntensity;
   shadowOffsetRef.current = shadowOffset;
+  aspectRatioRef.current = aspectRatio;
+
+  const getCanvasDimensions = useCallback(() => {
+    if (aspectRatioRef.current === '4:5') {
+      return {
+        width: CANVAS_PREVIEW_SIZE_4_5_WIDTH,
+        height: CANVAS_PREVIEW_SIZE_4_5_HEIGHT,
+      };
+    }
+    return {
+      width: CANVAS_PREVIEW_SIZE,
+      height: CANVAS_PREVIEW_SIZE,
+    };
+  }, []);
 
   const redrawImage = useCallback(
-    (ctx: CanvasRenderingContext2D, img: HTMLImageElement, imageAreaSize: number) => {
+    (ctx: CanvasRenderingContext2D, img: HTMLImageElement, imageAreaWidth: number, imageAreaHeight: number) => {
+      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
       imagePositionRef.current = drawImageWithEffects(ctx, img, {
-        actualCanvasSize: CANVAS_PREVIEW_SIZE,
-        imageAreaSize,
+        actualCanvasWidth: canvasWidth,
+        actualCanvasHeight: canvasHeight,
+        imageAreaWidth,
+        imageAreaHeight,
         bgColor: backgroundColorRef.current,
         useGlassBlur: glassBlurRef.current,
         blurIntensity: blurIntensityRef.current * SCALE_FACTOR,
@@ -91,7 +116,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
         isSafari: true,
       });
     },
-    [SCALE_FACTOR]
+    [getCanvasDimensions, SCALE_FACTOR]
   );
 
   const drawImageOnCanvas = useCallback(() => {
@@ -101,9 +126,11 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+
     // Set canvas to preview size
-    canvas.width = CANVAS_PREVIEW_SIZE;
-    canvas.height = CANVAS_PREVIEW_SIZE;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
     // Set display size (scaled down with CSS)
     canvas.style.width = `${CANVAS_DISPLAY_SIZE}px`;
@@ -119,11 +146,11 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
       imageRef.current = newImg;
       // Reset padding to disabled when new image is loaded (image fills canvas edge-to-edge)
       setPaddingEnabled(false);
-      const imageAreaSize = CANVAS_PREVIEW_SIZE; // No padding initially
-      redrawImage(ctx, newImg, imageAreaSize);
+      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+      redrawImage(ctx, newImg, canvasWidth, canvasHeight);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, setPaddingEnabled, redrawImage]);
+  }, [imageUrl, canvasRef, setPaddingEnabled, redrawImage, getCanvasDimensions]);
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -131,16 +158,17 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        canvas.width = CANVAS_PREVIEW_SIZE;
-        canvas.height = CANVAS_PREVIEW_SIZE;
+        const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
         canvas.style.width = `${CANVAS_DISPLAY_SIZE}px`;
         canvas.style.height = `${CANVAS_DISPLAY_SIZE}px`;
 
         ctx.fillStyle = backgroundColorRef.current;
-        ctx.fillRect(0, 0, CANVAS_PREVIEW_SIZE, CANVAS_PREVIEW_SIZE);
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     }
-  }, [canvasRef]);
+  }, [canvasRef, getCanvasDimensions]);
 
   // Draw image when imageUrl changes (not backgroundColor)
   useEffect(() => {
@@ -164,18 +192,20 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     if (!ctx) return;
 
     const performRender = () => {
+      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
       const effectivePadding = paddingEnabled ? padding * SCALE_FACTOR : 0;
-      const imageAreaSize = CANVAS_PREVIEW_SIZE - effectivePadding * 2;
+      const imageAreaWidth = canvasWidth - effectivePadding * 2;
+      const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
       // If we have an image, redraw it with new settings
       if (imageRef.current) {
-        redrawImage(ctx, imageRef.current, imageAreaSize);
+        redrawImage(ctx, imageRef.current, imageAreaWidth, imageAreaHeight);
         return;
       }
 
       // Fill background with solid color (no image loaded)
       ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, CANVAS_PREVIEW_SIZE, CANVAS_PREVIEW_SIZE);
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     };
 
     // Use RAF to defer rendering to next frame (prioritizes UI responsiveness)
@@ -212,17 +242,18 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     canvasRef,
     redrawImage,
     SCALE_FACTOR,
+    getCanvasDimensions,
   ]);
 
   return (
-    <CanvasContainer>
+    <CanvasContainer $aspectRatio={aspectRatio}>
       <Canvas ref={canvasRef} />
     </CanvasContainer>
   );
 }
 
-const CanvasContainer = styled.div`
-  width: ${CANVAS_DISPLAY_SIZE}px;
+const CanvasContainer = styled.div<{ $aspectRatio: '1:1' | '4:5' }>`
+  width: ${props => props.$aspectRatio === '4:5' ? '256px' : `${CANVAS_DISPLAY_SIZE}px`};
   height: ${CANVAS_DISPLAY_SIZE}px;
   background-color: white;
   border-radius: 8px;
@@ -232,11 +263,13 @@ const CanvasContainer = styled.div`
   justify-content: center;
   position: relative;
   overflow: hidden;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
 `;
 
 const Canvas = styled.canvas`
-  width: ${CANVAS_DISPLAY_SIZE}px;
-  height: ${CANVAS_DISPLAY_SIZE}px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  transition: opacity 0.3s ease;
 `;

@@ -22,6 +22,12 @@ export const PanelRow = styled.div`
   align-items: center;
 `;
 
+export const PanelLabelWrapper = styled.div<{$textAlign: 'center' | 'left'| 'right'}>`
+  text-align :${props => props.$textAlign || 'left'}; 
+  max-width: 360px;
+  width:100%;
+  
+`
 // Label text
 export const PanelLabel = styled.span`
   font-size: 0.875rem;

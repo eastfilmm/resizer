@@ -9,9 +9,10 @@ import {
   backgroundColorAtom,
   glassBlurAtom,
   shadowEnabledAtom,
-  copyrightEnabledAtom
+  copyrightEnabledAtom,
+  canvasAspectRatioAtom
 } from '@/atoms/imageAtoms';
-import { PaddingPanel } from './panels/PaddingPanel';
+import { LayoutPanel } from './panels/LayoutPanel';
 import { BackgroundPanel } from './panels/BackgroundPanel';
 import { GlassBlurPanel } from './panels/GlassBlurPanel';
 import { CopyrightPanel } from './panels/CopyrightPanel';
@@ -35,7 +36,7 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'padding', label: 'Padding', icon: '/padding.svg' },
+  { id: 'layout', label: 'Layout', icon: '/layout.svg' },
   { id: 'background', label: 'Background', icon: '/background.svg' },
   { id: 'glassblur', label: 'Glass Blur', icon: '/glassBlur.svg' },
   { id: 'shadow', label: 'Shadow', icon: '/shadow.svg' },
@@ -43,7 +44,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  padding: 120,
+  layout: 200,
   background: 80,
   glassblur: 160,
   shadow: 160,
@@ -72,20 +73,24 @@ const NavButton = memo(({ item, isActive, isEnabled, onClick }: NavButtonProps) 
 NavButton.displayName = 'NavButton';
 
 const PanelContent = memo(({ activePanel }: { activePanel: NavPanelType }) => {
-  switch (activePanel) {
-    case 'padding':
-      return <PaddingPanel />;
-    case 'background':
-      return <BackgroundPanel />;
-    case 'glassblur':
-      return <GlassBlurPanel />;
-    case 'shadow':
-      return <ShadowPanel />;
-    case 'copyright':
-      return <CopyrightPanel />;
-    default:
-      return null;
-  }
+  const content = useMemo(() => {
+    switch (activePanel) {
+      case 'layout':
+        return <LayoutPanel />;
+      case 'background':
+        return <BackgroundPanel />;
+      case 'glassblur':
+        return <GlassBlurPanel />;
+      case 'shadow':
+        return <ShadowPanel />;
+      case 'copyright':
+        return <CopyrightPanel />;
+      default:
+        return null;
+    }
+  }, [activePanel]);
+
+  return <>{content}</>;
 });
 PanelContent.displayName = 'PanelContent';
 
@@ -96,10 +101,12 @@ export const NavigationBar = () => {
   const glassBlur = useAtomValue(glassBlurAtom);
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
   const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
+  const aspectRatio = useAtomValue(canvasAspectRatioAtom);
 
   const [displayedPanel, setDisplayedPanel] = useState<NavPanelType>(null);
   const [isContentVisible, setIsContentVisible] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Cleanup timer helper
   const clearTimer = useCallback(() => {
@@ -150,16 +157,37 @@ export const NavigationBar = () => {
 
   // Memoize enabled states
   const enabledStates = useMemo(() => ({
-    padding: paddingEnabled,
+    layout: paddingEnabled || aspectRatio !== '1:1',
     background: backgroundColor !== 'white',
     glassblur: glassBlur,
     shadow: shadowEnabled,
     copyright: copyrightEnabled,
-  }), [paddingEnabled, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled]);
+  }), [paddingEnabled, aspectRatio, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled]);
 
   const handleNavClick = useCallback((id: NavPanelType) => {
     setActivePanel(prev => prev === id ? null : id);
   }, [setActivePanel]);
+
+  // Close panel when clicking outside (except navigation bar)
+  useEffect(() => {
+    if (activePanel === null) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setActivePanel(null);
+      }
+    };
+
+    // Add listener on next tick to avoid immediate closure
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('mousedown', handleClickOutside);
+    }, 0);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activePanel, setActivePanel]);
 
   const activeIndex = useMemo(() => {
     if (activePanel === null) return -1;
@@ -169,7 +197,7 @@ export const NavigationBar = () => {
   const panelHeight = activePanel ? PANEL_HEIGHTS[activePanel] : 0;
 
   return (
-    <Container>
+    <Container ref={containerRef}>
       <PanelContainer $height={panelHeight}>
         <PanelContentWrapper $isVisible={isContentVisible}>
           <PanelContent activePanel={displayedPanel} />

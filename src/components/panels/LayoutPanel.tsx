@@ -1,0 +1,142 @@
+'use client';
+
+import styled from 'styled-components';
+import { useCallback } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { paddingEnabledAtom, paddingAtom } from '@/atoms/imageAtoms';
+import { useAspectRatio } from '@/hooks/useAspectRatio';
+import {
+  PanelContainer,
+  PanelRow,
+  PanelLabel,
+  PanelLabelWrapper,
+  ToggleSwitch,
+  SliderSection,
+  SliderLabelRow,
+  SliderLabel,
+  SliderValue,
+  Slider,
+} from './shared';
+
+const AspectRatioOptions = styled.div`
+  display: flex;
+  gap: 8px;
+  width: 100%;
+`;
+
+const AspectRatioButton = styled.button<{ $isActive: boolean }>`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid ${props => props.$isActive ? '#007bff' : '#ddd'};
+  border-radius: 8px;
+  background-color: ${props => props.$isActive ? '#e7f3ff' : 'white'};
+  color: ${props => props.$isActive ? '#007bff' : '#666'};
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #007bff;
+    background-color: ${props => props.$isActive ? '#e7f3ff' : '#f8f9fa'};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+const RatioIcon = styled.div<{ $ratio: '1:1' | '4:5'; $isActive: boolean }>`
+  width: ${props => props.$ratio === '1:1' ? '20px' : '16px'};
+  height: 20px;
+  border: 2px solid ${props => props.$isActive ? '#007bff' : '#999'};
+  border-radius: 3px;
+  transition: border-color 0.2s ease;
+`;
+
+const SectionDivider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 8px 0;
+`;
+
+export const LayoutPanel = () => {
+  const paddingEnabled = useAtomValue(paddingEnabledAtom);
+  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
+  const padding = useAtomValue(paddingAtom);
+  const setPadding = useSetAtom(paddingAtom);
+  const { aspectRatio, updateAspectRatio } = useAspectRatio();
+
+  const togglePadding = useCallback(() => {
+    setPaddingEnabled((prev) => !prev);
+  }, [setPaddingEnabled]);
+
+  const handlePaddingChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPadding(Number(e.target.value));
+    },
+    [setPadding]
+  );
+
+  const handleAspectRatioChange = useCallback(
+    (ratio: '1:1' | '4:5') => {
+      if (aspectRatio !== ratio) {
+        updateAspectRatio(ratio);
+      }
+    },
+    [aspectRatio, updateAspectRatio]
+  );
+
+  return (
+    <PanelContainer>
+      {/* Aspect Ratio Section */}
+      <PanelLabelWrapper $textAlign="left">
+        <PanelLabel>Canvas Ratio</PanelLabel>
+      </PanelLabelWrapper>
+      <AspectRatioOptions>
+        <AspectRatioButton
+          $isActive={aspectRatio === '1:1'}
+          onClick={() => handleAspectRatioChange('1:1')}
+        >
+          <RatioIcon $ratio="1:1" $isActive={aspectRatio === '1:1'} />
+          1:1
+        </AspectRatioButton>
+        <AspectRatioButton
+          $isActive={aspectRatio === '4:5'}
+          onClick={() => handleAspectRatioChange('4:5')}
+        >
+          <RatioIcon $ratio="4:5" $isActive={aspectRatio === '4:5'} />
+          4:5
+        </AspectRatioButton>
+      </AspectRatioOptions>
+
+      {/* <SectionDivider /> */}
+
+      {/* Padding Section */}
+      <PanelRow>
+        <PanelLabel>Padding</PanelLabel>
+        <ToggleSwitch $isActive={paddingEnabled} onClick={togglePadding} />
+      </PanelRow>
+
+      <SliderSection>
+        <SliderLabelRow>
+          <SliderLabel>Size</SliderLabel>
+          <SliderValue>{padding}px</SliderValue>
+        </SliderLabelRow>
+        <Slider
+          type="range"
+          min="0"
+          max="200"
+          value={padding}
+          onChange={handlePaddingChange}
+          disabled={!paddingEnabled}
+        />
+      </SliderSection>
+    </PanelContainer>
+  );
+};

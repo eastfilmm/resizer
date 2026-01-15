@@ -18,8 +18,15 @@ import {
 } from '@/atoms/imageAtoms';
 import { useResetState } from '@/hooks/useResetState';
 import { useIsSafari } from '@/hooks/useIsSafari';
+import { useAspectRatio } from '@/hooks/useAspectRatio';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
-import { COPYRIGHT_STORAGE_KEY, CANVAS_ACTUAL_SIZE, CANVAS_DISPLAY_SIZE } from '@/constants/canvas';
+import {
+  COPYRIGHT_STORAGE_KEY,
+  CANVAS_ACTUAL_SIZE,
+  CANVAS_DISPLAY_SIZE,
+  CANVAS_ACTUAL_SIZE_4_5_WIDTH,
+  CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
+} from '@/constants/canvas';
 import { drawImageWithEffects } from '@/utils/canvas';
 
 interface DownloadButtonProps {
@@ -42,6 +49,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
   const resetState = useResetState({ canvasRef, fileInputRef});
   const isSafari = useIsSafari();
+  const { aspectRatio } = useAspectRatio();
 
   const handleDownload = useCallback(async () => {
     if (!imageUrl) return;
@@ -53,6 +61,19 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
 
     let dataUrl: string;
 
+    const getCanvasDimensions = () => {
+      if (aspectRatio === '4:5') {
+        return {
+          width: CANVAS_ACTUAL_SIZE_4_5_WIDTH,
+          height: CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
+        };
+      }
+      return {
+        width: CANVAS_ACTUAL_SIZE,
+        height: CANVAS_ACTUAL_SIZE,
+      };
+    };
+
     if (isSafari) {
       // Safari: Create full-resolution canvas for download
       const img = new Image();
@@ -62,9 +83,10 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
         img.onerror = () => resolve();
       });
 
+      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
       const fullResCanvas = document.createElement('canvas');
-      fullResCanvas.width = CANVAS_ACTUAL_SIZE;
-      fullResCanvas.height = CANVAS_ACTUAL_SIZE;
+      fullResCanvas.width = canvasWidth;
+      fullResCanvas.height = canvasHeight;
       const ctx = fullResCanvas.getContext('2d');
       if (!ctx) return;
 
@@ -72,11 +94,14 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
       ctx.imageSmoothingQuality = 'high';
 
       const effectivePadding = paddingEnabled ? padding : 0;
-      const imageAreaSize = CANVAS_ACTUAL_SIZE - effectivePadding * 2;
+      const imageAreaWidth = canvasWidth - effectivePadding * 2;
+      const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
       drawImageWithEffects(ctx, img, {
-        actualCanvasSize: CANVAS_ACTUAL_SIZE,
-        imageAreaSize,
+        actualCanvasWidth: canvasWidth,
+        actualCanvasHeight: canvasHeight,
+        imageAreaWidth,
+        imageAreaHeight,
         bgColor: backgroundColor,
         useGlassBlur: glassBlur,
         blurIntensity,
@@ -119,6 +144,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     isSafari,
     canvasRef,
     resetState,
+    aspectRatio,
   ]);
 
   return (

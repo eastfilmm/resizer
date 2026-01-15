@@ -29,6 +29,7 @@ export const PanelContentWrapper = styled.div<{ $isVisible: boolean }>`
   align-items: center;
   opacity: ${props => props.$isVisible ? 1 : 0};
   transition: opacity 0.15s ease;
+  pointer-events: ${props => props.$isVisible ? 'auto' : 'none'};
 `;
 
 export const NavContainer = styled.div`

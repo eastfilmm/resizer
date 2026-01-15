@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 
 // 네비게이션 활성 패널 타입
-export type NavPanelType = 'padding' | 'background' | 'glassblur' | 'shadow' | 'copyright' | null;
+export type NavPanelType = 'layout' | 'background' | 'glassblur' | 'shadow' | 'copyright' | null;
 
 // 현재 활성화된 네비게이션 패널
 export const activeNavPanelAtom = atom<NavPanelType>(null);
@@ -42,6 +42,9 @@ export const shadowIntensityAtom = atom<number>(30);
 // Shadow 오프셋 (이미지 오른쪽/아래 방향, 1-50px)
 export const shadowOffsetAtom = atom<number>(20);
 
+// 캔버스 가로세로 비율 ('1:1' | '4:5')
+export const canvasAspectRatioAtom = atom<'1:1' | '4:5'>('1:1');
+
 // Reset 가능 여부 (이미지가 있거나 필터가 초기값과 다를 때)
 export const canResetAtom = atom((get) => {
   const hasImage = get(imageUrlAtom) !== null;
@@ -55,7 +58,7 @@ export const canResetAtom = atom((get) => {
     get(copyrightEnabledAtom) !== false ||
     get(shadowEnabledAtom) !== false ||
     get(shadowIntensityAtom) !== 30 ||
-    get(shadowOffsetAtom) !== 20;
+    get(shadowOffsetAtom) !== 20
 
   return hasImage || hasFilterChanges;
 });

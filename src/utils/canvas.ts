@@ -4,6 +4,10 @@ import { canvasRGB } from 'stackblur-canvas';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_DISPLAY_SIZE,
+  CANVAS_ACTUAL_SIZE_4_5_WIDTH,
+  CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
+  CANVAS_PREVIEW_SIZE_4_5_WIDTH,
+  CANVAS_PREVIEW_SIZE_4_5_HEIGHT,
   COPYRIGHT_FONT_SIZE,
   COPYRIGHT_OFFSET,
   COPYRIGHT_RIGHT_MARGIN,
@@ -22,21 +26,23 @@ export interface ImagePosition {
 export function resetCanvas(
   canvas: HTMLCanvasElement,
   backgroundColor: 'white' | 'black' = 'white',
-  options?: { actualSize?: number; displaySize?: number }
+  options?: { actualSize?: number; displaySize?: number; aspectRatio?: '1:1' | '4:5' }
 ) {
-  const actualSize = options?.actualSize ?? CANVAS_ACTUAL_SIZE;
+  const aspectRatio = options?.aspectRatio ?? '1:1';
+  const actualWidth = aspectRatio === '4:5' ? CANVAS_ACTUAL_SIZE_4_5_WIDTH : CANVAS_ACTUAL_SIZE;
+  const actualHeight = aspectRatio === '4:5' ? CANVAS_ACTUAL_SIZE_4_5_HEIGHT : CANVAS_ACTUAL_SIZE;
   const displaySize = options?.displaySize ?? CANVAS_DISPLAY_SIZE;
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  canvas.width = actualSize;
-  canvas.height = actualSize;
+  canvas.width = actualWidth;
+  canvas.height = actualHeight;
   canvas.style.width = `${displaySize}px`;
   canvas.style.height = `${displaySize}px`;
 
   ctx.fillStyle = backgroundColor;
-  ctx.fillRect(0, 0, actualSize, actualSize);
+  ctx.fillRect(0, 0, actualWidth, actualHeight);
 }
 
 /**
@@ -47,7 +53,8 @@ export function resetCanvas(
 export function drawGlassBlurBackground(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
-  canvasSize: number,
+  canvasWidth: number,
+  canvasHeight: number,
   intensity: number,
   overlayColor: string,
   opacity: number,
@@ -60,58 +67,59 @@ export function drawGlassBlurBackground(
 
   // Calculate margin for edge clamping (3x blur intensity)
   const margin = Math.ceil(intensity * 3);
-  const expandedSize = canvasSize + margin * 2;
+  const expandedWidth = canvasWidth + margin * 2;
+  const expandedHeight = canvasHeight + margin * 2;
 
   // Create a temporary canvas with expanded size for edge clamping
   const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = expandedSize;
-  tempCanvas.height = expandedSize;
+  tempCanvas.width = expandedWidth;
+  tempCanvas.height = expandedHeight;
   const tempCtx = tempCanvas.getContext('2d');
   if (!tempCtx) return;
 
   // Draw cropped center square to the center of expanded canvas
-  tempCtx.drawImage(img, sx, sy, minDim, minDim, margin, margin, canvasSize, canvasSize);
+  tempCtx.drawImage(img, sx, sy, minDim, minDim, margin, margin, canvasWidth, canvasHeight);
 
   // Edge clamp: extend edges by copying edge pixels
   // Top edge
-  tempCtx.drawImage(tempCanvas, margin, margin, canvasSize, 1, margin, 0, canvasSize, margin);
+  tempCtx.drawImage(tempCanvas, margin, margin, canvasWidth, 1, margin, 0, canvasWidth, margin);
   // Bottom edge
   tempCtx.drawImage(
     tempCanvas,
     margin,
-    margin + canvasSize - 1,
-    canvasSize,
+    margin + canvasHeight - 1,
+    canvasWidth,
     1,
     margin,
-    margin + canvasSize,
-    canvasSize,
+    margin + canvasHeight,
+    canvasWidth,
     margin
   );
   // Left edge (including corners)
-  tempCtx.drawImage(tempCanvas, margin, 0, 1, expandedSize, 0, 0, margin, expandedSize);
+  tempCtx.drawImage(tempCanvas, margin, 0, 1, expandedHeight, 0, 0, margin, expandedHeight);
   // Right edge (including corners)
   tempCtx.drawImage(
     tempCanvas,
-    margin + canvasSize - 1,
+    margin + canvasWidth - 1,
     0,
     1,
-    expandedSize,
-    margin + canvasSize,
+    expandedHeight,
+    margin + canvasWidth,
     0,
     margin,
-    expandedSize
+    expandedHeight
   );
 
   if (isSafari) {
     // Safari: Use JavaScript-based stackblur (CSS filter has caching issues)
-    canvasRGB(tempCanvas, 0, 0, expandedSize, expandedSize, Math.round(intensity));
+    canvasRGB(tempCanvas, 0, 0, expandedWidth, expandedHeight, Math.round(intensity));
     // Copy only the center portion (without margins) to the main canvas
-    ctx.drawImage(tempCanvas, margin, margin, canvasSize, canvasSize, 0, 0, canvasSize, canvasSize);
+    ctx.drawImage(tempCanvas, margin, margin, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
   } else {
     // Chrome/Firefox: Use fast CSS filter blur
     const blurCanvas = document.createElement('canvas');
-    blurCanvas.width = expandedSize;
-    blurCanvas.height = expandedSize;
+    blurCanvas.width = expandedWidth;
+    blurCanvas.height = expandedHeight;
     const blurCtx = blurCanvas.getContext('2d');
     if (!blurCtx) return;
 
@@ -120,13 +128,13 @@ export function drawGlassBlurBackground(
     blurCtx.filter = 'none';
 
     // Copy only the center portion (without margins) to the main canvas
-    ctx.drawImage(blurCanvas, margin, margin, canvasSize, canvasSize, 0, 0, canvasSize, canvasSize);
+    ctx.drawImage(blurCanvas, margin, margin, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
   }
 
   // Apply color overlay with configurable transparency
   ctx.globalAlpha = opacity;
   ctx.fillStyle = overlayColor;
-  ctx.fillRect(0, 0, canvasSize, canvasSize);
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   ctx.globalAlpha = 1.0;
 }
 
@@ -174,8 +182,10 @@ export function drawCopyrightText(
 }
 
 export interface DrawImageOptions {
-  actualCanvasSize: number;
-  imageAreaSize: number;
+  actualCanvasWidth: number;
+  actualCanvasHeight: number;
+  imageAreaWidth: number;
+  imageAreaHeight: number;
   bgColor: string;
   useGlassBlur: boolean;
   blurIntensity: number;
@@ -199,8 +209,10 @@ export function drawImageWithEffects(
   options: DrawImageOptions
 ): ImagePosition {
   const {
-    actualCanvasSize,
-    imageAreaSize,
+    actualCanvasWidth,
+    actualCanvasHeight,
+    imageAreaWidth,
+    imageAreaHeight,
     bgColor,
     useGlassBlur,
     blurIntensity,
@@ -215,19 +227,19 @@ export function drawImageWithEffects(
   } = options;
 
   // Initialize canvas with selected background color
-  ctx.clearRect(0, 0, actualCanvasSize, actualCanvasSize);
+  ctx.clearRect(0, 0, actualCanvasWidth, actualCanvasHeight);
 
   // If glass blur is enabled, draw blurred background from image
   if (useGlassBlur) {
-    drawGlassBlurBackground(ctx, img, actualCanvasSize, blurIntensity, bgColor, overlayOpacity, isSafari);
+    drawGlassBlurBackground(ctx, img, actualCanvasWidth, actualCanvasHeight, blurIntensity, bgColor, overlayOpacity, isSafari);
   } else {
     ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, actualCanvasSize, actualCanvasSize);
+    ctx.fillRect(0, 0, actualCanvasWidth, actualCanvasHeight);
   }
 
   // Maximum area for image (excluding padding)
-  const maxWidth = imageAreaSize;
-  const maxHeight = imageAreaSize;
+  const maxWidth = imageAreaWidth;
+  const maxHeight = imageAreaHeight;
 
   let { width, height } = img;
 
@@ -240,8 +252,8 @@ export function drawImageWithEffects(
   // Center image on canvas (considering padding)
   // If shadow is enabled, offset image slightly to top-left to make room for shadow
   const shadowAdjust = useShadow ? shadowOffset / 2 : 0;
-  const x = (actualCanvasSize - width) / 2 - shadowAdjust;
-  const y = (actualCanvasSize - height) / 2 - shadowAdjust;
+  const x = (actualCanvasWidth - width) / 2 - shadowAdjust;
+  const y = (actualCanvasHeight - height) / 2 - shadowAdjust;
 
   const imagePosition: ImagePosition = { x, y, width, height };
 
