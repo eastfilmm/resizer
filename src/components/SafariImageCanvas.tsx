@@ -250,7 +250,6 @@ const CanvasContainer = styled.div<{ $aspectRatio: '1:1' | '4:5' }>`
   width: ${props => props.$aspectRatio === '4:5' ? '256px' : `${CANVAS_DISPLAY_SIZE}px`};
   height: ${CANVAS_DISPLAY_SIZE}px;
   background-color: white;
-  border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
