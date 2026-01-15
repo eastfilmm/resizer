@@ -9,7 +9,6 @@ import {
   glassBlurAtom,
   blurIntensityAtom,
   overlayOpacityAtom,
-  paddingEnabledAtom,
   paddingAtom,
   copyrightEnabledAtom,
   copyrightTextAtom,
@@ -39,14 +38,12 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
   const glassBlur = useAtomValue(glassBlurAtom);
   const blurIntensity = useAtomValue(blurIntensityAtom);
   const overlayOpacity = useAtomValue(overlayOpacityAtom);
-  const paddingEnabled = useAtomValue(paddingEnabledAtom);
   const padding = useAtomValue(paddingAtom);
   const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
   const copyrightText = useAtomValue(copyrightTextAtom);
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
   const shadowIntensity = useAtomValue(shadowIntensityAtom);
   const shadowOffset = useAtomValue(shadowOffsetAtom);
-  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
   const { aspectRatio } = useAspectRatio();
 
   // Refs to access current values in callbacks without re-triggering effects
@@ -144,13 +141,11 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     const newImg = new Image();
     newImg.onload = () => {
       imageRef.current = newImg;
-      // Reset padding to disabled when new image is loaded (image fills canvas edge-to-edge)
-      setPaddingEnabled(false);
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
       redrawImage(ctx, newImg, canvasWidth, canvasHeight);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, setPaddingEnabled, redrawImage, getCanvasDimensions]);
+  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions]);
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -193,7 +188,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
 
     const performRender = () => {
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-      const effectivePadding = paddingEnabled ? padding * SCALE_FACTOR : 0;
+      const effectivePadding = padding * SCALE_FACTOR;
       const imageAreaWidth = canvasWidth - effectivePadding * 2;
       const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
@@ -232,7 +227,6 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     glassBlur,
     blurIntensity,
     overlayOpacity,
-    paddingEnabled,
     padding,
     copyrightEnabled,
     copyrightText,

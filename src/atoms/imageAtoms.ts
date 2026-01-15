@@ -21,11 +21,8 @@ export const blurIntensityAtom = atom<number>(30);
 // 색상 오버레이 투명도 (0-100%, 0.0-1.0)
 export const overlayOpacityAtom = atom<number>(0.3);
 
-// 캔버스 패딩 활성화 여부
-export const paddingEnabledAtom = atom<boolean>(false);
-
 // 캔버스 패딩 (0-200px 범위, 캔버스 기준 2000px)
-export const paddingAtom = atom<number>(40);
+export const paddingAtom = atom<number>(0);
 
 // Copyright 기능 활성화 여부
 export const copyrightEnabledAtom = atom<boolean>(false);
@@ -50,8 +47,7 @@ export const canResetAtom = atom((get) => {
   const hasImage = get(imageUrlAtom) !== null;
   const hasFilterChanges =
     get(backgroundColorAtom) !== 'white' ||
-    get(paddingEnabledAtom) !== false ||
-    get(paddingAtom) !== 40 ||
+    get(paddingAtom) !== 0 ||
     get(glassBlurAtom) !== false ||
     get(blurIntensityAtom) !== 30 ||
     get(overlayOpacityAtom) !== 0.3 ||

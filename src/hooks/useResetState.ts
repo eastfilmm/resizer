@@ -5,7 +5,6 @@ import { useSetAtom } from 'jotai';
 import {
   imageUrlAtom,
   backgroundColorAtom,
-  paddingEnabledAtom,
   paddingAtom,
   glassBlurAtom,
   blurIntensityAtom,
@@ -21,7 +20,7 @@ import { resetCanvas } from '@/utils/canvas';
 export const DEFAULT_VALUES = {
   backgroundColor: 'white' as const,
   paddingEnabled: false,
-  padding: 40,
+  padding: 0,
   glassBlur: false,
   blurIntensity: 30,
   overlayOpacity: 0.3,
@@ -39,7 +38,6 @@ interface UseResetStateProps {
 export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) => {
   const setImageUrl = useSetAtom(imageUrlAtom);
   const setBackgroundColor = useSetAtom(backgroundColorAtom);
-  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
   const setPadding = useSetAtom(paddingAtom);
   const setGlassBlur = useSetAtom(glassBlurAtom);
   const setBlurIntensity = useSetAtom(blurIntensityAtom);
@@ -58,7 +56,6 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
 
     // Reset all settings to default values
     setBackgroundColor(DEFAULT_VALUES.backgroundColor);
-    setPaddingEnabled(DEFAULT_VALUES.paddingEnabled);
     setPadding(DEFAULT_VALUES.padding);
     setGlassBlur(DEFAULT_VALUES.glassBlur);
     setBlurIntensity(DEFAULT_VALUES.blurIntensity);
@@ -77,7 +74,6 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     fileInputRef,
     setImageUrl,
     setBackgroundColor,
-    setPaddingEnabled,
     setPadding,
     setGlassBlur,
     setBlurIntensity,

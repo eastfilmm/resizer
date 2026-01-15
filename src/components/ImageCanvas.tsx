@@ -9,7 +9,6 @@ import {
   glassBlurAtom,
   blurIntensityAtom,
   overlayOpacityAtom,
-  paddingEnabledAtom,
   paddingAtom,
   copyrightEnabledAtom,
   copyrightTextAtom,
@@ -36,14 +35,12 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const glassBlur = useAtomValue(glassBlurAtom);
   const blurIntensity = useAtomValue(blurIntensityAtom);
   const overlayOpacity = useAtomValue(overlayOpacityAtom);
-  const paddingEnabled = useAtomValue(paddingEnabledAtom);
   const padding = useAtomValue(paddingAtom);
   const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
   const copyrightText = useAtomValue(copyrightTextAtom);
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
   const shadowIntensity = useAtomValue(shadowIntensityAtom);
   const shadowOffset = useAtomValue(shadowOffsetAtom);
-  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
   const { aspectRatio } = useAspectRatio();
 
   // Refs to access current values in callbacks without re-triggering effects
@@ -133,13 +130,11 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const newImg = new Image();
     newImg.onload = () => {
       imageRef.current = newImg;
-      // Reset padding to disabled when new image is loaded (image fills canvas edge-to-edge)
-      setPaddingEnabled(false);
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
       redrawImage(ctx, newImg, canvasWidth, canvasHeight);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, setPaddingEnabled, redrawImage, getCanvasDimensions]);
+  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions]);
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -181,7 +176,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-    const effectivePadding = paddingEnabled ? padding : 0;
+    const effectivePadding = padding;
     const imageAreaWidth = canvasWidth - effectivePadding * 2;
     const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
@@ -199,7 +194,6 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     glassBlur,
     blurIntensity,
     overlayOpacity,
-    paddingEnabled,
     padding,
     copyrightEnabled,
     copyrightText,

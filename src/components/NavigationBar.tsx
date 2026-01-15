@@ -5,7 +5,6 @@ import { useAtom, useAtomValue } from 'jotai';
 import { 
   activeNavPanelAtom, 
   NavPanelType,
-  paddingEnabledAtom,
   backgroundColorAtom,
   glassBlurAtom,
   shadowEnabledAtom,
@@ -44,7 +43,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 200,
+  layout: 160,
   background: 80,
   glassblur: 160,
   shadow: 160,
@@ -96,7 +95,6 @@ PanelContent.displayName = 'PanelContent';
 
 export const NavigationBar = () => {
   const [activePanel, setActivePanel] = useAtom(activeNavPanelAtom);
-  const paddingEnabled = useAtomValue(paddingEnabledAtom);
   const backgroundColor = useAtomValue(backgroundColorAtom);
   const glassBlur = useAtomValue(glassBlurAtom);
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
@@ -157,12 +155,12 @@ export const NavigationBar = () => {
 
   // Memoize enabled states
   const enabledStates = useMemo(() => ({
-    layout: paddingEnabled || aspectRatio !== '1:1',
+    layout: aspectRatio !== '1:1',
     background: backgroundColor !== 'white',
     glassblur: glassBlur,
     shadow: shadowEnabled,
     copyright: copyrightEnabled,
-  }), [paddingEnabled, aspectRatio, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled]);
+  }), [ aspectRatio, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled]);
 
   const handleNavClick = useCallback((id: NavPanelType) => {
     setActivePanel(prev => prev === id ? null : id);

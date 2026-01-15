@@ -5,7 +5,6 @@ import { useAtomValue } from 'jotai';
 import {
   imageUrlAtom,
   backgroundColorAtom,
-  paddingEnabledAtom,
   paddingAtom,
   glassBlurAtom,
   blurIntensityAtom,
@@ -38,7 +37,6 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   const imageUrl = useAtomValue(imageUrlAtom);
   const copyrightText = useAtomValue(copyrightTextAtom);
   const backgroundColor = useAtomValue(backgroundColorAtom);
-  const paddingEnabled = useAtomValue(paddingEnabledAtom);
   const padding = useAtomValue(paddingAtom);
   const glassBlur = useAtomValue(glassBlurAtom);
   const blurIntensity = useAtomValue(blurIntensityAtom);
@@ -93,7 +91,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      const effectivePadding = paddingEnabled ? padding : 0;
+      const effectivePadding = 0;
       const imageAreaWidth = canvasWidth - effectivePadding * 2;
       const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
@@ -132,7 +130,6 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     imageUrl,
     copyrightText,
     backgroundColor,
-    paddingEnabled,
     padding,
     glassBlur,
     blurIntensity,

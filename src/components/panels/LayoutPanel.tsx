@@ -3,17 +3,14 @@
 import styled from 'styled-components';
 import { useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { paddingEnabledAtom, paddingAtom } from '@/atoms/imageAtoms';
+import { paddingAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import {
   PanelContainer,
-  PanelRow,
   PanelLabel,
   PanelLabelWrapper,
-  ToggleSwitch,
   SliderSection,
   SliderLabelRow,
-  SliderLabel,
   SliderValue,
   Slider,
 } from './shared';
@@ -58,23 +55,10 @@ const RatioIcon = styled.div<{ $ratio: '1:1' | '4:5'; $isActive: boolean }>`
   transition: border-color 0.2s ease;
 `;
 
-const SectionDivider = styled.div`
-  width: 100%;
-  height: 1px;
-  background-color: #e0e0e0;
-  margin: 8px 0;
-`;
-
 export const LayoutPanel = () => {
-  const paddingEnabled = useAtomValue(paddingEnabledAtom);
-  const setPaddingEnabled = useSetAtom(paddingEnabledAtom);
   const padding = useAtomValue(paddingAtom);
   const setPadding = useSetAtom(paddingAtom);
   const { aspectRatio, updateAspectRatio } = useAspectRatio();
-
-  const togglePadding = useCallback(() => {
-    setPaddingEnabled((prev) => !prev);
-  }, [setPaddingEnabled]);
 
   const handlePaddingChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,15 +101,11 @@ export const LayoutPanel = () => {
 
       {/* <SectionDivider /> */}
 
-      {/* Padding Section */}
-      <PanelRow>
-        <PanelLabel>Padding</PanelLabel>
-        <ToggleSwitch $isActive={paddingEnabled} onClick={togglePadding} />
-      </PanelRow>
+      {     /* Padding Section */}
 
       <SliderSection>
         <SliderLabelRow>
-          <SliderLabel>Size</SliderLabel>
+        <PanelLabel>Padding</PanelLabel>
           <SliderValue>{padding}px</SliderValue>
         </SliderLabelRow>
         <Slider
@@ -134,7 +114,6 @@ export const LayoutPanel = () => {
           max="200"
           value={padding}
           onChange={handlePaddingChange}
-          disabled={!paddingEnabled}
         />
       </SliderSection>
     </PanelContainer>
