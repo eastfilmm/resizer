@@ -8,5 +8,6 @@
     "javascriptreact",
     "typescript",
     "typescriptreact"
-  ]
+  ],
+  "vs-code-prettier-eslint.prettierLast": true
 }

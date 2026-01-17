@@ -2,7 +2,7 @@
 
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom, useStore } from 'jotai';
 import {
   imageUrlAtom,
   backgroundColorAtom,
@@ -35,29 +35,21 @@ interface SafariImageCanvasProps {
  * Safari-optimized canvas component with reduced resolution for better performance
  */
 export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps) {
+  const store = useStore();
   const imageUrl = useAtomValue(imageUrlAtom);
-  const backgroundColor = useAtomValue(backgroundColorAtom);
-  const glassBlur = useAtomValue(glassBlurAtom);
-  const blurIntensity = useAtomValue(blurIntensityAtom);
-  const overlayOpacity = useAtomValue(overlayOpacityAtom);
-  const padding = useAtomValue(paddingAtom);
-  const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
-  const copyrightText = useAtomValue(copyrightTextAtom);
-  const shadowEnabled = useAtomValue(shadowEnabledAtom);
-  const shadowIntensity = useAtomValue(shadowIntensityAtom);
-  const shadowOffset = useAtomValue(shadowOffsetAtom);
   const { aspectRatio } = useAspectRatio();
 
   // Refs to access current values in callbacks without re-triggering effects
-  const backgroundColorRef = useRef(backgroundColor);
-  const glassBlurRef = useRef(glassBlur);
-  const blurIntensityRef = useRef(blurIntensity);
-  const overlayOpacityRef = useRef(overlayOpacity);
-  const copyrightEnabledRef = useRef(copyrightEnabled);
-  const copyrightTextRef = useRef(copyrightText);
-  const shadowEnabledRef = useRef(shadowEnabled);
-  const shadowIntensityRef = useRef(shadowIntensity);
-  const shadowOffsetRef = useRef(shadowOffset);
+  const backgroundColorRef = useRef(store.get(backgroundColorAtom));
+  const glassBlurRef = useRef(store.get(glassBlurAtom));
+  const blurIntensityRef = useRef(store.get(blurIntensityAtom));
+  const overlayOpacityRef = useRef(store.get(overlayOpacityAtom));
+  const paddingRef = useRef(store.get(paddingAtom));
+  const copyrightEnabledRef = useRef(store.get(copyrightEnabledAtom));
+  const copyrightTextRef = useRef(store.get(copyrightTextAtom));
+  const shadowEnabledRef = useRef(store.get(shadowEnabledAtom));
+  const shadowIntensityRef = useRef(store.get(shadowIntensityAtom));
+  const shadowOffsetRef = useRef(store.get(shadowOffsetAtom));
   const aspectRatioRef = useRef(aspectRatio);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<ImagePosition | null>(null);
@@ -69,57 +61,59 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
   // Scale factor: 1000/2000 = 0.5
   const SCALE_FACTOR = CANVAS_PREVIEW_SIZE / 2000;
 
-  // Keep refs in sync with state
-  backgroundColorRef.current = backgroundColor;
-  glassBlurRef.current = glassBlur;
-  blurIntensityRef.current = blurIntensity;
-  overlayOpacityRef.current = overlayOpacity;
-  copyrightEnabledRef.current = copyrightEnabled;
-  copyrightTextRef.current = copyrightText;
-  shadowEnabledRef.current = shadowEnabled;
-  shadowIntensityRef.current = shadowIntensity;
-  shadowOffsetRef.current = shadowOffset;
+  // Keep aspectRatioRef in sync with state
   aspectRatioRef.current = aspectRatio;
 
-   const getCanvasDimensions = useCallback(() => {
-     if (aspectRatioRef.current === '4:5') {
-       return {
-         width: CANVAS_PREVIEW_SIZE_4_5_WIDTH,
-         height: CANVAS_PREVIEW_SIZE_4_5_HEIGHT,
-       };
-     }
-     if (aspectRatioRef.current === '9:16') {
-       return {
-         width: CANVAS_PREVIEW_SIZE_9_16_WIDTH,
-         height: CANVAS_PREVIEW_SIZE_9_16_HEIGHT,
-       };
-     }
-     return {
-       width: CANVAS_PREVIEW_SIZE,
-       height: CANVAS_PREVIEW_SIZE,
-     };
-   }, []);
+  const getCanvasDimensions = useCallback(() => {
+    if (aspectRatioRef.current === '4:5') {
+      return {
+        width: CANVAS_PREVIEW_SIZE_4_5_WIDTH,
+        height: CANVAS_PREVIEW_SIZE_4_5_HEIGHT,
+      };
+    }
+    if (aspectRatioRef.current === '9:16') {
+      return {
+        width: CANVAS_PREVIEW_SIZE_9_16_WIDTH,
+        height: CANVAS_PREVIEW_SIZE_9_16_HEIGHT,
+      };
+    }
+    return {
+      width: CANVAS_PREVIEW_SIZE,
+      height: CANVAS_PREVIEW_SIZE,
+    };
+  }, []);
 
   const redrawImage = useCallback(
-    (ctx: CanvasRenderingContext2D, img: HTMLImageElement, imageAreaWidth: number, imageAreaHeight: number) => {
+    (ctx: CanvasRenderingContext2D, img: HTMLImageElement | null) => {
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-      imagePositionRef.current = drawImageWithEffects(ctx, img, {
-        actualCanvasWidth: canvasWidth,
-        actualCanvasHeight: canvasHeight,
-        imageAreaWidth,
-        imageAreaHeight,
-        bgColor: backgroundColorRef.current,
-        useGlassBlur: glassBlurRef.current,
-        blurIntensity: blurIntensityRef.current * SCALE_FACTOR,
-        overlayOpacity: overlayOpacityRef.current,
-        showCopyright: copyrightEnabledRef.current,
-        copyrightText: copyrightTextRef.current,
-        useShadow: shadowEnabledRef.current,
-        shadowIntensity: shadowIntensityRef.current * SCALE_FACTOR,
-        shadowOffset: shadowOffsetRef.current * SCALE_FACTOR,
-        scaleFactor: SCALE_FACTOR,
-        isSafari: true,
-      });
+      const padding = paddingRef.current;
+      const effectivePadding = padding * SCALE_FACTOR;
+      const imageAreaWidth = canvasWidth - effectivePadding * 2;
+      const imageAreaHeight = canvasHeight - effectivePadding * 2;
+
+      if (img) {
+        imagePositionRef.current = drawImageWithEffects(ctx, img, {
+          actualCanvasWidth: canvasWidth,
+          actualCanvasHeight: canvasHeight,
+          imageAreaWidth,
+          imageAreaHeight,
+          bgColor: backgroundColorRef.current,
+          useGlassBlur: glassBlurRef.current,
+          blurIntensity: blurIntensityRef.current * SCALE_FACTOR,
+          overlayOpacity: overlayOpacityRef.current,
+          showCopyright: copyrightEnabledRef.current,
+          copyrightText: copyrightTextRef.current,
+          useShadow: shadowEnabledRef.current,
+          shadowIntensity: shadowIntensityRef.current * SCALE_FACTOR,
+          shadowOffset: shadowOffsetRef.current * SCALE_FACTOR,
+          scaleFactor: SCALE_FACTOR,
+          isSafari: true,
+        });
+      } else {
+        // Fill background with solid color (no image loaded)
+        ctx.fillStyle = backgroundColorRef.current;
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      }
     },
     [getCanvasDimensions, SCALE_FACTOR]
   );
@@ -132,9 +126,6 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-    // 패딩은 styled.div에서만 관리
-    const imageAreaWidth = canvasWidth;
-    const imageAreaHeight = canvasHeight;
 
     // Set canvas to preview size
     canvas.width = canvasWidth;
@@ -152,10 +143,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     const newImg = new Image();
     newImg.onload = () => {
       imageRef.current = newImg;
-      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-      const imageAreaWidth = canvasWidth;
-      const imageAreaHeight = canvasHeight;
-      redrawImage(ctx, newImg, imageAreaWidth, imageAreaHeight);
+      redrawImage(ctx, newImg);
     };
     newImg.src = imageUrl;
   }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions]);
@@ -178,6 +166,67 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     }
   }, [canvasRef, getCanvasDimensions]);
 
+  // Handle effect changes imperatively with RAF throttle
+  useEffect(() => {
+    const atomsToWatch = [
+      backgroundColorAtom,
+      glassBlurAtom,
+      blurIntensityAtom,
+      overlayOpacityAtom,
+      paddingAtom,
+      copyrightEnabledAtom,
+      copyrightTextAtom,
+      shadowEnabledAtom,
+      shadowIntensityAtom,
+      shadowOffsetAtom,
+    ];
+
+    const performRender = () => {
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) {
+          redrawImage(ctx, imageRef.current);
+        }
+      }
+    };
+
+    const unsubscribes = atomsToWatch.map((atom) =>
+      store.sub(atom, () => {
+        // Update refs
+        backgroundColorRef.current = store.get(backgroundColorAtom);
+        glassBlurRef.current = store.get(glassBlurAtom);
+        blurIntensityRef.current = store.get(blurIntensityAtom);
+        overlayOpacityRef.current = store.get(overlayOpacityAtom);
+        paddingRef.current = store.get(paddingAtom);
+        copyrightEnabledRef.current = store.get(copyrightEnabledAtom);
+        copyrightTextRef.current = store.get(copyrightTextAtom);
+        shadowEnabledRef.current = store.get(shadowEnabledAtom);
+        shadowIntensityRef.current = store.get(shadowIntensityAtom);
+        shadowOffsetRef.current = store.get(shadowOffsetAtom);
+
+        // Schedule RAF throttle
+        pendingRenderRef.current = true;
+        if (rafIdRef.current === null) {
+          rafIdRef.current = requestAnimationFrame(() => {
+            rafIdRef.current = null;
+            if (pendingRenderRef.current) {
+              pendingRenderRef.current = false;
+              performRender();
+            }
+          });
+        }
+      })
+    );
+
+    return () => {
+      unsubscribes.forEach((unsub) => unsub());
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
+  }, [store, canvasRef, redrawImage]);
+
   // Draw image when imageUrl or aspectRatio changes
   useEffect(() => {
     if (imageUrl) {
@@ -188,69 +237,17 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
       // Clear image reference when imageUrl is null (reset)
       imageRef.current = null;
       imagePositionRef.current = null;
-    }
-  }, [imageUrl, aspectRatio, drawImageOnCanvas]);
-
-  // Update canvas when any effect settings change (RAF throttle for Safari performance)
-  useEffect(() => {
-    if (!canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const performRender = () => {
-      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-      const effectivePadding = padding * SCALE_FACTOR;
-      const imageAreaWidth = canvasWidth - effectivePadding * 2;
-      const imageAreaHeight = canvasHeight - effectivePadding * 2;
-
-      // If we have an image, redraw it with new settings
-      if (imageRef.current) {
-        redrawImage(ctx, imageRef.current, imageAreaWidth, imageAreaHeight);
-        return;
-      }
-
-      // Fill background with solid color (no image loaded)
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    };
-
-    // Use RAF to defer rendering to next frame (prioritizes UI responsiveness)
-    pendingRenderRef.current = true;
-    if (rafIdRef.current === null) {
-      rafIdRef.current = requestAnimationFrame(() => {
-        rafIdRef.current = null;
-        if (pendingRenderRef.current) {
-          pendingRenderRef.current = false;
-          performRender();
+      // Clear canvas
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) {
+          const { width, height } = getCanvasDimensions();
+          ctx.fillStyle = backgroundColorRef.current;
+          ctx.fillRect(0, 0, width, height);
         }
-      });
-    }
-
-    // Cleanup RAF on unmount or before next effect
-    return () => {
-      if (rafIdRef.current !== null) {
-        cancelAnimationFrame(rafIdRef.current);
-        rafIdRef.current = null;
       }
-    };
-  }, [
-    backgroundColor,
-    glassBlur,
-    blurIntensity,
-    overlayOpacity,
-    padding,
-    copyrightEnabled,
-    copyrightText,
-    shadowEnabled,
-    shadowIntensity,
-    shadowOffset,
-    canvasRef,
-    redrawImage,
-    SCALE_FACTOR,
-    getCanvasDimensions,
-  ]);
+    }
+  }, [imageUrl, aspectRatio, drawImageOnCanvas, getCanvasDimensions]);
 
   return (
     <CanvasContainer $aspectRatio={aspectRatio as '1:1' | '4:5' | '9:16'}>
@@ -263,8 +260,8 @@ const CanvasContainer = styled.div<{ $aspectRatio: '1:1' | '4:5' | '9:16' }>`
   width: ${props => props.$aspectRatio === '4:5'
     ? '256px'
     : props.$aspectRatio === '9:16'
-    ? '180px' // 320 * 9/16 for display (rounded)
-    : `${CANVAS_DISPLAY_SIZE}px`};
+      ? '180px' // 320 * 9/16 for display (rounded)
+      : `${CANVAS_DISPLAY_SIZE}px`};
   height: ${CANVAS_DISPLAY_SIZE}px;
   background-color: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
