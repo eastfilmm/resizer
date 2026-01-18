@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     siteName: "Resizer App",
     images: [
       {
-        url: "https://resizer-nine.vercel.app/public/resizer_icon.png",
+        url: "https://resizer-nine.vercel.app/resizer_icon.png", // ← public 앞 경로 빼야 정상적으로 OG 이미지 동작
         width: 600,
         height: 600,
       },
