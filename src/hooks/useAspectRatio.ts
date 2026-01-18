@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { canvasAspectRatioAtom } from '@/atoms/imageAtoms';
-import { ASPECT_RATIO_STORAGE_KEY } from '@/constants/canvas';
+import { ASPECT_RATIO_STORAGE_KEY } from '@/constants/CanvasContents';
 
 export const useAspectRatio = () => {
   const [aspectRatio, setAspectRatio] = useAtom(canvasAspectRatioAtom);

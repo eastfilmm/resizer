@@ -52,16 +52,15 @@ resizer/
     │   │   └── shared.tsx            # Shared panel styled components
     │   ├── ActionButtons.tsx         # Upload/Download/Reset button group
     │   ├── DownloadButton.tsx        # Export and reset after download
-    │   ├── ImageCanvas.tsx           # Chrome/Firefox canvas (2000x2000 full res)
+    │   ├── ImageCanvas.tsx           # Unified canvas (Safari + Chrome/Firefox)
     │   ├── ImageUploader.tsx         # File upload handling
     │   ├── NavigationBar.tsx         # Bottom navigation with effect panels
     │   ├── NavigationBar.styles.tsx  # NavigationBar styled components
-    │   ├── ResetButton.tsx           # Reset all settings
-    │   └── SafariImageCanvas.tsx     # Safari-optimized canvas (1000x1000 preview)
+    │   └── ResetButton.tsx           # Reset all settings
     ├── constants/             # App constants
-    │   └── canvas.ts          # Canvas sizes and constants
+    │   └── CanvasContents.ts  # Canvas sizes, aspect ratios, and constants
     ├── hooks/                 # Custom React hooks
-    │   ├── useAspectRatio.ts  # Aspect ratio calculation hook
+    │   ├── useAspectRatio.ts  # Aspect ratio state management hook
     │   ├── useIsSafari.ts     # Safari browser detection
     │   └── useResetState.ts   # Reset state logic with default values
     ├── lib/                   # Library utilities
@@ -69,7 +68,7 @@ resizer/
     ├── types/                 # TypeScript type definitions
     │   └── styled-components.d.ts
     └── utils/                 # Helper/utility functions
-        └── canvas.ts          # Canvas rendering utilities
+        └── CanvasUtils.ts     # Canvas rendering utilities and helpers
 ```
 
 ## 주요 디렉토리 설명
@@ -82,21 +81,22 @@ Jotai 상태 관리 atom 정의. `imageAtoms.ts`에 모든 애플리케이션 �
 
 ### `src/components/`
 React 컴포넌트들:
-- **`panels/`**: 각 효과 제어 패널 컴포넌트
-- **`styled/`**: 재사용 가능한 스타일 컴포넌트
-- 캔버스, 업로드, 다운로드 등 주요 기능 컴포넌트
+- **`panels/`**: 각 효과 제어 패널 컴포넌트 (Background, Copyright, GlassBlur, Layout, Shadow)
+- **`styled/`**: 재사용 가능한 스타일 컴포넌트 (Button, Layout)
+- `ImageCanvas.tsx`: 통합 캔버스 컴포넌트 (Safari와 Chrome/Firefox 모두 처리)
+- 업로드, 다운로드, 리셋 등 주요 기능 컴포넌트
 
 ### `src/hooks/`
 커스텀 React 훅:
 - `useIsSafari`: Safari 브라우저 감지
 - `useResetState`: 상태 리셋 로직
-- `useAspectRatio`: 이미지 비율 계산
+- `useAspectRatio`: 캔버스 비율 상태 관리 (1:1, 4:5, 9:16)
 
 ### `src/utils/`
-유틸리티 함수. `canvas.ts`에 캔버스 렌더링 관련 모든 로직이 포함되어 있습니다.
+유틸리티 함수. `CanvasUtils.ts`에 캔버스 렌더링 관련 모든 로직이 포함되어 있습니다.
 
 ### `src/constants/`
-애플리케이션 상수. 캔버스 크기 등이 정의되어 있습니다.
+애플리케이션 상수. `CanvasContents.ts`에 캔버스 크기, 비율별 크기, 폰트 크기, localStorage 키 등이 정의되어 있습니다.
 
 ### `src/lib/`
 라이브러리 설정. `styled-components-registry.tsx`는 SSR 지원을 위한 레지스트리입니다.

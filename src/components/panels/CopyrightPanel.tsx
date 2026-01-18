@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { copyrightEnabledAtom, copyrightTextAtom } from '@/atoms/imageAtoms';
-import { COPYRIGHT_STORAGE_KEY } from '@/constants/canvas';
+import { COPYRIGHT_STORAGE_KEY } from '@/constants/CanvasContents';
 import { PanelContainer, PanelRow, PanelLabel, ToggleSwitch, TextInput } from './shared';
 
 export const CopyrightPanel = () => {

@@ -14,7 +14,7 @@ import {
   shadowIntensityAtom,
   shadowOffsetAtom,
 } from '@/atoms/imageAtoms';
-import { resetCanvas } from '@/utils/canvas';
+import { resetCanvas } from '@/utils/CanvasUtils';
 
 // Default values for all settings (single source of truth)
 export const DEFAULT_VALUES = {

@@ -4,6 +4,7 @@ import { canvasRGB } from 'stackblur-canvas';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_DISPLAY_SIZE,
+  CANVAS_PREVIEW_SIZE,
   CANVAS_ACTUAL_SIZE_4_5_WIDTH,
   CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
   CANVAS_PREVIEW_SIZE_4_5_WIDTH,
@@ -15,13 +16,49 @@ import {
   COPYRIGHT_FONT_SIZE,
   COPYRIGHT_OFFSET,
   COPYRIGHT_RIGHT_MARGIN,
-} from '@/constants/canvas';
+} from '@/constants/CanvasContents';
 
 export interface ImagePosition {
   x: number;
   y: number;
   width: number;
   height: number;
+}
+
+/**
+ * Get canvas actual dimensions based on aspect ratio and Safari flag
+ */
+export function getCanvasDimensions(
+  aspectRatio: '1:1' | '4:5' | '9:16',
+  isSafari: boolean
+): { width: number; height: number } {
+  if (aspectRatio === '4:5') {
+    return isSafari
+      ? { width: CANVAS_PREVIEW_SIZE_4_5_WIDTH, height: CANVAS_PREVIEW_SIZE_4_5_HEIGHT }
+      : { width: CANVAS_ACTUAL_SIZE_4_5_WIDTH, height: CANVAS_ACTUAL_SIZE_4_5_HEIGHT };
+  }
+  if (aspectRatio === '9:16') {
+    return isSafari
+      ? { width: CANVAS_PREVIEW_SIZE_9_16_WIDTH, height: CANVAS_PREVIEW_SIZE_9_16_HEIGHT }
+      : { width: CANVAS_ACTUAL_SIZE_9_16_WIDTH, height: CANVAS_ACTUAL_SIZE_9_16_HEIGHT };
+  }
+  const size = isSafari ? CANVAS_PREVIEW_SIZE : CANVAS_ACTUAL_SIZE;
+  return { width: size, height: size };
+}
+
+/**
+ * Get canvas display size for CSS styling (same for Safari and non-Safari)
+ */
+export function getCanvasDisplaySize(
+  aspectRatio: '1:1' | '4:5' | '9:16'
+): { width: number; height: number } {
+  if (aspectRatio === '4:5') {
+    return { width: 256, height: CANVAS_DISPLAY_SIZE };
+  }
+  if (aspectRatio === '9:16') {
+    return { width: 180, height: CANVAS_DISPLAY_SIZE };
+  }
+  return { width: CANVAS_DISPLAY_SIZE, height: CANVAS_DISPLAY_SIZE };
 }
 
 /**

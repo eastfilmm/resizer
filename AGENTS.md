@@ -8,6 +8,7 @@ A Next.js web application for resizing images. Users can upload images, preview 
 
 ### Features
 
+- **Aspect Ratio**: Select canvas aspect ratio (1:1, 4:5, 9:16)
 - **Background Color**: Toggle between white/black background
 - **Canvas Padding**: Adjust padding around the image (0-200px)
 - **Glass Blur**: Blur effect using the image's center as background with tint overlay
@@ -72,26 +73,39 @@ The project uses `StyledComponentsRegistry` for SSR support. New styled-componen
 
 ### 2. Canvas Rendering Architecture
 
-**Browser Detection**: `useIsSafari()` hook detects Safari and conditionally renders:
+**Unified Component**: `ImageCanvas.tsx` handles both Safari and non-Safari browsers via `isSafari` prop.
 
-**Chrome/Firefox** → `ImageCanvas.tsx`
-- Full 2000x2000 resolution preview
+**Browser Detection**: `useIsSafari()` hook detects Safari and passes result as `isSafari` prop to `ImageCanvas`.
+
+**Aspect Ratios**: Supports three aspect ratios (1:1, 4:5, 9:16) controlled by `canvasAspectRatioAtom` and `useAspectRatio()` hook.
+- **1:1**: Square canvas (2000x2000 actual, 320x320 display)
+- **4:5**: Portrait (1600x2000 actual, 256x320 display)
+- **9:16**: Vertical portrait (1125x2000 actual, 180x320 display)
+- Aspect ratio state persisted in localStorage (`ASPECT_RATIO_STORAGE_KEY`)
+- Canvas dimensions dynamically adjusted based on selected ratio
+
+**Chrome/Firefox** (`isSafari: false`)
+- Full resolution preview (2000px height, ratio-dependent width)
 - Immediate rendering (no throttle)
 - CSS filter for blur (faster)
-- Display size: 320px via CSS
+- Display size varies by aspect ratio (320px height, ratio-dependent width)
 
-**Safari** → `SafariImageCanvas.tsx`
-- Reduced 1000x1000 resolution preview (SCALE_FACTOR = 0.5)
+**Safari** (`isSafari: true`)
+- Reduced resolution preview (800px height, ratio-dependent width, SCALE_FACTOR = 0.4)
 - RAF throttle for smooth slider performance
 - JavaScript stackblur (Safari has CSS filter caching issues)
-- All effects scaled by 0.5: blur, shadow, padding, copyright text
-- Download generates full 2000x2000 resolution canvas
+- All effects scaled by 0.4: blur, shadow, padding, copyright text
+- Download generates full resolution canvas (2000px height)
+
+**Utils & Constants**: 
+- Canvas dimension helpers (`getCanvasDimensions`, `getCanvasDisplaySize`) are in `src/utils/CanvasUtils.ts`
+- Canvas constants (sizes, font sizes, storage keys) are in `src/constants/CanvasContents.ts`
 
 ### 3. Copyright Text Color
 - Copyright text color **auto-adjusts** based on background color
 - White background → Black text
 - Black background → White text
-- Logic in `src/utils/canvas.ts` `drawCopyrightText()` function
+- Logic in `src/utils/CanvasUtils.ts` `drawCopyrightText()` function
 
 ### 4. No Prettier
 The project does not use Prettier. Follow ESLint rules only.
@@ -100,10 +114,13 @@ The project does not use Prettier. Follow ESLint rules only.
 Be careful with refactoring. Consider adding tests for critical utilities.
 
 ### 6. Adding new effects
-필수 수정 파일: `imageAtoms.ts`, `panels/*.tsx`, `canvas.ts`, `ImageCanvas.tsx`, `SafariImageCanvas.tsx`, `DownloadButton.tsx`, `NavigationBar.tsx`, `useResetState.ts`, `docs/`
+필수 수정 파일: `imageAtoms.ts`, `panels/*.tsx`, `CanvasUtils.ts`, `ImageCanvas.tsx`, `DownloadButton.tsx`, `NavigationBar.tsx`, `useResetState.ts`, `docs/`
 
 ### 7. Safari 최적화
-Safari 전용: `SafariImageCanvas.tsx`에서 SCALE_FACTOR 사용, stackblur 적용, RAF throttle. 다운로드는 항상 2000x2000 해상도.
+`ImageCanvas.tsx`에서 `isSafari` prop에 따라 조건부 처리:
+- Safari: SCALE_FACTOR(0.4) 사용, stackblur 적용, RAF throttle
+- 일반 브라우저: 즉시 렌더링, CSS filter blur
+- 다운로드는 항상 2000x2000 해상도 (Safari/일반 공통)
 
 ---
 

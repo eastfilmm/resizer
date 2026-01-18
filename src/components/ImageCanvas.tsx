@@ -16,22 +16,16 @@ import {
   shadowIntensityAtom,
   shadowOffsetAtom,
 } from '@/atoms/imageAtoms';
-import { drawImageWithEffects, ImagePosition } from '@/utils/canvas';
-import {
-  CANVAS_ACTUAL_SIZE,
-  CANVAS_DISPLAY_SIZE,
-  CANVAS_ACTUAL_SIZE_4_5_WIDTH,
-  CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
-  CANVAS_ACTUAL_SIZE_9_16_WIDTH,
-  CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
-} from '@/constants/canvas';
+import { drawImageWithEffects, ImagePosition, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/CanvasUtils';
+import { CANVAS_DISPLAY_SIZE, CANVAS_PREVIEW_SIZE } from '@/constants/CanvasContents';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
+  isSafari?: boolean;
 }
 
-export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
+export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvasProps) {
   const store = useStore();
   const imageUrl = useAtomValue(imageUrlAtom);
   const { aspectRatio } = useAspectRatio();
@@ -52,44 +46,23 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
   const imagePositionRef = useRef<ImagePosition | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Safari RAF throttle refs
+  const rafIdRef = useRef<number | null>(null);
+  const pendingRenderRef = useRef(false);
+
+  // Scale factor: 800/2000 = 0.4 (Safari only)
+  const SCALE_FACTOR = isSafari ? CANVAS_PREVIEW_SIZE / 2000 : 1;
+
   // Keep aspectRatioRef in sync with state
   aspectRatioRef.current = aspectRatio;
 
-  const getCanvasDimensions = useCallback(() => {
-    if (aspectRatioRef.current === '4:5') {
-      return {
-        width: CANVAS_ACTUAL_SIZE_4_5_WIDTH,
-        height: CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
-      };
-    }
-    if (aspectRatioRef.current === '9:16') {
-      return {
-        width: CANVAS_ACTUAL_SIZE_9_16_WIDTH,
-        height: CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
-      };
-    }
-    return {
-      width: CANVAS_ACTUAL_SIZE,
-      height: CANVAS_ACTUAL_SIZE,
-    };
-  }, []);
-
-  const getCanvasDisplaySize = useCallback(() => {
-    if (aspectRatioRef.current === '4:5') {
-      return { width: 256, height: CANVAS_DISPLAY_SIZE };
-    }
-    if (aspectRatioRef.current === '9:16') {
-      return { width: 180, height: CANVAS_DISPLAY_SIZE };
-    }
-    return { width: CANVAS_DISPLAY_SIZE, height: CANVAS_DISPLAY_SIZE };
-  }, []);
-
   const redrawImage = useCallback(
     (ctx: CanvasRenderingContext2D, img: HTMLImageElement | null) => {
-      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatioRef.current, isSafari);
       const padding = paddingRef.current;
-      const imageAreaWidth = canvasWidth - padding * 2;
-      const imageAreaHeight = canvasHeight - padding * 2;
+      const effectivePadding = isSafari ? padding * SCALE_FACTOR : padding;
+      const imageAreaWidth = canvasWidth - effectivePadding * 2;
+      const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
       if (img) {
         imagePositionRef.current = drawImageWithEffects(ctx, img, {
@@ -99,14 +72,15 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
           imageAreaHeight,
           bgColor: backgroundColorRef.current,
           useGlassBlur: glassBlurRef.current,
-          blurIntensity: blurIntensityRef.current,
+          blurIntensity: blurIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),
           overlayOpacity: overlayOpacityRef.current,
           showCopyright: copyrightEnabledRef.current,
           copyrightText: copyrightTextRef.current,
           useShadow: shadowEnabledRef.current,
-          shadowIntensity: shadowIntensityRef.current,
-          shadowOffset: shadowOffsetRef.current,
-          isSafari: false,
+          shadowIntensity: shadowIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),
+          shadowOffset: shadowOffsetRef.current * (isSafari ? SCALE_FACTOR : 1),
+          scaleFactor: SCALE_FACTOR,
+          isSafari,
         });
       } else {
         // Fill background with solid color (no image loaded)
@@ -114,7 +88,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     },
-    [getCanvasDimensions]
+    [isSafari, SCALE_FACTOR]
   );
 
   const drawImageOnCanvas = useCallback(() => {
@@ -124,8 +98,8 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize();
+    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatioRef.current, isSafari);
+    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatioRef.current);
 
     // Set canvas actual size
     canvas.width = canvasWidth;
@@ -146,7 +120,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       redrawImage(ctx, newImg);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions, getCanvasDisplaySize]);
+  }, [imageUrl, canvasRef, redrawImage, isSafari]);
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -154,8 +128,8 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
-        const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize();
+        const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, isSafari);
+        const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatio);
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
         canvas.style.width = `${displayWidth}px`;
@@ -165,9 +139,9 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     }
-  }, [canvasRef, getCanvasDimensions, getCanvasDisplaySize]);
+  }, [canvasRef, aspectRatio, isSafari]);
 
-  // Handle effect changes imperatively
+  // Handle effect changes imperatively with conditional RAF throttle for Safari
   useEffect(() => {
     const atomsToWatch = [
       backgroundColorAtom,
@@ -181,6 +155,15 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
       shadowIntensityAtom,
       shadowOffsetAtom,
     ];
+
+    const performRender = () => {
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) {
+          redrawImage(ctx, imageRef.current);
+        }
+      }
+    };
 
     const unsubscribes = atomsToWatch.map((atom) =>
       store.sub(atom, () => {
@@ -202,20 +185,33 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
           containerRef.current.style.backgroundColor = newBackgroundColor;
         }
 
-        // Redraw imperatively
-        if (canvasRef.current) {
-          const ctx = canvasRef.current.getContext('2d');
-          if (ctx) {
-            redrawImage(ctx, imageRef.current);
+        // Safari: Use RAF throttle for smooth slider performance
+        // Non-Safari: Immediate rendering
+        if (isSafari) {
+          pendingRenderRef.current = true;
+          if (rafIdRef.current === null) {
+            rafIdRef.current = requestAnimationFrame(() => {
+              rafIdRef.current = null;
+              if (pendingRenderRef.current) {
+                pendingRenderRef.current = false;
+                performRender();
+              }
+            });
           }
+        } else {
+          performRender();
         }
       })
     );
 
     return () => {
       unsubscribes.forEach((unsub) => unsub());
+      if (isSafari && rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
     };
-  }, [store, canvasRef, redrawImage]);
+  }, [store, canvasRef, redrawImage, isSafari]);
 
   // Draw image when imageUrl or aspectRatio changes
   useEffect(() => {
@@ -232,8 +228,8 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          const { width, height } = getCanvasDimensions();
-          const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize();
+          const { width, height } = getCanvasDimensions(aspectRatio, isSafari);
+          const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatio);
           canvas.width = width;
           canvas.height = height;
           canvas.style.width = `${displayWidth}px`;
@@ -243,7 +239,7 @@ export default function ImageCanvas({ canvasRef }: ImageCanvasProps) {
         }
       }
     }
-  }, [imageUrl, aspectRatio, drawImageOnCanvas, getCanvasDimensions, getCanvasDisplaySize]);
+  }, [imageUrl, aspectRatio, drawImageOnCanvas, isSafari]);
 
   // Initialize container background color on mount
   useEffect(() => {
@@ -279,6 +275,7 @@ const CanvasContainer = styled.div<{
   position: relative;
   overflow: hidden;
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  ${props => props.$aspectRatio === '1:1' ? 'will-change: transform;' : ''}
 `;
 
 const Canvas = styled.canvas`

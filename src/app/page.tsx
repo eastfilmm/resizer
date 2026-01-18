@@ -4,7 +4,6 @@ import { useRef } from 'react';
 import styled from 'styled-components';
 import { Container, Main, Title, SubTitle } from '@/components/styled/Layout';
 import ImageCanvas from '@/components/ImageCanvas';
-import SafariImageCanvas from '@/components/SafariImageCanvas';
 import ActionButtons from '@/components/ActionButtons';
 import { NavigationBar } from '@/components/NavigationBar';
 import { useIsSafari } from '@/hooks/useIsSafari';
@@ -23,13 +22,9 @@ export default function Home() {
         <Title>Image Resizer</Title>
         <SubTitle>for Instagram</SubTitle>
         </HeaderWrapper>
-        {/* 이미지 캔버스 - Safari는 최적화된 버전 사용 */}
+        {/* 이미지 캔버스 */}
         <CanvasWrapper>
-          {isSafari ? (
-          <SafariImageCanvas canvasRef={canvasRef} />
-          ) : (
-            <ImageCanvas canvasRef={canvasRef} />
-          )}
+          <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} />
         </CanvasWrapper>
         {/* 이미지 업로드 및 다운로드 버튼 */}
         <ActionButtons canvasRef={canvasRef} fileInputRef={fileInputRef} />
