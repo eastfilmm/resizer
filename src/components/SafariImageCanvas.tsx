@@ -53,6 +53,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
   const aspectRatioRef = useRef(aspectRatio);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<ImagePosition | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Safari RAF throttle refs
   const rafIdRef = useRef<number | null>(null);
@@ -81,6 +82,16 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
       width: CANVAS_PREVIEW_SIZE,
       height: CANVAS_PREVIEW_SIZE,
     };
+  }, []);
+
+  const getCanvasDisplaySize = useCallback(() => {
+    if (aspectRatioRef.current === '4:5') {
+      return { width: 256, height: CANVAS_DISPLAY_SIZE };
+    }
+    if (aspectRatioRef.current === '9:16') {
+      return { width: 180, height: CANVAS_DISPLAY_SIZE };
+    }
+    return { width: CANVAS_DISPLAY_SIZE, height: CANVAS_DISPLAY_SIZE };
   }, []);
 
   const redrawImage = useCallback(
@@ -126,14 +137,15 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize();
 
     // Set canvas to preview size
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    // Set display size (scaled down with CSS)
-    canvas.style.width = `${CANVAS_DISPLAY_SIZE}px`;
-    canvas.style.height = `${CANVAS_DISPLAY_SIZE}px`;
+    // Set display size (scaled down with CSS) - match container size
+    canvas.style.width = `${displayWidth}px`;
+    canvas.style.height = `${displayHeight}px`;
 
     // Enable high quality image rendering
     ctx.imageSmoothingEnabled = true;
@@ -146,7 +158,7 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
       redrawImage(ctx, newImg);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions]);
+  }, [imageUrl, canvasRef, redrawImage, getCanvasDimensions, getCanvasDisplaySize]);
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -155,16 +167,17 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
       const ctx = canvas.getContext('2d');
       if (ctx) {
         const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+        const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize();
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
-        canvas.style.width = `${CANVAS_DISPLAY_SIZE}px`;
-        canvas.style.height = `${CANVAS_DISPLAY_SIZE}px`;
+        canvas.style.width = `${displayWidth}px`;
+        canvas.style.height = `${displayHeight}px`;
 
         ctx.fillStyle = backgroundColorRef.current;
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     }
-  }, [canvasRef, getCanvasDimensions]);
+  }, [canvasRef, getCanvasDimensions, getCanvasDisplaySize]);
 
   // Handle effect changes imperatively with RAF throttle
   useEffect(() => {
@@ -193,7 +206,8 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
     const unsubscribes = atomsToWatch.map((atom) =>
       store.sub(atom, () => {
         // Update refs
-        backgroundColorRef.current = store.get(backgroundColorAtom);
+        const newBackgroundColor = store.get(backgroundColorAtom);
+        backgroundColorRef.current = newBackgroundColor;
         glassBlurRef.current = store.get(glassBlurAtom);
         blurIntensityRef.current = store.get(blurIntensityAtom);
         overlayOpacityRef.current = store.get(overlayOpacityAtom);
@@ -203,6 +217,11 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
         shadowEnabledRef.current = store.get(shadowEnabledAtom);
         shadowIntensityRef.current = store.get(shadowIntensityAtom);
         shadowOffsetRef.current = store.get(shadowOffsetAtom);
+
+        // Update container background color imperatively (no re-render)
+        if (containerRef.current) {
+          containerRef.current.style.backgroundColor = newBackgroundColor;
+        }
 
         // Schedule RAF throttle
         pendingRenderRef.current = true;
@@ -237,33 +256,51 @@ export default function SafariImageCanvas({ canvasRef }: SafariImageCanvasProps)
       // Clear image reference when imageUrl is null (reset)
       imageRef.current = null;
       imagePositionRef.current = null;
-      // Clear canvas
+      // Clear canvas and update display size
       if (canvasRef.current) {
-        const ctx = canvasRef.current.getContext('2d');
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
         if (ctx) {
           const { width, height } = getCanvasDimensions();
+          const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize();
+          canvas.width = width;
+          canvas.height = height;
+          canvas.style.width = `${displayWidth}px`;
+          canvas.style.height = `${displayHeight}px`;
           ctx.fillStyle = backgroundColorRef.current;
           ctx.fillRect(0, 0, width, height);
         }
       }
     }
-  }, [imageUrl, aspectRatio, drawImageOnCanvas, getCanvasDimensions]);
+  }, [imageUrl, aspectRatio, drawImageOnCanvas, getCanvasDimensions, getCanvasDisplaySize]);
+
+  // Initialize container background color on mount
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.style.backgroundColor = backgroundColorRef.current;
+    }
+  }, []);
 
   return (
-    <CanvasContainer $aspectRatio={aspectRatio as '1:1' | '4:5' | '9:16'}>
+    <CanvasContainer 
+      ref={containerRef}
+      $aspectRatio={aspectRatio as '1:1' | '4:5' | '9:16'}
+    >
       <Canvas ref={canvasRef} />
     </CanvasContainer>
   );
 }
 
-const CanvasContainer = styled.div<{ $aspectRatio: '1:1' | '4:5' | '9:16' }>`
+const CanvasContainer = styled.div<{ 
+  $aspectRatio: '1:1' | '4:5' | '9:16';
+}>`
   width: ${props => props.$aspectRatio === '4:5'
     ? '256px'
     : props.$aspectRatio === '9:16'
       ? '180px' // 320 * 9/16 for display (rounded)
       : `${CANVAS_DISPLAY_SIZE}px`};
   height: ${CANVAS_DISPLAY_SIZE}px;
-  background-color: white;
+  background-color: white; /* Initial value, updated imperatively via ref */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
@@ -277,6 +314,5 @@ const CanvasContainer = styled.div<{ $aspectRatio: '1:1' | '4:5' | '9:16' }>`
 const Canvas = styled.canvas`
   width: 100%;
   height: 100%;
-  object-fit: contain;
   transition: opacity 0.3s ease;
 `;
