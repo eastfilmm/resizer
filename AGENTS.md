@@ -59,40 +59,9 @@ No test framework is currently configured. If adding tests, consider Vitest or J
 
 ## Project Structure
 
-```
-src/
-├── app/              # Next.js App Router (pages, layouts)
-│   └── page.tsx      # Main page with browser-specific canvas rendering
-├── atoms/            # Jotai atoms for global state
-│   └── imageAtoms.ts # All application state (image, effects, settings)
-├── components/       # React components
-│   ├── styled/       # Shared styled components (Button, Layout)
-│   ├── panels/       # Effect control panels
-│   │   ├── BackgroundPanel.tsx   # Background color toggle
-│   │   ├── PaddingPanel.tsx      # Padding slider
-│   │   ├── GlassBlurPanel.tsx    # Glass blur toggle + sliders
-│   │   ├── ShadowPanel.tsx       # Shadow toggle + sliders
-│   │   ├── CopyrightPanel.tsx    # Copyright toggle + text input
-│   │   └── shared.tsx            # Shared panel styled components
-│   ├── ImageCanvas.tsx          # Chrome/Firefox canvas (2000x2000 full res)
-│   ├── SafariImageCanvas.tsx    # Safari-optimized canvas (1000x1000 preview)
-│   ├── ImageUploader.tsx        # File upload handling
-│   ├── DownloadButton.tsx       # Export and reset after download
-│   ├── ResetButton.tsx          # Reset all settings
-│   ├── ActionButtons.tsx        # Upload/Download/Reset button group
-│   └── NavigationBar.tsx        # Bottom navigation with effect panels
-├── hooks/            # Custom React hooks
-│   ├── useIsSafari.ts           # Safari browser detection
-│   └── useResetState.ts         # Reset state logic with default values
-├── constants/        # App constants
-│   └── canvas.ts     # Canvas sizes and constants
-├── lib/              # Library utilities (SSR registry, etc.)
-├── types/            # TypeScript type definitions
-└── utils/            # Helper/utility functions
-    └── canvas.ts     # Canvas rendering utilities
-public/               # Static assets (SVG icons, images)
-docs/                 # Feature documentation
-```
+프로젝트의 최신 디렉토리 구조는 `@docs/PROJECT_STRUCTURE.md` 파일을 참조하세요.
+
+이 파일은 프로젝트 구조가 변경될 때마다 업데이트되며, 항상 최신 상태를 유지합니다.
 
 ---
 
@@ -131,19 +100,21 @@ The project does not use Prettier. Follow ESLint rules only.
 Be careful with refactoring. Consider adding tests for critical utilities.
 
 ### 6. Adding new effects
-When adding new image effects, update these files:
-- `src/atoms/imageAtoms.ts` - Add state atoms and include in `canResetAtom`
-- `src/components/panels/` - Create new panel component (e.g., `ShadowPanel.tsx`)
-- `src/utils/canvas.ts` - Add rendering logic to `drawImageWithEffects()`
-- `src/components/ImageCanvas.tsx` - Pass new effect parameters
-- `src/components/SafariImageCanvas.tsx` - Pass scaled parameters with SCALE_FACTOR
-- `src/components/DownloadButton.tsx` - Include in download logic
-- `src/components/NavigationBar.tsx` - Add panel to navigation
-- `src/hooks/useResetState.ts` - Add to DEFAULT_VALUES and reset logic
-- `docs/` - Create documentation file for the new feature
+필수 수정 파일: `imageAtoms.ts`, `panels/*.tsx`, `canvas.ts`, `ImageCanvas.tsx`, `SafariImageCanvas.tsx`, `DownloadButton.tsx`, `NavigationBar.tsx`, `useResetState.ts`, `docs/`
 
-### 7. Safari-specific considerations
-- Always test performance-heavy features on Safari
-- Use SCALE_FACTOR when adding new numeric effects in SafariImageCanvas
-- Blur operations are expensive on Safari - consider optimization strategies
-- Download functionality must generate full-resolution output even on Safari
+### 7. Safari 최적화
+Safari 전용: `SafariImageCanvas.tsx`에서 SCALE_FACTOR 사용, stackblur 적용, RAF throttle. 다운로드는 항상 2000x2000 해상도.
+
+---
+
+## 서브 에이전트 (Sub Agents)
+
+각 기능별 상세 문서를 `@`로 참조: `@docs/CanvasPadding.md`, `@docs/GlassBlur.md`, `@docs/Shadow.md`, `@docs/Copyright.md`
+
+새 기능 추가 시 `docs/FeatureName.md` 생성 후 이 섹션에 링크 추가.
+
+---
+
+## 서브 에이전트 워크플로우
+
+4단계 워크플로우는 `@docs/WORKFLOW.md` 참조. 빠른 시작: `"FeatureName" 기능 추가해줘. @docs/WORKFLOW.md 4단계 실행해줘.`
