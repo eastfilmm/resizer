@@ -130,6 +130,10 @@ Be careful with refactoring. Consider adding tests for critical utilities.
 
 새 기능 추가 시 `docs/FeatureName.md` 생성 후 이 섹션에 링크 추가.
 
+### 커밋 자동화 (Commit Automation)
+
+코드 변경 작업 완료 후 자동으로 커밋을 생성하는 서브 에이전트입니다. 상세 내용은 `@docs/CommitAutomation.md` 참조.
+
 ---
 
 ## 서브 에이전트 워크플로우
