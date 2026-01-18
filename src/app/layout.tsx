@@ -16,6 +16,21 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Resizer App",
   description: "Mobile-first resizer application",
+  openGraph: {
+    title: "Resizer App",
+    description: "Mobile-first resizer application",
+    url: "https://resizer-nine.vercel.app/",
+    siteName: "Resizer App",
+    images: [
+      {
+        url: "https://resizer-nine.vercel.app/public/resizer_icon.png",
+        width: 600,
+        height: 600,
+      },
+    ],
+    locale: "ko_KR",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
