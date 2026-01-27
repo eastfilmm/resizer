@@ -14,6 +14,7 @@ import {
   shadowOffsetAtom,
   copyrightEnabledAtom,
   copyrightTextAtom,
+  polaroidModeAtom,
 } from '@/atoms/imageAtoms';
 import { useResetState } from '@/hooks/useResetState';
 import { useIsSafari } from '@/hooks/useIsSafari';
@@ -47,7 +48,8 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   const shadowIntensity = useAtomValue(shadowIntensityAtom);
   const shadowOffset = useAtomValue(shadowOffsetAtom);
   const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
-  const resetState = useResetState({ canvasRef, fileInputRef});
+  const isPolaroid = useAtomValue(polaroidModeAtom);
+  const resetState = useResetState({ canvasRef, fileInputRef });
   const isSafari = useIsSafari();
   const { aspectRatio } = useAspectRatio();
 
@@ -117,6 +119,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
         useShadow: shadowEnabled,
         shadowIntensity,
         shadowOffset,
+        usePolaroid: isPolaroid,
         isSafari: true,
       });
 
@@ -150,6 +153,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     canvasRef,
     resetState,
     aspectRatio,
+    isPolaroid,
   ]);
 
   return (
