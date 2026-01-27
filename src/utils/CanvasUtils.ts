@@ -232,6 +232,138 @@ export function drawCopyrightText(
   }
 }
 
+/**
+ * Draw polaroid frame with image inside
+ * Frame ratio: 9:6 (3:2) for landscape images, 6:9 for portrait images (rotated 90 degrees)
+ * Frame has white border with wider bottom margin (classic polaroid style)
+ */
+export function drawPolaroidFrame(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  canvasWidth: number,
+  canvasHeight: number,
+  bgColor: string,
+  scaleFactor: number = 1
+): ImagePosition {
+  // Determine if image is landscape or portrait
+  const isLandscape = img.width >= img.height;
+
+  // Define padding ratios (relative to a base unit)/
+  // Top/Left/Right: 1 unit, Bottom: 3 units (polaroid characteristic)
+  const topPaddingRatio = 1;
+  const sidePaddingRatio = 1;
+  const bottomPaddingRatio = 3;
+
+  // Calculate total padding units
+  const totalVerticalPadding = topPaddingRatio + bottomPaddingRatio; // 4 units
+  const totalHorizontalPadding = sidePaddingRatio * 2; // 2 units
+
+  // Use 8% of smaller canvas dimension as base padding unit
+  const paddingUnit = Math.min(canvasWidth, canvasHeight) * 0.04;
+
+  // Calculate required padding in pixels
+  const totalHorizontalPaddingPx = totalHorizontalPadding * paddingUnit;
+  const totalVerticalPaddingPx = totalVerticalPadding * paddingUnit;
+
+  // Calculate image aspect ratio
+  const imageAspectRatio = img.width / img.height;
+
+  // Available space for the entire frame (canvas minus some margin)
+  const maxFrameWidth = canvasWidth * 0.9;
+  const maxFrameHeight = canvasHeight * 0.9;
+
+  // Calculate frame size based on image + padding
+  // Frame needs to fit: image area + padding
+  let frameWidth: number;
+  let frameHeight: number;
+
+  // Calculate what size image area we can fit
+  const availableImageWidth = maxFrameWidth - totalHorizontalPaddingPx;
+  const availableImageHeight = maxFrameHeight - totalVerticalPaddingPx;
+
+  // Fit image to available space
+  let imageAreaWidth: number;
+  let imageAreaHeight: number;
+
+  if (imageAspectRatio > availableImageWidth / availableImageHeight) {
+    // Image is wider - fit to width
+    imageAreaWidth = availableImageWidth;
+    imageAreaHeight = imageAreaWidth / imageAspectRatio;
+  } else {
+    // Image is taller - fit to height
+    imageAreaHeight = availableImageHeight;
+    imageAreaWidth = imageAreaHeight * imageAspectRatio;
+  }
+
+  // Frame size = image area + padding
+  frameWidth = imageAreaWidth + totalHorizontalPaddingPx;
+  frameHeight = imageAreaHeight + totalVerticalPaddingPx;
+
+  // Center frame on canvas
+  const frameX = (canvasWidth - frameWidth) / 2;
+  const frameY = (canvasHeight - frameHeight) / 2;
+
+  // Fill canvas background
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+  // Draw polaroid frame (white background with border radius)
+  const borderRadius = 24 * scaleFactor;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.beginPath();
+  if (ctx.roundRect) {
+    ctx.roundRect(frameX, frameY, frameWidth, frameHeight, borderRadius);
+  } else {
+    // Fallback for older browsers
+    ctx.moveTo(frameX + borderRadius, frameY);
+    ctx.lineTo(frameX + frameWidth - borderRadius, frameY);
+    ctx.quadraticCurveTo(frameX + frameWidth, frameY, frameX + frameWidth, frameY + borderRadius);
+    ctx.lineTo(frameX + frameWidth, frameY + frameHeight - borderRadius);
+    ctx.quadraticCurveTo(frameX + frameWidth, frameY + frameHeight, frameX + frameWidth - borderRadius, frameY + frameHeight);
+    ctx.lineTo(frameX + borderRadius, frameY + frameHeight);
+    ctx.quadraticCurveTo(frameX, frameY + frameHeight, frameX, frameY + frameHeight - borderRadius);
+    ctx.lineTo(frameX, frameY + borderRadius);
+    ctx.quadraticCurveTo(frameX, frameY, frameX + borderRadius, frameY);
+  }
+  ctx.fill();
+
+  // Add subtle shadow to frame
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+  ctx.shadowBlur = 15 * scaleFactor;
+  ctx.shadowOffsetX = 5 * scaleFactor;
+  ctx.shadowOffsetY = 5 * scaleFactor;
+  ctx.fill(); // Re-fill the rounded path to apply shadow
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
+  // Calculate actual padding based on padding unit
+  const topMargin = topPaddingRatio * paddingUnit;
+  const sideMargin = sidePaddingRatio * paddingUnit;
+  const bottomMargin = bottomPaddingRatio * paddingUnit;
+
+  // Calculate image area inside frame
+  const imageAreaX = frameX + sideMargin;
+  const imageAreaY = frameY + topMargin;
+  // imageAreaWidth and imageAreaHeight already calculated above (lines 285-293)
+
+  // Calculate image size to fit inside frame while maintaining aspect ratio
+  // imageAspectRatio already calculated above (line 269)
+  // Image area was already sized to match image aspect ratio, so just use it directly
+  const drawWidth = imageAreaWidth;
+  const drawHeight = imageAreaHeight;
+
+  // Position image in the image area
+  const imageX = imageAreaX;
+  const imageY = imageAreaY;
+
+  // Draw image
+  ctx.drawImage(img, imageX, imageY, drawWidth, drawHeight);
+
+  return { x: imageX, y: imageY, width: drawWidth, height: drawHeight };
+}
+
 export interface DrawImageOptions {
   actualCanvasWidth: number;
   actualCanvasHeight: number;
@@ -246,6 +378,7 @@ export interface DrawImageOptions {
   useShadow: boolean;
   shadowIntensity: number;
   shadowOffset: number;
+  usePolaroid: boolean;
   isSafari?: boolean;
   scaleFactor?: number;
 }
@@ -273,12 +406,18 @@ export function drawImageWithEffects(
     useShadow,
     shadowIntensity,
     shadowOffset,
+    usePolaroid,
     isSafari = false,
     scaleFactor = 1,
   } = options;
 
   // Initialize canvas with selected background color
   ctx.clearRect(0, 0, actualCanvasWidth, actualCanvasHeight);
+
+  // If polaroid mode is enabled, use dedicated polaroid rendering
+  if (usePolaroid) {
+    return drawPolaroidFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor);
+  }
 
   // If glass blur is enabled, draw blurred background from image
   if (useGlassBlur) {

@@ -2,8 +2,8 @@
 
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
-import { 
-  activeNavPanelAtom, 
+import {
+  activeNavPanelAtom,
   NavPanelType,
   backgroundColorAtom,
   glassBlurAtom,
@@ -43,7 +43,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 160,
+  layout: 260,
   background: 80,
   glassblur: 160,
   shadow: 160,
@@ -160,7 +160,7 @@ export const NavigationBar = () => {
     glassblur: glassBlur,
     shadow: shadowEnabled,
     copyright: copyrightEnabled,
-  }), [ aspectRatio, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled]);
+  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled]);
 
   const handleNavClick = useCallback((id: NavPanelType) => {
     setActivePanel(prev => prev === id ? null : id);

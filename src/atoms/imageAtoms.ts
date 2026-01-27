@@ -39,8 +39,11 @@ export const shadowIntensityAtom = atom<number>(30);
 // Shadow 오프셋 (이미지 오른쪽/아래 방향, 1-50px)
 export const shadowOffsetAtom = atom<number>(20);
 
-// 캔버스 가로세로 비율 ('1:1' | '4:5')
+// 캔버스 가로세로 비율 ('1:1' | '4:5' | '9:16')
 export const canvasAspectRatioAtom = atom<'1:1' | '4:5' | '9:16'>('1:1');
+
+// 폴라로이드 프레임 모드 활성화 여부
+export const polaroidModeAtom = atom<boolean>(false);
 
 // Reset 가능 여부 (이미지가 있거나 필터가 초기값과 다를 때)
 export const canResetAtom = atom((get) => {
@@ -54,7 +57,8 @@ export const canResetAtom = atom((get) => {
     get(copyrightEnabledAtom) !== false ||
     get(shadowEnabledAtom) !== false ||
     get(shadowIntensityAtom) !== 30 ||
-    get(shadowOffsetAtom) !== 20
+    get(shadowOffsetAtom) !== 20 ||
+    get(polaroidModeAtom) !== false;
 
   return hasImage || hasFilterChanges;
 });

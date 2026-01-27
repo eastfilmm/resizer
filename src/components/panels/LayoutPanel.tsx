@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { paddingAtom } from '@/atoms/imageAtoms';
+import { paddingAtom, polaroidModeAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import {
   PanelContainer,
@@ -55,10 +55,35 @@ const RatioIcon = styled.div<{ $ratio: '1:1' | '4:5' | '9:16'; $isActive: boolea
   transition: border-color 0.2s ease;
 `;
 
+const PolaroidIcon = styled.div<{ $isActive: boolean }>`
+  width: 18px;
+  height: 16px;
+  background: white;
+  border: 2px solid ${props => props.$isActive ? '#007bff' : '#999'};
+  border-radius: 2px;
+  position: relative;
+  padding-bottom: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    right: 1px;
+    height: 8px;
+    background: ${props => props.$isActive ? '#007bff' : '#ddd'};
+    border-radius: 1px;
+  }
+`;
+
 export const LayoutPanel = () => {
   const padding = useAtomValue(paddingAtom);
   const setPadding = useSetAtom(paddingAtom);
   const { aspectRatio, updateAspectRatio } = useAspectRatio();
+  const polaroidMode = useAtomValue(polaroidModeAtom);
+  const setPolaroidMode = useSetAtom(polaroidModeAtom);
 
   const handlePaddingChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +101,10 @@ export const LayoutPanel = () => {
     },
     [aspectRatio, updateAspectRatio, setPadding]
   );
+
+  const handlePolaroidToggle = useCallback(() => {
+    setPolaroidMode(!polaroidMode);
+  }, [polaroidMode, setPolaroidMode]);
 
   return (
     <PanelContainer>
@@ -107,13 +136,26 @@ export const LayoutPanel = () => {
         </AspectRatioButton>
       </AspectRatioOptions>
 
+      {/* Polaroid Mode Section */}
+      <PanelLabelWrapper $textAlign="left">
+        <PanelLabel>Polaroid Frame</PanelLabel>
+      </PanelLabelWrapper>
+      <AspectRatioButton
+        $isActive={polaroidMode}
+        onClick={handlePolaroidToggle}
+        style={{ width: '100%' }}
+      >
+        <PolaroidIcon $isActive={polaroidMode} />
+        Polaroid
+      </AspectRatioButton>
+
       {/* <SectionDivider /> */}
 
       {     /* Padding Section */}
 
       <SliderSection>
         <SliderLabelRow>
-        <PanelLabel>Padding</PanelLabel>
+          <PanelLabel>Padding</PanelLabel>
           <SliderValue>{padding}px</SliderValue>
         </SliderLabelRow>
         <Slider

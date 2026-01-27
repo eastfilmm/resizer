@@ -13,6 +13,7 @@ import {
   shadowEnabledAtom,
   shadowIntensityAtom,
   shadowOffsetAtom,
+  polaroidModeAtom,
 } from '@/atoms/imageAtoms';
 import { resetCanvas } from '@/utils/CanvasUtils';
 
@@ -28,6 +29,7 @@ export const DEFAULT_VALUES = {
   shadowEnabled: false,
   shadowIntensity: 30,
   shadowOffset: 20,
+  polaroidMode: false,
 } as const;
 
 interface UseResetStateProps {
@@ -46,6 +48,7 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
   const setShadowEnabled = useSetAtom(shadowEnabledAtom);
   const setShadowIntensity = useSetAtom(shadowIntensityAtom);
   const setShadowOffset = useSetAtom(shadowOffsetAtom);
+  const setPolaroidMode = useSetAtom(polaroidModeAtom);
 
   const resetState = useCallback(() => {
     // Clear image
@@ -64,6 +67,7 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     setShadowEnabled(DEFAULT_VALUES.shadowEnabled);
     setShadowIntensity(DEFAULT_VALUES.shadowIntensity);
     setShadowOffset(DEFAULT_VALUES.shadowOffset);
+    setPolaroidMode(DEFAULT_VALUES.polaroidMode);
 
     // Reset canvas
     if (canvasRef.current) {
@@ -82,6 +86,7 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     setShadowEnabled,
     setShadowIntensity,
     setShadowOffset,
+    setPolaroidMode,
   ]);
 
   return resetState;

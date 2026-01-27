@@ -15,6 +15,7 @@ import {
   shadowEnabledAtom,
   shadowIntensityAtom,
   shadowOffsetAtom,
+  polaroidModeAtom,
 } from '@/atoms/imageAtoms';
 import { drawImageWithEffects, ImagePosition, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/CanvasUtils';
 import { CANVAS_DISPLAY_SIZE, CANVAS_PREVIEW_SIZE } from '@/constants/CanvasContents';
@@ -41,6 +42,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   const shadowEnabledRef = useRef(store.get(shadowEnabledAtom));
   const shadowIntensityRef = useRef(store.get(shadowIntensityAtom));
   const shadowOffsetRef = useRef(store.get(shadowOffsetAtom));
+  const polaroidModeRef = useRef(store.get(polaroidModeAtom));
   const aspectRatioRef = useRef(aspectRatio);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<ImagePosition | null>(null);
@@ -79,6 +81,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
           useShadow: shadowEnabledRef.current,
           shadowIntensity: shadowIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),
           shadowOffset: shadowOffsetRef.current * (isSafari ? SCALE_FACTOR : 1),
+          usePolaroid: polaroidModeRef.current,
           scaleFactor: SCALE_FACTOR,
           isSafari,
         });
@@ -112,6 +115,12 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
     // Enable high quality image rendering
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
+
+    // If image is already loaded, redraw immediately to avoid flicker
+    if (imageRef.current && imageRef.current.src === imageUrl) {
+      redrawImage(ctx, imageRef.current);
+      return;
+    }
 
     // Load new image
     const newImg = new Image();
@@ -154,6 +163,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
       shadowEnabledAtom,
       shadowIntensityAtom,
       shadowOffsetAtom,
+      polaroidModeAtom,
     ];
 
     const performRender = () => {
@@ -179,6 +189,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
         shadowEnabledRef.current = store.get(shadowEnabledAtom);
         shadowIntensityRef.current = store.get(shadowIntensityAtom);
         shadowOffsetRef.current = store.get(shadowOffsetAtom);
+        polaroidModeRef.current = store.get(polaroidModeAtom);
 
         // Update container background color imperatively (no re-render)
         if (containerRef.current) {
@@ -213,16 +224,24 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
     };
   }, [store, canvasRef, redrawImage, isSafari]);
 
+  // Track the current image URL to detect changes
+  const lastImageUrlRef = useRef<string | null>(null);
+
   // Draw image when imageUrl or aspectRatio changes
   useEffect(() => {
     if (imageUrl) {
-      imageRef.current = null;
-      imagePositionRef.current = null;
+      // Only clear cache if the URL itself changed
+      if (lastImageUrlRef.current !== imageUrl) {
+        imageRef.current = null;
+        imagePositionRef.current = null;
+        lastImageUrlRef.current = imageUrl;
+      }
       drawImageOnCanvas();
     } else {
       // Clear image reference when imageUrl is null (reset)
       imageRef.current = null;
       imagePositionRef.current = null;
+      lastImageUrlRef.current = null;
       // Clear canvas and update display size
       if (canvasRef.current) {
         const canvas = canvasRef.current;
@@ -249,7 +268,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   }, []);
 
   return (
-    <CanvasContainer 
+    <CanvasContainer
       ref={containerRef}
       $aspectRatio={aspectRatio as '1:1' | '4:5' | '9:16'}
     >
@@ -258,7 +277,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   );
 }
 
-const CanvasContainer = styled.div<{ 
+const CanvasContainer = styled.div<{
   $aspectRatio: '1:1' | '4:5' | '9:16';
 }>`
   width: ${props => props.$aspectRatio === '4:5'
