@@ -44,7 +44,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 264,
+  layout: 260,
   background: 80,
   glassblur: 160,
   shadow: 160,
@@ -137,32 +137,28 @@ export const NavigationBar = () => {
       setIsContentVisible(false);
       timerRef.current = setTimeout(() => {
         setDisplayedPanel(null);
-      }, 100);
+      }, 150); // Match opacity transition
     } else {
       // Opening or switching panels
       if (displayedPanel === null) {
-        // Opening from closed: set panel, then fade in after height animation
+        // Opening from closed: set panel immediately, then fade in
         setDisplayedPanel(activePanel);
         timerRef.current = setTimeout(() => {
           setIsContentVisible(true);
-        }, 200);
+        }, 50); // Small delay to ensure height transition started
       } else if (activePanel !== displayedPanel) {
         // Switching panels: fade out -> change panel -> fade in
         setIsContentVisible(false);
         timerRef.current = setTimeout(() => {
           setDisplayedPanel(activePanel);
-          setTimeout(() => {
-            setIsContentVisible(true);
-          }, 100);
-        }, 100);
-      } else {
-        // Same panel reopened (edge case): ensure content is visible
-        if (!isContentVisible) {
           setIsContentVisible(true);
-        }
+        }, 150); // Wait for fade out then switch and fade in at once
+      } else {
+        // Same panel: ensure it's visible
+        setIsContentVisible(true);
       }
     }
-  }, [activePanel, displayedPanel, isContentVisible, clearTimer]);
+  }, [activePanel, clearTimer]); // Remove displayedPanel/isContentVisible from deps to prevent loops
 
   // Memoize active states (when the blue dot should appear)
   const activeStates = useMemo(() => ({

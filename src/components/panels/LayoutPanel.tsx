@@ -1,7 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { paddingAtom, polaroidModeAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
@@ -78,7 +78,7 @@ const PolaroidIcon = styled.div<{ $isActive: boolean }>`
   }
 `;
 
-export const LayoutPanel = () => {
+export const LayoutPanel = memo(() => {
   const padding = useAtomValue(paddingAtom);
   const setPadding = useSetAtom(paddingAtom);
   const { aspectRatio, updateAspectRatio } = useAspectRatio();
@@ -169,4 +169,6 @@ export const LayoutPanel = () => {
       </SliderSection>
     </PanelContainer>
   );
-};
+});
+
+LayoutPanel.displayName = 'LayoutPanel';

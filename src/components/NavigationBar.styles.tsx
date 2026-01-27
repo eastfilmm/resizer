@@ -15,6 +15,7 @@ export const PanelContainer = styled.div<{ $height: number }>`
   overflow: hidden;
   height: ${props => props.$height}px;
   transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: height;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -29,6 +30,7 @@ export const PanelContentWrapper = styled.div<{ $isVisible: boolean }>`
   align-items: center;
   opacity: ${props => props.$isVisible ? 1 : 0};
   transition: opacity 0.15s ease;
+  will-change: opacity;
   pointer-events: ${props => props.$isVisible ? 'auto' : 'none'};
 `;
 
