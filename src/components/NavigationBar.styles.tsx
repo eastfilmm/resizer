@@ -62,13 +62,13 @@ export const NavButtonsWrapper = styled.div`
   z-index: 1;
 `;
 
-export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: boolean }>`
+export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: boolean; $isClickable: boolean }>`
   flex: 1;
   height: 100%;
   border: none;
   outline: none;
   background-color: transparent;
-  cursor: pointer;
+  cursor: ${props => props.$isClickable ? 'pointer' : 'default'};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,6 +76,7 @@ export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: b
   transition: background-color 0.2s ease;
   position: relative;
   gap: 4px;
+  pointer-events: ${props => props.$isClickable ? 'auto' : 'none'};
 
   &::after {
     content: '';
@@ -89,28 +90,37 @@ export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: b
   }
 
   &:hover {
-    background-color: ${props => props.$isActive ? 'transparent' : 'rgba(0, 0, 0, 0.05)'};
+    background-color: ${props => (props.$isActive || !props.$isClickable) ? 'transparent' : 'rgba(0, 0, 0, 0.05)'};
   }
 
   &:active {
-    background-color: ${props => props.$isActive ? 'transparent' : 'rgba(0, 0, 0, 0.1)'};
+    background-color: ${props => (props.$isActive || !props.$isClickable) ? 'transparent' : 'rgba(0, 0, 0, 0.1)'};
   }
 `;
 
-export const ButtonLabel = styled.span<{ $isActive: boolean }>`
+export const ButtonLabel = styled.span<{ $isActive: boolean; $isDimmed: boolean }>`
   font-size: 11px;
   font-weight: 500;
-  color: ${props => props.$isActive ? '#007bff' : '#666666'};
+  color: ${props => {
+    if (props.$isDimmed) return '#ffffff';
+    return props.$isActive ? '#007bff' : '#666666';
+  }};
   white-space: nowrap;
   transition: color 0.3s ease;
 `;
 
-export const NavIcon = styled.img<{ $isActive: boolean }>`
+export const NavIcon = styled.img<{ $isActive: boolean; $isDimmed: boolean }>`
   width: 24px;
   height: 24px;
   transition: filter 0.3s ease, opacity 0.3s ease;
-  opacity: ${props => props.$isActive ? 1 : 0.6};
-  filter: ${props => props.$isActive 
-    ? 'invert(32%) sepia(98%) saturate(1234%) hue-rotate(200deg) brightness(97%) contrast(101%)' 
-    : 'none'};
+  opacity: ${props => {
+    if (props.$isDimmed) return 1;
+    return props.$isActive ? 1 : 0.6;
+  }};
+  filter: ${props => {
+    if (props.$isDimmed) return 'brightness(0) invert(1)'; // Make it white
+    return props.$isActive
+      ? 'invert(32%) sepia(98%) saturate(1234%) hue-rotate(200deg) brightness(97%) contrast(101%)'
+      : 'none';
+  }};
 `;

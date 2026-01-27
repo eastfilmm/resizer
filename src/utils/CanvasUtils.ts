@@ -329,9 +329,9 @@ export function drawPolaroidFrame(
 
   // Add subtle shadow to frame
   ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-  ctx.shadowBlur = 15 * scaleFactor;
-  ctx.shadowOffsetX = 5 * scaleFactor;
-  ctx.shadowOffsetY = 5 * scaleFactor;
+  ctx.shadowBlur = 30 * scaleFactor;
+  ctx.shadowOffsetX = 10 * scaleFactor;
+  ctx.shadowOffsetY = 10 * scaleFactor;
   ctx.fill(); // Re-fill the rounded path to apply shadow
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;

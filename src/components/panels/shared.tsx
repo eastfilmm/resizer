@@ -22,16 +22,17 @@ export const PanelRow = styled.div`
   align-items: center;
 `;
 
-export const PanelLabelWrapper = styled.div<{$textAlign: 'center' | 'left'| 'right'}>`
+export const PanelLabelWrapper = styled.div<{ $textAlign: 'center' | 'left' | 'right' }>`
   text-align :${props => props.$textAlign || 'left'}; 
   max-width: 360px;
   width:100%;
   
 `
 // Label text
-export const PanelLabel = styled.span`
+export const PanelLabel = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: #666;
+  color: ${props => props.$isDimmed ? '#ffffff' : '#666'};
+  transition: color 0.2s ease;
 `;
 
 // Toggle Switch
@@ -81,15 +82,17 @@ export const SliderLabelRow = styled.div`
 `;
 
 // Slider Label
-export const SliderLabel = styled.span`
+export const SliderLabel = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: #666;
+  color: ${props => props.$isDimmed ? '#ffffff' : '#666'};
+  transition: color 0.2s ease;
 `;
 
 // Slider Value
-export const SliderValue = styled.span`
+export const SliderValue = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: #666;
+  color: ${props => props.$isDimmed ? '#ffffff' : '#666'};
+  transition: color 0.2s ease;
 `;
 
 // Slider Input
@@ -122,6 +125,8 @@ export const Slider = styled.input`
   }
   
   &:disabled::-webkit-slider-thumb {
+    background: #ffffff;
+    border: 1px solid #ddd;
     cursor: not-allowed;
   }
   
@@ -132,6 +137,12 @@ export const Slider = styled.input`
     border-radius: 50%;
     cursor: pointer;
     border: none;
+  }
+
+  &:disabled::-moz-range-thumb {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    cursor: not-allowed;
   }
 `;
 

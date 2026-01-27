@@ -9,7 +9,8 @@ import {
   glassBlurAtom,
   shadowEnabledAtom,
   copyrightEnabledAtom,
-  canvasAspectRatioAtom
+  canvasAspectRatioAtom,
+  polaroidModeAtom
 } from '@/atoms/imageAtoms';
 import { LayoutPanel } from './panels/LayoutPanel';
 import { BackgroundPanel } from './panels/BackgroundPanel';
@@ -54,18 +55,27 @@ interface NavButtonProps {
   item: NavItem;
   isActive: boolean;
   isEnabled: boolean;
+  isDimmed: boolean;
+  isClickable: boolean;
   onClick: (id: Exclude<NavPanelType, null>) => void;
 }
 
-const NavButton = memo(({ item, isActive, isEnabled, onClick }: NavButtonProps) => {
+const NavButton = memo(({ item, isActive, isEnabled, isDimmed, isClickable, onClick }: NavButtonProps) => {
   const handleClick = useCallback(() => {
+    if (!isClickable) return;
     onClick(item.id);
-  }, [onClick, item.id]);
+  }, [onClick, item.id, isClickable]);
 
   return (
-    <NavButtonStyled $isActive={isActive} $isEnabled={isEnabled} onClick={handleClick}>
-      <NavIcon src={item.icon} alt={item.label} $isActive={isActive} />
-      <ButtonLabel $isActive={isActive}>{item.label}</ButtonLabel>
+    <NavButtonStyled
+      $isActive={isActive}
+      $isEnabled={isEnabled}
+      $isClickable={isClickable}
+      onClick={handleClick}
+      disabled={!isClickable}
+    >
+      <NavIcon src={item.icon} alt={item.label} $isActive={isActive} $isDimmed={isDimmed} />
+      <ButtonLabel $isActive={isActive} $isDimmed={isDimmed}>{item.label}</ButtonLabel>
     </NavButtonStyled>
   );
 });
@@ -100,6 +110,7 @@ export const NavigationBar = () => {
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
   const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
+  const polaroidMode = useAtomValue(polaroidModeAtom);
 
   const [displayedPanel, setDisplayedPanel] = useState<NavPanelType>(null);
   const [isContentVisible, setIsContentVisible] = useState(false);
@@ -153,18 +164,23 @@ export const NavigationBar = () => {
     }
   }, [activePanel, displayedPanel, isContentVisible, clearTimer]);
 
-  // Memoize enabled states
-  const enabledStates = useMemo(() => ({
-    layout: aspectRatio !== '1:1',
+  // Memoize active states (when the blue dot should appear)
+  const activeStates = useMemo(() => ({
+    layout: aspectRatio !== '1:1' || polaroidMode,
     background: backgroundColor !== 'white',
     glassblur: glassBlur,
     shadow: shadowEnabled,
     copyright: copyrightEnabled,
-  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled]);
+  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled, polaroidMode]);
 
-  const handleNavClick = useCallback((id: NavPanelType) => {
+  const handleNavClick = useCallback((id: Exclude<NavPanelType, null>) => {
+    // In Polaroid mode, only 'layout' and 'background' are actually functional.
+    // 'layout' must be clickable to turn off Polaroid mode even if it looks dimmed.
+    if (polaroidMode && id !== 'layout' && id !== 'background') {
+      return;
+    }
     setActivePanel(prev => prev === id ? null : id);
-  }, [setActivePanel]);
+  }, [setActivePanel, polaroidMode]);
 
   // Close panel when clicking outside (except navigation bar)
   useEffect(() => {
@@ -210,7 +226,9 @@ export const NavigationBar = () => {
               key={item.id}
               item={item}
               isActive={activePanel === item.id}
-              isEnabled={enabledStates[item.id]}
+              isEnabled={activeStates[item.id]}
+              isDimmed={polaroidMode && item.id !== 'layout' && item.id !== 'background'}
+              isClickable={!polaroidMode || item.id === 'layout' || item.id === 'background'}
               onClick={handleNavClick}
             />
           ))}

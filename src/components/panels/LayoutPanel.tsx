@@ -155,8 +155,8 @@ export const LayoutPanel = () => {
 
       <SliderSection>
         <SliderLabelRow>
-          <PanelLabel>Padding</PanelLabel>
-          <SliderValue>{padding}px</SliderValue>
+          <PanelLabel $isDimmed={polaroidMode}>Padding</PanelLabel>
+          <SliderValue $isDimmed={polaroidMode}>{padding}px</SliderValue>
         </SliderLabelRow>
         <Slider
           type="range"
@@ -164,6 +164,7 @@ export const LayoutPanel = () => {
           max="200"
           value={padding}
           onChange={handlePaddingChange}
+          disabled={polaroidMode}
         />
       </SliderSection>
     </PanelContainer>
