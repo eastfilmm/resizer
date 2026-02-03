@@ -11,7 +11,7 @@ export const Container = styled.div`
 `;
 
 export const PanelContainer = styled.div<{ $height: number }>`
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.3);
   overflow: hidden;
   height: ${props => props.$height}px;
   transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);

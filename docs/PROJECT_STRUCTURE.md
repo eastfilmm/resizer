@@ -12,7 +12,7 @@ resizer/
 ├── AGENTS.md                  # AI 에이전트 가이드라인
 ├── docs/                      # 기능별 문서
 │   ├── CanvasPadding.md
-│   ├── Copyright.md
+│   ├── CommitAutomation.md
 │   ├── GlassBlur.md
 │   ├── PROJECT_STRUCTURE.md   # 프로젝트 구조 문서 (이 파일)
 │   ├── Shadow.md
@@ -23,12 +23,12 @@ resizer/
 ├── pnpm-lock.yaml
 ├── public/                    # Static assets (SVG icons, images)
 │   ├── background.svg
-│   ├── copyright.svg
 │   ├── download.svg
 │   ├── glassBlur.svg
 │   ├── layout.svg
 │   ├── padding.svg
 │   ├── refresh_icon.svg
+│   ├── resizer_icon.png
 │   ├── shadow.svg
 │   └── upload.svg
 ├── README.md
@@ -43,13 +43,13 @@ resizer/
     │   ├── styled/            # Shared styled components
     │   │   ├── Button.tsx     # Reusable button component
     │   │   └── Layout.tsx     # Layout components
-    │   ├── panels/            # Effect control panels
-    │   │   ├── BackgroundPanel.tsx   # Background color toggle
-    │   │   ├── CopyrightPanel.tsx    # Copyright toggle + text input
-    │   │   ├── GlassBlurPanel.tsx    # Glass blur toggle + sliders
-    │   │   ├── LayoutPanel.tsx       # Canvas padding slider
-    │   │   ├── ShadowPanel.tsx       # Shadow toggle + sliders
-    │   │   └── shared.tsx            # Shared panel styled components
+│   ├── panels/            # Effect control panels
+│   │   ├── BackgroundPanel.tsx   # Background color toggle
+│   │   ├── GlassBlurPanel.tsx    # Glass blur toggle + sliders
+│   │   ├── LayoutPanel.tsx       # Canvas ratio + Polaroid frame
+│   │   ├── PaddingPanel.tsx      # Canvas padding slider
+│   │   ├── ShadowPanel.tsx       # Shadow toggle + sliders
+│   │   └── shared.tsx            # Shared panel styled components
     │   ├── ActionButtons.tsx         # Upload/Download/Reset button group
     │   ├── DownloadButton.tsx        # Export and reset after download
     │   ├── ImageCanvas.tsx           # Unified canvas (Safari + Chrome/Firefox)
@@ -81,7 +81,7 @@ Jotai 상태 관리 atom 정의. `imageAtoms.ts`에 모든 애플리케이션 �
 
 ### `src/components/`
 React 컴포넌트들:
-- **`panels/`**: 각 효과 제어 패널 컴포넌트 (Background, Copyright, GlassBlur, Layout, Shadow)
+- **`panels/`**: 각 효과 제어 패널 컴포넌트 (Background, GlassBlur, Layout, Padding, Shadow)
 - **`styled/`**: 재사용 가능한 스타일 컴포넌트 (Button, Layout)
 - `ImageCanvas.tsx`: 통합 캔버스 컴포넌트 (Safari와 Chrome/Firefox 모두 처리)
 - 업로드, 다운로드, 리셋 등 주요 기능 컴포넌트

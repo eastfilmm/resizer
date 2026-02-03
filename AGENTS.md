@@ -9,11 +9,11 @@ A Next.js web application for resizing images. Users can upload images, preview 
 ### Features
 
 - **Aspect Ratio**: Select canvas aspect ratio (1:1, 4:5, 9:16)
+- **Polaroid Frame**: Classic polaroid-style frame effect
+- **Padding**: Adjust padding around the image (0-200px)
 - **Background Color**: Toggle between white/black background
-- **Canvas Padding**: Adjust padding around the image (0-200px)
 - **Glass Blur**: Blur effect using the image's center as background with tint overlay
 - **Shadow**: Drop shadow effect on the right and bottom of the image
-- **Copyright**: Add copyright text overlay on the image (color auto-adjusts based on background)
 
 ### Tech Stack
 
@@ -94,29 +94,23 @@ The project uses `StyledComponentsRegistry` for SSR support. New styled-componen
 - Reduced resolution preview (800px height, ratio-dependent width, SCALE_FACTOR = 0.4)
 - RAF throttle for smooth slider performance
 - JavaScript stackblur (Safari has CSS filter caching issues)
-- All effects scaled by 0.4: blur, shadow, padding, copyright text
+- All effects scaled by 0.4: blur, shadow, padding
 - Download generates full resolution canvas (2000px height)
 
 **Utils & Constants**: 
 - Canvas dimension helpers (`getCanvasDimensions`, `getCanvasDisplaySize`) are in `src/utils/CanvasUtils.ts`
 - Canvas constants (sizes, font sizes, storage keys) are in `src/constants/CanvasContents.ts`
 
-### 3. Copyright Text Color
-- Copyright text color **auto-adjusts** based on background color
-- White background → Black text
-- Black background → White text
-- Logic in `src/utils/CanvasUtils.ts` `drawCopyrightText()` function
-
-### 4. No Prettier
+### 3. No Prettier
 The project does not use Prettier. Follow ESLint rules only.
 
-### 5. No tests yet
+### 4. No tests yet
 Be careful with refactoring. Consider adding tests for critical utilities.
 
-### 6. Adding new effects
+### 5. Adding new effects
 필수 수정 파일: `imageAtoms.ts`, `panels/*.tsx`, `CanvasUtils.ts`, `ImageCanvas.tsx`, `DownloadButton.tsx`, `NavigationBar.tsx`, `useResetState.ts`, `docs/`
 
-### 7. Safari 최적화
+### 6. Safari 최적화
 `ImageCanvas.tsx`에서 `isSafari` prop에 따라 조건부 처리:
 - Safari: SCALE_FACTOR(0.4) 사용, stackblur 적용, RAF throttle
 - 일반 브라우저: 즉시 렌더링, CSS filter blur
@@ -126,7 +120,7 @@ Be careful with refactoring. Consider adding tests for critical utilities.
 
 ## 서브 에이전트 (Sub Agents)
 
-각 기능별 상세 문서를 `@`로 참조: `@docs/CanvasPadding.md`, `@docs/GlassBlur.md`, `@docs/Shadow.md`, `@docs/Copyright.md`
+각 기능별 상세 문서를 `@`로 참조: `@docs/CanvasPadding.md`, `@docs/GlassBlur.md`, `@docs/Shadow.md`
 
 새 기능 추가 시 `docs/FeatureName.md` 생성 후 이 섹션에 링크 추가.
 
