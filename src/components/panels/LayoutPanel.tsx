@@ -156,7 +156,7 @@ export const LayoutPanel = memo(() => {
       <SliderSection>
         <SliderLabelRow>
           <PanelLabel $isDimmed={polaroidMode}>Padding</PanelLabel>
-          <SliderValue $isDimmed={polaroidMode}>{padding}px</SliderValue>
+          <SliderValue style={{ width: '40px' }} $isDimmed={polaroidMode}>{padding}px</SliderValue>
         </SliderLabelRow>
         <Slider
           type="range"
