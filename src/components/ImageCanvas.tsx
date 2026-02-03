@@ -10,8 +10,6 @@ import {
   blurIntensityAtom,
   overlayOpacityAtom,
   paddingAtom,
-  copyrightEnabledAtom,
-  copyrightTextAtom,
   shadowEnabledAtom,
   shadowIntensityAtom,
   shadowOffsetAtom,
@@ -37,8 +35,6 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   const blurIntensityRef = useRef(store.get(blurIntensityAtom));
   const overlayOpacityRef = useRef(store.get(overlayOpacityAtom));
   const paddingRef = useRef(store.get(paddingAtom));
-  const copyrightEnabledRef = useRef(store.get(copyrightEnabledAtom));
-  const copyrightTextRef = useRef(store.get(copyrightTextAtom));
   const shadowEnabledRef = useRef(store.get(shadowEnabledAtom));
   const shadowIntensityRef = useRef(store.get(shadowIntensityAtom));
   const shadowOffsetRef = useRef(store.get(shadowOffsetAtom));
@@ -76,8 +72,6 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
           useGlassBlur: glassBlurRef.current,
           blurIntensity: blurIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),
           overlayOpacity: overlayOpacityRef.current,
-          showCopyright: copyrightEnabledRef.current,
-          copyrightText: copyrightTextRef.current,
           useShadow: shadowEnabledRef.current,
           shadowIntensity: shadowIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),
           shadowOffset: shadowOffsetRef.current * (isSafari ? SCALE_FACTOR : 1),
@@ -158,8 +152,6 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
       blurIntensityAtom,
       overlayOpacityAtom,
       paddingAtom,
-      copyrightEnabledAtom,
-      copyrightTextAtom,
       shadowEnabledAtom,
       shadowIntensityAtom,
       shadowOffsetAtom,
@@ -184,8 +176,6 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
         blurIntensityRef.current = store.get(blurIntensityAtom);
         overlayOpacityRef.current = store.get(overlayOpacityAtom);
         paddingRef.current = store.get(paddingAtom);
-        copyrightEnabledRef.current = store.get(copyrightEnabledAtom);
-        copyrightTextRef.current = store.get(copyrightTextAtom);
         shadowEnabledRef.current = store.get(shadowEnabledAtom);
         shadowIntensityRef.current = store.get(shadowIntensityAtom);
         shadowOffsetRef.current = store.get(shadowOffsetAtom);

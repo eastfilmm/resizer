@@ -13,9 +13,6 @@ import {
   CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
   CANVAS_PREVIEW_SIZE_9_16_WIDTH,
   CANVAS_PREVIEW_SIZE_9_16_HEIGHT,
-  COPYRIGHT_FONT_SIZE,
-  COPYRIGHT_OFFSET,
-  COPYRIGHT_RIGHT_MARGIN,
 } from '@/constants/CanvasContents';
 
 export interface ImagePosition {
@@ -190,49 +187,6 @@ export function drawGlassBlurBackground(
 }
 
 /**
- * Draw copyright text on the image
- * For landscape: below the image, right-aligned, with offset below image bottom
- * For portrait: right side of image, rotated 90 degrees, with offset right of image
- * Text color is automatically determined based on background color
- */
-export function drawCopyrightText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  imagePosition: ImagePosition,
-  backgroundColor: 'white' | 'black',
-  scaleFactor: number = 1
-): void {
-  if (!text.trim()) return;
-
-  const isLandscape = imagePosition.width >= imagePosition.height;
-
-  // Auto-detect text color based on background (white bg = black text, black bg = white text)
-  const textColor = backgroundColor === 'white' ? 'black' : 'white';
-  ctx.fillStyle = textColor;
-  ctx.font = `${COPYRIGHT_FONT_SIZE * scaleFactor}px sans-serif`;
-
-  if (isLandscape) {
-    // Landscape: horizontal text below image, right-aligned with margin
-    ctx.textBaseline = 'top';
-    ctx.textAlign = 'right';
-    const textX = imagePosition.x + imagePosition.width - COPYRIGHT_RIGHT_MARGIN * scaleFactor;
-    const textY = imagePosition.y + imagePosition.height + COPYRIGHT_OFFSET * scaleFactor;
-    ctx.fillText(text, textX, textY);
-  } else {
-    // Portrait: rotated 90 degrees, right side of image with margin
-    ctx.save();
-    const textX = imagePosition.x + imagePosition.width + COPYRIGHT_OFFSET * scaleFactor;
-    const textY = imagePosition.y + imagePosition.height;
-    ctx.translate(textX, textY);
-    ctx.rotate(Math.PI / 2); // Rotate 90 degrees (text reads from bottom to top)
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText(text, -COPYRIGHT_RIGHT_MARGIN * scaleFactor, 0);
-    ctx.restore();
-  }
-}
-
-/**
  * Draw polaroid frame with image inside
  * Frame ratio: 9:6 (3:2) for landscape images, 6:9 for portrait images (rotated 90 degrees)
  * Frame has white border with wider bottom margin (classic polaroid style)
@@ -373,8 +327,6 @@ export interface DrawImageOptions {
   useGlassBlur: boolean;
   blurIntensity: number;
   overlayOpacity: number;
-  showCopyright: boolean;
-  copyrightText: string;
   useShadow: boolean;
   shadowIntensity: number;
   shadowOffset: number;
@@ -401,8 +353,6 @@ export function drawImageWithEffects(
     useGlassBlur,
     blurIntensity,
     overlayOpacity,
-    showCopyright,
-    copyrightText,
     useShadow,
     shadowIntensity,
     shadowOffset,
@@ -462,13 +412,6 @@ export function drawImageWithEffects(
 
   // Draw image with high quality
   ctx.drawImage(img, x, y, width, height);
-
-  // Draw copyright text if enabled
-  if (showCopyright && copyrightText) {
-    // Determine background color from bgColor string
-    const backgroundColor: 'white' | 'black' = bgColor === 'white' || bgColor === '#ffffff' ? 'white' : 'black';
-    drawCopyrightText(ctx, copyrightText, imagePosition, backgroundColor, scaleFactor);
-  }
 
   return imagePosition;
 }

@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 
 // 네비게이션 활성 패널 타입
-export type NavPanelType = 'layout' | 'background' | 'glassblur' | 'shadow' | 'copyright' | null;
+export type NavPanelType = 'layout' | 'padding' | 'background' | 'glassblur' | 'shadow' | null;
 
 // 현재 활성화된 네비게이션 패널
 export const activeNavPanelAtom = atom<NavPanelType>(null);
@@ -24,11 +24,6 @@ export const overlayOpacityAtom = atom<number>(0.3);
 // 캔버스 패딩 (0-200px 범위, 캔버스 기준 2000px)
 export const paddingAtom = atom<number>(0);
 
-// Copyright 기능 활성화 여부
-export const copyrightEnabledAtom = atom<boolean>(false);
-
-// Copyright 텍스트
-export const copyrightTextAtom = atom<string>('');
 
 // Shadow 효과 활성화 여부
 export const shadowEnabledAtom = atom<boolean>(false);
@@ -54,7 +49,6 @@ export const canResetAtom = atom((get) => {
     get(glassBlurAtom) !== false ||
     get(blurIntensityAtom) !== 30 ||
     get(overlayOpacityAtom) !== 0.3 ||
-    get(copyrightEnabledAtom) !== false ||
     get(shadowEnabledAtom) !== false ||
     get(shadowIntensityAtom) !== 30 ||
     get(shadowOffsetAtom) !== 20 ||

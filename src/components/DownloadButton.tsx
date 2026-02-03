@@ -12,8 +12,6 @@ import {
   shadowEnabledAtom,
   shadowIntensityAtom,
   shadowOffsetAtom,
-  copyrightEnabledAtom,
-  copyrightTextAtom,
   polaroidModeAtom,
 } from '@/atoms/imageAtoms';
 import { useResetState } from '@/hooks/useResetState';
@@ -21,9 +19,7 @@ import { useIsSafari } from '@/hooks/useIsSafari';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
 import {
-  COPYRIGHT_STORAGE_KEY,
   CANVAS_ACTUAL_SIZE,
-  CANVAS_DISPLAY_SIZE,
   CANVAS_ACTUAL_SIZE_4_5_WIDTH,
   CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
   CANVAS_ACTUAL_SIZE_9_16_WIDTH,
@@ -38,7 +34,6 @@ interface DownloadButtonProps {
 
 export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps) => {
   const imageUrl = useAtomValue(imageUrlAtom);
-  const copyrightText = useAtomValue(copyrightTextAtom);
   const backgroundColor = useAtomValue(backgroundColorAtom);
   const padding = useAtomValue(paddingAtom);
   const glassBlur = useAtomValue(glassBlurAtom);
@@ -47,7 +42,6 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
   const shadowIntensity = useAtomValue(shadowIntensityAtom);
   const shadowOffset = useAtomValue(shadowOffsetAtom);
-  const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
   const isPolaroid = useAtomValue(polaroidModeAtom);
   const resetState = useResetState({ canvasRef, fileInputRef });
   const isSafari = useIsSafari();
@@ -55,11 +49,6 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
 
   const handleDownload = useCallback(async () => {
     if (!imageUrl) return;
-
-    // Save copyright text to localStorage
-    if (copyrightText) {
-      localStorage.setItem(COPYRIGHT_STORAGE_KEY, copyrightText);
-    }
 
     let dataUrl: string;
 
@@ -114,8 +103,6 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
         useGlassBlur: glassBlur,
         blurIntensity,
         overlayOpacity,
-        showCopyright: copyrightEnabled,
-        copyrightText,
         useShadow: shadowEnabled,
         shadowIntensity,
         shadowOffset,
@@ -139,7 +126,6 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     resetState();
   }, [
     imageUrl,
-    copyrightText,
     backgroundColor,
     padding,
     glassBlur,
@@ -148,7 +134,6 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     shadowEnabled,
     shadowIntensity,
     shadowOffset,
-    copyrightEnabled,
     isSafari,
     canvasRef,
     resetState,

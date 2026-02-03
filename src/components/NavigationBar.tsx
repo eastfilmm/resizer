@@ -8,14 +8,14 @@ import {
   backgroundColorAtom,
   glassBlurAtom,
   shadowEnabledAtom,
-  copyrightEnabledAtom,
   canvasAspectRatioAtom,
-  polaroidModeAtom
+  polaroidModeAtom,
+  paddingAtom
 } from '@/atoms/imageAtoms';
 import { LayoutPanel } from './panels/LayoutPanel';
+import { PaddingPanel } from './panels/PaddingPanel';
 import { BackgroundPanel } from './panels/BackgroundPanel';
 import { GlassBlurPanel } from './panels/GlassBlurPanel';
-import { CopyrightPanel } from './panels/CopyrightPanel';
 import { ShadowPanel } from './panels/ShadowPanel';
 import {
   Container,
@@ -37,18 +37,18 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'layout', label: 'Layout', icon: '/layout.svg' },
+  { id: 'padding', label: 'Padding', icon: '/padding.svg' },
   { id: 'background', label: 'Background', icon: '/background.svg' },
   { id: 'glassblur', label: 'Glass Blur', icon: '/glassBlur.svg' },
   { id: 'shadow', label: 'Shadow', icon: '/shadow.svg' },
-  { id: 'copyright', label: 'Copyright', icon: '/copyright.svg' },
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 260,
+  layout: 200,
+  padding: 60,
   background: 80,
   glassblur: 160,
   shadow: 160,
-  copyright: 160,
 };
 
 interface NavButtonProps {
@@ -92,8 +92,8 @@ const PanelContent = memo(({ activePanel }: { activePanel: NavPanelType }) => {
         return <GlassBlurPanel />;
       case 'shadow':
         return <ShadowPanel />;
-      case 'copyright':
-        return <CopyrightPanel />;
+      case 'padding':
+        return <PaddingPanel />;
       default:
         return null;
     }
@@ -108,7 +108,7 @@ export const NavigationBar = () => {
   const backgroundColor = useAtomValue(backgroundColorAtom);
   const glassBlur = useAtomValue(glassBlurAtom);
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
-  const copyrightEnabled = useAtomValue(copyrightEnabledAtom);
+  const padding = useAtomValue(paddingAtom);
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
   const polaroidMode = useAtomValue(polaroidModeAtom);
 
@@ -163,15 +163,16 @@ export const NavigationBar = () => {
   // Memoize active states (when the blue dot should appear)
   const activeStates = useMemo(() => ({
     layout: aspectRatio !== '1:1' || polaroidMode,
+    padding: padding > 0,
     background: backgroundColor !== 'white',
     glassblur: glassBlur,
     shadow: shadowEnabled,
-    copyright: copyrightEnabled,
-  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, copyrightEnabled, polaroidMode]);
+  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, padding, polaroidMode]);
 
   const handleNavClick = useCallback((id: Exclude<NavPanelType, null>) => {
-    // In Polaroid mode, only 'layout' and 'background' are actually functional.
+    // In Polaroid mode, only 'layout' and 'background' are functional.
     // 'layout' must be clickable to turn off Polaroid mode even if it looks dimmed.
+    // 'padding' is also disabled in Polaroid mode.
     if (polaroidMode && id !== 'layout' && id !== 'background') {
       return;
     }

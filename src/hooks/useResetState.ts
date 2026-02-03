@@ -9,7 +9,6 @@ import {
   glassBlurAtom,
   blurIntensityAtom,
   overlayOpacityAtom,
-  copyrightEnabledAtom,
   shadowEnabledAtom,
   shadowIntensityAtom,
   shadowOffsetAtom,
@@ -25,7 +24,6 @@ export const DEFAULT_VALUES = {
   glassBlur: false,
   blurIntensity: 30,
   overlayOpacity: 0.3,
-  copyrightEnabled: false,
   shadowEnabled: false,
   shadowIntensity: 30,
   shadowOffset: 20,
@@ -44,7 +42,6 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
   const setGlassBlur = useSetAtom(glassBlurAtom);
   const setBlurIntensity = useSetAtom(blurIntensityAtom);
   const setOverlayOpacity = useSetAtom(overlayOpacityAtom);
-  const setCopyrightEnabled = useSetAtom(copyrightEnabledAtom);
   const setShadowEnabled = useSetAtom(shadowEnabledAtom);
   const setShadowIntensity = useSetAtom(shadowIntensityAtom);
   const setShadowOffset = useSetAtom(shadowOffsetAtom);
@@ -63,7 +60,6 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     setGlassBlur(DEFAULT_VALUES.glassBlur);
     setBlurIntensity(DEFAULT_VALUES.blurIntensity);
     setOverlayOpacity(DEFAULT_VALUES.overlayOpacity);
-    setCopyrightEnabled(DEFAULT_VALUES.copyrightEnabled);
     setShadowEnabled(DEFAULT_VALUES.shadowEnabled);
     setShadowIntensity(DEFAULT_VALUES.shadowIntensity);
     setShadowOffset(DEFAULT_VALUES.shadowOffset);
@@ -82,7 +78,6 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     setGlassBlur,
     setBlurIntensity,
     setOverlayOpacity,
-    setCopyrightEnabled,
     setShadowEnabled,
     setShadowIntensity,
     setShadowOffset,
