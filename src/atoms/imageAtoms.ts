@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 
 // 네비게이션 활성 패널 타입
-export type NavPanelType = 'layout' | 'padding' | 'background' | 'glassblur' | 'shadow' | null;
+export type NavPanelType = 'layout' | 'polaroid' | 'background' | 'glassblur' | 'shadow' | null;
 
 // 현재 활성화된 네비게이션 패널
 export const activeNavPanelAtom = atom<NavPanelType>(null);

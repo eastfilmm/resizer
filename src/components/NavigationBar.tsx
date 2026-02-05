@@ -13,7 +13,7 @@ import {
   paddingAtom
 } from '@/atoms/imageAtoms';
 import { LayoutPanel } from './panels/LayoutPanel';
-import { PaddingPanel } from './panels/PaddingPanel';
+import { PolaroidPanel } from './panels/PolaroidPanel';
 import { BackgroundPanel } from './panels/BackgroundPanel';
 import { GlassBlurPanel } from './panels/GlassBlurPanel';
 import { ShadowPanel } from './panels/ShadowPanel';
@@ -37,15 +37,15 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'layout', label: 'Layout', icon: '/layout.svg' },
-  { id: 'padding', label: 'Padding', icon: '/padding.svg' },
+  { id: 'polaroid', label: 'Polaroid', icon: '/polaroid.svg' },
   { id: 'background', label: 'Background', icon: '/background.svg' },
   { id: 'glassblur', label: 'Glass Blur', icon: '/glassBlur.svg' },
   { id: 'shadow', label: 'Shadow', icon: '/shadow.svg' },
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 200,
-  padding: 72,
+  layout: 160,
+  polaroid: 130,
   background: 72,
   glassblur: 160,
   shadow: 160,
@@ -86,14 +86,14 @@ const PanelContent = memo(({ activePanel }: { activePanel: NavPanelType }) => {
     switch (activePanel) {
       case 'layout':
         return <LayoutPanel />;
+      case 'polaroid':
+        return <PolaroidPanel />;
       case 'background':
         return <BackgroundPanel />;
       case 'glassblur':
         return <GlassBlurPanel />;
       case 'shadow':
         return <ShadowPanel />;
-      case 'padding':
-        return <PaddingPanel />;
       default:
         return null;
     }
@@ -162,18 +162,17 @@ export const NavigationBar = () => {
 
   // Memoize active states (when the blue dot should appear)
   const activeStates = useMemo(() => ({
-    layout: aspectRatio !== '1:1' || polaroidMode,
-    padding: padding > 0,
+    layout: aspectRatio !== '1:1' || padding > 0,
+    polaroid: polaroidMode,
     background: backgroundColor !== 'white',
     glassblur: glassBlur,
     shadow: shadowEnabled,
   }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, padding, polaroidMode]);
 
   const handleNavClick = useCallback((id: Exclude<NavPanelType, null>) => {
-    // In Polaroid mode, only 'layout' and 'background' are functional.
-    // 'layout' must be clickable to turn off Polaroid mode even if it looks dimmed.
-    // 'padding' is also disabled in Polaroid mode.
-    if (polaroidMode && id !== 'layout' && id !== 'background') {
+    // In Polaroid mode, only 'layout', 'polaroid' and 'background' are functional.
+    // glassblur and shadow are disabled in Polaroid mode.
+    if (polaroidMode && id !== 'layout' && id !== 'polaroid' && id !== 'background') {
       return;
     }
     setActivePanel(prev => prev === id ? null : id);
@@ -224,8 +223,8 @@ export const NavigationBar = () => {
               item={item}
               isActive={activePanel === item.id}
               isEnabled={activeStates[item.id]}
-              isDimmed={polaroidMode && item.id !== 'layout' && item.id !== 'background'}
-              isClickable={!polaroidMode || item.id === 'layout' || item.id === 'background'}
+              isDimmed={polaroidMode && item.id !== 'layout' && item.id !== 'polaroid' && item.id !== 'background'}
+              isClickable={!polaroidMode || item.id === 'layout' || item.id === 'polaroid' || item.id === 'background'}
               onClick={handleNavClick}
             />
           ))}

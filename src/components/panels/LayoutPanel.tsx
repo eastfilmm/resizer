@@ -9,6 +9,10 @@ import {
   PanelContainer,
   PanelLabel,
   PanelLabelWrapper,
+  SliderSection,
+  SliderLabelRow,
+  SliderValue,
+  Slider,
 } from './shared';
 
 const AspectRatioOptions = styled.div`
@@ -52,34 +56,11 @@ const RatioIcon = styled.div<{ $ratio: '1:1' | '4:5' | '9:16'; $isActive: boolea
   transition: border-color 0.2s ease;
 `;
 
-const PolaroidIcon = styled.div<{ $isActive: boolean }>`
-  width: 18px;
-  height: 16px;
-  background: white;
-  border: 2px solid ${props => props.$isActive ? '#007bff' : '#999'};
-  border-radius: 2px;
-  position: relative;
-  padding-bottom: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.2s ease;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 1px;
-    left: 1px;
-    right: 1px;
-    height: 8px;
-    background: ${props => props.$isActive ? '#007bff' : '#ddd'};
-    border-radius: 1px;
-  }
-`;
-
 export const LayoutPanel = memo(() => {
+  const padding = useAtomValue(paddingAtom);
   const setPadding = useSetAtom(paddingAtom);
   const { aspectRatio, updateAspectRatio } = useAspectRatio();
   const polaroidMode = useAtomValue(polaroidModeAtom);
-  const setPolaroidMode = useSetAtom(polaroidModeAtom);
 
   const handleAspectRatioChange = useCallback(
     (ratio: '1:1' | '4:5' | '9:16') => {
@@ -91,9 +72,12 @@ export const LayoutPanel = memo(() => {
     [aspectRatio, updateAspectRatio, setPadding]
   );
 
-  const handlePolaroidToggle = useCallback(() => {
-    setPolaroidMode(!polaroidMode);
-  }, [polaroidMode, setPolaroidMode]);
+  const handlePaddingChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPadding(Number(e.target.value));
+    },
+    [setPadding]
+  );
 
   return (
     <PanelContainer>
@@ -125,18 +109,21 @@ export const LayoutPanel = memo(() => {
         </AspectRatioButton>
       </AspectRatioOptions>
 
-      {/* Polaroid Mode Section */}
-      <PanelLabelWrapper $textAlign="left">
-        <PanelLabel>Polaroid Frame</PanelLabel>
-      </PanelLabelWrapper>
-      <AspectRatioButton
-        $isActive={polaroidMode}
-        onClick={handlePolaroidToggle}
-        style={{ width: '100%' }}
-      >
-        <PolaroidIcon $isActive={polaroidMode} />
-        Polaroid
-      </AspectRatioButton>
+      {/* Padding Section */}
+      <SliderSection>
+        <SliderLabelRow>
+          <PanelLabel $isDimmed={polaroidMode}>Padding</PanelLabel>
+          <SliderValue style={{ width: '36px' }} $isDimmed={polaroidMode}>{padding}px</SliderValue>
+        </SliderLabelRow>
+        <Slider
+          type="range"
+          min="0"
+          max="200"
+          value={padding}
+          onChange={handlePaddingChange}
+          disabled={polaroidMode}
+        />
+      </SliderSection>
     </PanelContainer>
   );
 });
