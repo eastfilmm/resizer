@@ -44,9 +44,9 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 204,
-  padding: 60,
-  background: 80,
+  layout: 200,
+  padding: 72,
+  background: 72,
   glassblur: 160,
   shadow: 160,
 };

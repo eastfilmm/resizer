@@ -53,6 +53,5 @@ const HeaderWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 4px;
 `;

@@ -20,24 +20,24 @@ export const Main = styled.main`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 12px;
   gap: 12px;
   overflow: hidden;
   min-height: 0;
 `;
 
 export const Title = styled.h1`
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: bold;
   color: #333;
   
   @media (max-width: 480px) {
-    font-size: 1.25rem;
+    font-size: 1.0rem;
   }
 `;
 
 export const SubTitle = styled.h2`
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: normal;
   color: #666;
 `;
