@@ -68,6 +68,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
           actualCanvasHeight: canvasHeight,
           imageAreaWidth,
           imageAreaHeight,
+          padding: effectivePadding,
           bgColor: backgroundColorRef.current,
           useGlassBlur: glassBlurRef.current,
           blurIntensity: blurIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),

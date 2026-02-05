@@ -3,20 +3,28 @@
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { polaroidModeAtom } from '@/atoms/imageAtoms';
+import { polaroidModeAtom, paddingAtom } from '@/atoms/imageAtoms';
 import {
   PanelContainer,
   PanelLabel,
   PanelLabelWrapper,
 } from './shared';
 
+const POLAROID_DEFAULT_PADDING = 80;
+
 export const PolaroidPanel = memo(() => {
   const polaroidMode = useAtomValue(polaroidModeAtom);
   const setPolaroidMode = useSetAtom(polaroidModeAtom);
+  const setPadding = useSetAtom(paddingAtom);
 
   const handlePolaroidToggle = useCallback(() => {
-    setPolaroidMode(!polaroidMode);
-  }, [polaroidMode, setPolaroidMode]);
+    const newPolaroidMode = !polaroidMode;
+    setPolaroidMode(newPolaroidMode);
+    // Polaroid 켤 때 기본 padding 80px 적용
+    if (newPolaroidMode) {
+      setPadding(POLAROID_DEFAULT_PADDING);
+    }
+  }, [polaroidMode, setPolaroidMode, setPadding]);
 
   return (
     <PanelContainer>

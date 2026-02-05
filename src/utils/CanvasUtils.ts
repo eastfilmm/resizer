@@ -197,7 +197,8 @@ export function drawPolaroidFrame(
   canvasWidth: number,
   canvasHeight: number,
   bgColor: string,
-  scaleFactor: number = 1
+  scaleFactor: number = 1,
+  canvasPadding: number = 0
 ): ImagePosition {
   // Determine if image is landscape or portrait
   const isLandscape = img.width >= img.height;
@@ -222,9 +223,9 @@ export function drawPolaroidFrame(
   // Calculate image aspect ratio
   const imageAspectRatio = img.width / img.height;
 
-  // Available space for the entire frame (canvas minus some margin)
-  const maxFrameWidth = canvasWidth * 0.9;
-  const maxFrameHeight = canvasHeight * 0.9;
+  // Available space for the entire frame (canvas minus canvas padding)
+  const maxFrameWidth = canvasWidth - canvasPadding * 2;
+  const maxFrameHeight = canvasHeight - canvasPadding * 2;
 
   // Calculate frame size based on image + padding
   // Frame needs to fit: image area + padding
@@ -323,6 +324,7 @@ export interface DrawImageOptions {
   actualCanvasHeight: number;
   imageAreaWidth: number;
   imageAreaHeight: number;
+  padding: number;
   bgColor: string;
   useGlassBlur: boolean;
   blurIntensity: number;
@@ -349,6 +351,7 @@ export function drawImageWithEffects(
     actualCanvasHeight,
     imageAreaWidth,
     imageAreaHeight,
+    padding,
     bgColor,
     useGlassBlur,
     blurIntensity,
@@ -366,7 +369,7 @@ export function drawImageWithEffects(
 
   // If polaroid mode is enabled, use dedicated polaroid rendering
   if (usePolaroid) {
-    return drawPolaroidFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor);
+    return drawPolaroidFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
   }
 
   // If glass blur is enabled, draw blurred background from image

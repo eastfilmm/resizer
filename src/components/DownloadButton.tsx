@@ -90,15 +90,15 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      const effectivePadding = 0;
-      const imageAreaWidth = canvasWidth - effectivePadding * 2;
-      const imageAreaHeight = canvasHeight - effectivePadding * 2;
+      const imageAreaWidth = canvasWidth - padding * 2;
+      const imageAreaHeight = canvasHeight - padding * 2;
 
       drawImageWithEffects(ctx, img, {
         actualCanvasWidth: canvasWidth,
         actualCanvasHeight: canvasHeight,
         imageAreaWidth,
         imageAreaHeight,
+        padding,
         bgColor: backgroundColor,
         useGlassBlur: glassBlur,
         blurIntensity,
