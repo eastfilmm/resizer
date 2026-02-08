@@ -20,9 +20,11 @@ export const PolaroidPanel = memo(() => {
   const handlePolaroidToggle = useCallback(() => {
     const newPolaroidMode = !polaroidMode;
     setPolaroidMode(newPolaroidMode);
-    // Polaroid 켤 때 기본 padding 80px 적용
+    // Polaroid 켤 때 기본 padding 80px 적용, 끌 때 0으로 초기화
     if (newPolaroidMode) {
       setPadding(POLAROID_DEFAULT_PADDING);
+    } else {
+      setPadding(0);
     }
   }, [polaroidMode, setPolaroidMode, setPadding]);
 

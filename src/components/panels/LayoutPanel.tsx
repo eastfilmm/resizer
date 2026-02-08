@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { paddingAtom, polaroidModeAtom } from '@/atoms/imageAtoms';
+import { paddingAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import {
   PanelContainer,
@@ -56,23 +56,18 @@ const RatioIcon = styled.div<{ $ratio: '1:1' | '4:5' | '9:16'; $isActive: boolea
   transition: border-color 0.2s ease;
 `;
 
-const POLAROID_DEFAULT_PADDING = 80;
-
 export const LayoutPanel = memo(() => {
   const padding = useAtomValue(paddingAtom);
   const setPadding = useSetAtom(paddingAtom);
-  const polaroidMode = useAtomValue(polaroidModeAtom);
   const { aspectRatio, updateAspectRatio } = useAspectRatio();
 
   const handleAspectRatioChange = useCallback(
     (ratio: '1:1' | '4:5' | '9:16') => {
       if (aspectRatio !== ratio) {
         updateAspectRatio(ratio);
-        // Polaroid 모드일 때는 80px 유지, 아니면 0으로 초기화
-        setPadding(polaroidMode ? POLAROID_DEFAULT_PADDING : 0);
       }
     },
-    [aspectRatio, updateAspectRatio, setPadding, polaroidMode]
+    [aspectRatio, updateAspectRatio]
   );
 
   const handlePaddingChange = useCallback(

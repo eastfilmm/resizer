@@ -53,7 +53,6 @@ export const SliderBackground = styled.div<{ $activeIndex: number }>`
   left: ${props => props.$activeIndex >= 0 ? `${props.$activeIndex * 20}%` : '0'};
   opacity: ${props => props.$activeIndex >= 0 ? 1 : 0};
   pointer-events: none;
-  border-radius: 0 0 4px 4px;
 `;
 
 export const NavButtonsWrapper = styled.div`

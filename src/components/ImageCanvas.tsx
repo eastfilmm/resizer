@@ -103,7 +103,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    // Set display size (scaled down with CSS) - match container size
+    // Set display size (scaled down with CSS)
     canvas.style.width = `${displayWidth}px`;
     canvas.style.height = `${displayHeight}px`;
 
@@ -126,18 +126,15 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
     newImg.src = imageUrl;
   }, [imageUrl, canvasRef, redrawImage, isSafari]);
 
-  // Initialize canvas on mount
+  // Initialize canvas on mount (skip when image is already loaded to avoid double-clear flicker)
   useEffect(() => {
-    if (canvasRef.current) {
+    if (canvasRef.current && !imageRef.current) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (ctx) {
         const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, isSafari);
-        const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatio);
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
-        canvas.style.width = `${displayWidth}px`;
-        canvas.style.height = `${displayHeight}px`;
 
         ctx.fillStyle = backgroundColorRef.current;
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
