@@ -320,7 +320,7 @@ export function drawPolaroidFrame(
   // Draw date text at bottom right of the image (if provided)
   // Analog camera date stamp style
   if (dateText) {
-    const fontSize = 40 * scaleFactor;
+    const fontSize = 48 * scaleFactor;
     const dateMargin = 12 * scaleFactor;
     
     ctx.save();
