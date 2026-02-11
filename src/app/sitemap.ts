@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
+import { getSiteUrl } from '@/utils/siteConfig';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://picturedrucker.com/';
-  
+  const baseUrl = getSiteUrl();
+
   return [
     {
       url: baseUrl,

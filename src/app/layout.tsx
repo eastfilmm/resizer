@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import StyledComponentsRegistry from "@/lib/styled-components-registry";
+import { getSiteUrl, getSiteUrlObject } from "@/utils/siteConfig";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Resizer" }],
   creator: "Resizer",
   publisher: "Resizer",
-  metadataBase: new URL("https://resizer-nine.vercel.app"),
+  metadataBase: getSiteUrlObject(),
   alternates: {
     canonical: "/",
   },
@@ -44,11 +45,11 @@ export const metadata: Metadata = {
     title: "Image Resizer for Instagram - 인스타그램 이미지 리사이저",
     description:
       "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
-    url: "https://resizer-nine.vercel.app/",
+    url: `${getSiteUrl()}/`,
     siteName: "Image Resizer for Instagram",
     images: [
       {
-        url: "https://resizer-nine.vercel.app/resizer_icon.png",
+        url: `${getSiteUrl()}/resizer_icon.png`,
         width: 600,
         height: 600,
         alt: "Image Resizer for Instagram",
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
     title: "Image Resizer for Instagram - 인스타그램 이미지 리사이저",
     description:
       "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
-    images: ["https://resizer-nine.vercel.app/resizer_icon.png"],
+    images: [`${getSiteUrl()}/resizer_icon.png`],
   },
   robots: {
     index: true,
@@ -89,13 +90,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const siteUrl = getSiteUrl();
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "Image Resizer for Instagram",
     description:
       "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
-    url: "https://resizer-nine.vercel.app/",
+    url: `${siteUrl}/`,
     applicationCategory: "MultimediaApplication",
     operatingSystem: "Any",
     offers: {

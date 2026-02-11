@@ -1,11 +1,18 @@
 import { Metadata } from 'next';
 import ClientPage from './client-page';
+import { getSiteUrl } from '@/utils/siteConfig';
 
 // 서버 컴포넌트에서 메타데이터와 기본 HTML 구조 제공
 export const metadata: Metadata = {
   title: 'Image Resizer for Instagram - 인스타그램 이미지 리사이저',
   description:
     '인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    url: `${getSiteUrl()}/`,
+  },
 };
 
 export default function Home() {

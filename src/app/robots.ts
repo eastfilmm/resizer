@@ -1,6 +1,9 @@
 import { MetadataRoute } from 'next';
+import { getSiteUrl } from '@/utils/siteConfig';
 
 export default function robots(): MetadataRoute.Robots {
+  const baseUrl = getSiteUrl();
+
   return {
     rules: [
       {
@@ -14,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [],
       },
     ],
-    sitemap: 'https://resizer-nine.vercel.app/sitemap.xml',
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
