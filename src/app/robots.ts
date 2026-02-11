@@ -8,6 +8,11 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
         disallow: [],
       },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: [],
+      },
     ],
     sitemap: 'https://resizer-nine.vercel.app/sitemap.xml',
   };
