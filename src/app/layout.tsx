@@ -16,23 +16,28 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Image Resizer for Instagram - 인스타그램 이미지 리사이저",
-    template: "%s | Image Resizer",
+    default: "Picture Drucker - Image Resizer for Instagram",
+    template: "%s | Picture Drucker",
   },
   description:
-    "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
+    "Free online image resizer optimized for Instagram Feed and Stories. Resize images to 1:1, 4:5, and 9:16 aspect ratios. Apply polaroid frames, padding, glass blur, shadow effects, and customize background colors.",
   keywords: [
-    "이미지 리사이저",
-    "인스타그램 리사이저",
-    "이미지 편집",
-    "인스타그램 포스팅",
-    "이미지 비율 조정",
-    "폴라로이드 프레임",
-    "이미지 효과",
+    "image resizer",
+    "instagram resizer",
+    "instagram feed",
+    "instagram stories",
+    "image editor",
+    "instagram post",
+    "aspect ratio",
+    "polaroid frame",
+    "image effects",
+    "photo editor",
+    "social media tools",
+    "instagram optimized",
   ],
-  authors: [{ name: "Resizer" }],
-  creator: "Resizer",
-  publisher: "Resizer",
+  authors: [{ name: "Picture Drucker" }],
+  creator: "Picture Drucker",
+  publisher: "Picture Drucker",
   metadataBase: getSiteUrlObject(),
   alternates: {
     canonical: "/",
@@ -42,27 +47,27 @@ export const metadata: Metadata = {
     apple: "/resizer_icon.png",
   },
   openGraph: {
-    title: "Image Resizer for Instagram - 인스타그램 이미지 리사이저",
+    title: "Picture Drucker - Image Resizer for Instagram",
     description:
-      "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
+      "Free online image resizer optimized for Instagram Feed and Stories. Resize images to 1:1, 4:5, and 9:16 aspect ratios. Apply polaroid frames, padding, glass blur, shadow effects, and customize background colors.",
     url: `${getSiteUrl()}/`,
-    siteName: "Image Resizer for Instagram",
+    siteName: "Picture Drucker",
     images: [
       {
         url: `${getSiteUrl()}/resizer_icon.png`,
         width: 600,
         height: 600,
-        alt: "Image Resizer for Instagram",
+        alt: "Picture Drucker - Image Resizer for Instagram",
       },
     ],
-    locale: "ko_KR",
+    locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "Image Resizer for Instagram - 인스타그램 이미지 리사이저",
+    title: "Picture Drucker - Image Resizer for Instagram",
     description:
-      "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
+      "Free online image resizer optimized for Instagram Feed and Stories. Resize images to 1:1, 4:5, and 9:16 aspect ratios. Apply polaroid frames, padding, glass blur, shadow effects, and customize background colors.",
     images: [`${getSiteUrl()}/resizer_icon.png`],
   },
   robots: {
@@ -94,30 +99,30 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Image Resizer for Instagram",
+    name: "Picture Drucker",
     description:
-      "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
+      "Free online image resizer optimized for Instagram Feed and Stories. Resize images to 1:1, 4:5, and 9:16 aspect ratios. Apply polaroid frames, padding, glass blur, shadow effects, and customize background colors.",
     url: `${siteUrl}/`,
     applicationCategory: "MultimediaApplication",
     operatingSystem: "Any",
     offers: {
       "@type": "Offer",
       price: "0",
-      priceCurrency: "KRW",
+      priceCurrency: "USD",
     },
     featureList: [
-      "이미지 리사이즈",
-      "비율 조정 (1:1, 4:5, 9:16)",
-      "폴라로이드 프레임",
-      "패딩 조정",
-      "글래스 블러 효과",
-      "그림자 효과",
-      "배경색 변경",
+      "Image resizing",
+      "Aspect ratio adjustment (1:1, 4:5, 9:16)",
+      "Polaroid frame",
+      "Padding adjustment",
+      "Glass blur effect",
+      "Shadow effect",
+      "Background color customization",
     ],
   };
 
   return (
-    <html lang="ko">
+    <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <script
           type="application/ld+json"
