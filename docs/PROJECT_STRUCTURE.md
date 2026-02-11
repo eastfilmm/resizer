@@ -19,14 +19,18 @@ resizer/
 │   └── WORKFLOW.md            # 서브 에이전트 워크플로우
 ├── eslint.config.mjs
 ├── next.config.ts
+├── opencode.json
+├── package-lock.json
 ├── package.json
 ├── pnpm-lock.yaml
 ├── public/                    # Static assets (SVG icons, images)
 │   ├── background.svg
+│   ├── copyright.svg
 │   ├── download.svg
 │   ├── glassBlur.svg
 │   ├── layout.svg
 │   ├── padding.svg
+│   ├── polaroid.svg
 │   ├── refresh_icon.svg
 │   ├── resizer_icon.png
 │   ├── shadow.svg
@@ -47,7 +51,7 @@ resizer/
 │   │   ├── BackgroundPanel.tsx   # Background color toggle
 │   │   ├── GlassBlurPanel.tsx    # Glass blur toggle + sliders
 │   │   ├── LayoutPanel.tsx       # Canvas ratio + Polaroid frame
-│   │   ├── PaddingPanel.tsx      # Canvas padding slider
+│   │   ├── PolaroidPanel.tsx      # Polaroid frame toggle
 │   │   ├── ShadowPanel.tsx       # Shadow toggle + sliders
 │   │   └── shared.tsx            # Shared panel styled components
     │   ├── ActionButtons.tsx         # Upload/Download/Reset button group

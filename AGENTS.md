@@ -101,8 +101,8 @@ The project uses `StyledComponentsRegistry` for SSR support. New styled-componen
 - Canvas dimension helpers (`getCanvasDimensions`, `getCanvasDisplaySize`) are in `src/utils/CanvasUtils.ts`
 - Canvas constants (sizes, font sizes, storage keys) are in `src/constants/CanvasContents.ts`
 
-### 3. No Prettier
-The project does not use Prettier. Follow ESLint rules only.
+### 3. Prettier
+The project uses Prettier for code formatting (`.prettierrc` config exists). Follow both ESLint and Prettier rules.
 
 ### 4. No tests yet
 Be careful with refactoring. Consider adding tests for critical utilities.

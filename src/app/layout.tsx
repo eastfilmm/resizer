@@ -14,22 +14,66 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Resizer App",
-  description: "Mobile-first resizer application",
+  title: {
+    default: "Image Resizer for Instagram - 인스타그램 이미지 리사이저",
+    template: "%s | Image Resizer",
+  },
+  description:
+    "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
+  keywords: [
+    "이미지 리사이저",
+    "인스타그램 리사이저",
+    "이미지 편집",
+    "인스타그램 포스팅",
+    "이미지 비율 조정",
+    "폴라로이드 프레임",
+    "이미지 효과",
+  ],
+  authors: [{ name: "Resizer" }],
+  creator: "Resizer",
+  publisher: "Resizer",
+  metadataBase: new URL("https://resizer-nine.vercel.app"),
+  alternates: {
+    canonical: "/",
+  },
+  icons: {
+    icon: "/resizer_icon.png",
+    apple: "/resizer_icon.png",
+  },
   openGraph: {
-    title: "Resizer App",
-    description: "Mobile-first resizer application",
+    title: "Image Resizer for Instagram - 인스타그램 이미지 리사이저",
+    description:
+      "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
     url: "https://resizer-nine.vercel.app/",
-    siteName: "Resizer App",
+    siteName: "Image Resizer for Instagram",
     images: [
       {
-        url: "https://resizer-nine.vercel.app/resizer_icon.png", // ← public 앞 경로 빼야 정상적으로 OG 이미지 동작
+        url: "https://resizer-nine.vercel.app/resizer_icon.png",
         width: 600,
         height: 600,
+        alt: "Image Resizer for Instagram",
       },
     ],
     locale: "ko_KR",
     type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Image Resizer for Instagram - 인스타그램 이미지 리사이저",
+    description:
+      "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
+    images: ["https://resizer-nine.vercel.app/resizer_icon.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 
@@ -45,9 +89,38 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Image Resizer for Instagram",
+    description:
+      "인스타그램용 이미지 리사이저. 1:1, 4:5, 9:16 비율로 이미지를 리사이즈하고, 폴라로이드 프레임, 패딩, 글래스 블러, 그림자 효과를 적용하세요.",
+    url: "https://resizer-nine.vercel.app/",
+    applicationCategory: "MultimediaApplication",
+    operatingSystem: "Any",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "KRW",
+    },
+    featureList: [
+      "이미지 리사이즈",
+      "비율 조정 (1:1, 4:5, 9:16)",
+      "폴라로이드 프레임",
+      "패딩 조정",
+      "글래스 블러 효과",
+      "그림자 효과",
+      "배경색 변경",
+    ],
+  };
+
   return (
     <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <StyledComponentsRegistry>
           {children}
         </StyledComponentsRegistry>
