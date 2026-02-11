@@ -19,7 +19,7 @@ export default function ClientPage() {
     <Container>
       <Main>
         <HeaderWrapper>
-        <Title>Image Resizer</Title>
+        <Title>Picture Drucker</Title>
         <SubTitle>for Instagram</SubTitle>
         </HeaderWrapper>
         {/* 이미지 캔버스 */}
