@@ -3,11 +3,12 @@
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { polaroidModeAtom, paddingAtom } from '@/atoms/imageAtoms';
+import { polaroidModeAtom, paddingAtom, polaroidDateAtom } from '@/atoms/imageAtoms';
 import {
   PanelContainer,
   PanelLabel,
   PanelLabelWrapper,
+  TextInput,
 } from './shared';
 
 const POLAROID_DEFAULT_PADDING = 80;
@@ -16,6 +17,8 @@ export const PolaroidPanel = memo(() => {
   const polaroidMode = useAtomValue(polaroidModeAtom);
   const setPolaroidMode = useSetAtom(polaroidModeAtom);
   const setPadding = useSetAtom(paddingAtom);
+  const polaroidDate = useAtomValue(polaroidDateAtom);
+  const setPolaroidDate = useSetAtom(polaroidDateAtom);
 
   const handlePolaroidToggle = useCallback(() => {
     const newPolaroidMode = !polaroidMode;
@@ -27,6 +30,14 @@ export const PolaroidPanel = memo(() => {
       setPadding(0);
     }
   }, [polaroidMode, setPolaroidMode, setPadding]);
+
+  const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setPolaroidDate(e.target.value);
+  }, [setPolaroidDate]);
+
+  const handleDateClear = useCallback(() => {
+    setPolaroidDate('');
+  }, [setPolaroidDate]);
 
   return (
     <PanelContainer>
@@ -42,6 +53,27 @@ export const PolaroidPanel = memo(() => {
         <PolaroidIcon $isActive={polaroidMode} />
         Polaroid
       </PolaroidButton>
+      
+      {/* Date Input Section */}
+      <DateInputSection>
+        <PanelLabelWrapper $textAlign="left">
+          <PanelLabel>Date</PanelLabel>
+        </PanelLabelWrapper>
+        <DateInputWrapper>
+          <DateInput
+            type="text"
+            value={polaroidDate}
+            onChange={handleDateChange}
+            placeholder="e.g. 2024.01.01"
+            disabled={!polaroidMode}
+          />
+          {polaroidDate && polaroidMode && (
+            <ClearButton onClick={handleDateClear} type="button">
+              ×
+            </ClearButton>
+          )}
+        </DateInputWrapper>
+      </DateInputSection>
     </PanelContainer>
   );
 });
@@ -95,5 +127,46 @@ const PolaroidButton = styled.button<{ $isActive: boolean }>`
 
   &:active {
     transform: scale(0.98);
+  }
+`;
+
+const DateInputSection = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const DateInputWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+`;
+
+const DateInput = styled(TextInput)`
+  width: 100%;
+  padding-right: 36px;
+`;
+
+const ClearButton = styled.button`
+  position: absolute;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  border: none;
+  border-radius: 50%;
+  color: #666;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #ccc;
+    color: #333;
   }
 `;

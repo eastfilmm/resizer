@@ -45,7 +45,7 @@ const NAV_ITEMS: NavItem[] = [
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
   layout: 160,
-  polaroid: 120,
+  polaroid: 200,
   background: 72,
   glassblur: 160,
   shadow: 160,

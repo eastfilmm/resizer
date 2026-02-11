@@ -198,7 +198,8 @@ export function drawPolaroidFrame(
   canvasHeight: number,
   bgColor: string,
   scaleFactor: number = 1,
-  canvasPadding: number = 0
+  canvasPadding: number = 0,
+  dateText: string = ''
 ): ImagePosition {
   // Determine if image is landscape or portrait
   const isLandscape = img.width >= img.height;
@@ -316,6 +317,32 @@ export function drawPolaroidFrame(
   // Draw image
   ctx.drawImage(img, imageX, imageY, drawWidth, drawHeight);
 
+  // Draw date text at bottom right of the image (if provided)
+  // Analog camera date stamp style
+  if (dateText) {
+    const fontSize = 40 * scaleFactor;
+    const dateMargin = 12 * scaleFactor;
+    
+    ctx.save();
+    // Monospace font for analog LED display feel
+    ctx.font = `bold ${fontSize}px "Courier New", Courier, monospace`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'bottom';
+    
+    // Position at bottom right of the image
+    const dateX = imageX + drawWidth - dateMargin;
+    const dateY = imageY + drawHeight - dateMargin;
+    
+    // Add subtle glow effect for LED feel
+    ctx.shadowColor = '#FF6B00';
+    ctx.shadowBlur = 4 * scaleFactor;
+    
+    // Draw text in orange/red color (classic analog date stamp)
+    ctx.fillStyle = '#FF6B00';
+    ctx.fillText(dateText, dateX, dateY);
+    ctx.restore();
+  }
+
   return { x: imageX, y: imageY, width: drawWidth, height: drawHeight };
 }
 
@@ -335,6 +362,7 @@ export interface DrawImageOptions {
   usePolaroid: boolean;
   isSafari?: boolean;
   scaleFactor?: number;
+  polaroidDate?: string;
 }
 
 /**
@@ -369,7 +397,7 @@ export function drawImageWithEffects(
 
   // If polaroid mode is enabled, use dedicated polaroid rendering
   if (usePolaroid) {
-    return drawPolaroidFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
+    return drawPolaroidFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding, options.polaroidDate || '');
   }
 
   // If glass blur is enabled, draw blurred background from image
