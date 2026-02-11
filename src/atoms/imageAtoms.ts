@@ -43,6 +43,9 @@ export const polaroidModeAtom = atom<boolean>(false);
 // Thin Frame 모드 활성화 여부 (얇은 검정색 프레임)
 export const thinFrameModeAtom = atom<boolean>(false);
 
+// Medium Film Frame 모드 활성화 여부 (중형 필름 프레임)
+export const mediumFilmFrameModeAtom = atom<boolean>(false);
+
 // Polaroid date text
 export const polaroidDateAtom = atom<string>('');
 
@@ -60,6 +63,7 @@ export const canResetAtom = atom((get) => {
     get(shadowOffsetAtom) !== 20 ||
     get(polaroidModeAtom) !== false ||
     get(thinFrameModeAtom) !== false ||
+    get(mediumFilmFrameModeAtom) !== false ||
     get(polaroidDateAtom) !== '';
 
   return hasImage || hasFilterChanges;

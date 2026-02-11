@@ -413,6 +413,161 @@ export function drawThinFrame(
   return { x: imageX, y: imageY, width: imageWidth, height: imageHeight };
 }
 
+/**
+ * Draw medium format film frame around image
+ * For portrait images: frame is vertical (film info on top)
+ * For landscape images: frame is rotated 90 degrees left (film info on left)
+ * Frame fits tightly around the image with no gap between image and frame
+ */
+export function drawMediumFilmFrame(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  canvasWidth: number,
+  canvasHeight: number,
+  bgColor: string,
+  scaleFactor: number = 1,
+  canvasPadding: number = 0
+): ImagePosition {
+  const isLandscape = img.width > img.height;
+  
+  // Frame border thickness (left, right, bottom for portrait / top, right, bottom for landscape)
+  const frameBorderWidth = 36 * scaleFactor;
+  // Film info area height (top for portrait / left for landscape)
+  const filmInfoHeight = 70 * scaleFactor;
+  
+  // Available space for the frame (canvas minus canvas padding)
+  const maxFrameWidth = canvasWidth - canvasPadding * 2;
+  const maxFrameHeight = canvasHeight - canvasPadding * 2;
+  
+  // Calculate image aspect ratio
+  const imageAspectRatio = img.width / img.height;
+  
+  let imageWidth: number;
+  let imageHeight: number;
+  let frameWidth: number;
+  let frameHeight: number;
+  let imageX: number;
+  let imageY: number;
+  let frameX: number;
+  let frameY: number;
+  
+  if (isLandscape) {
+    // Landscape: frame rotated 90 degrees left (film info on left side)
+    // Frame layout: [         topBorder            ]
+    //               [filmInfo | image | rightBorder]
+    //               [         bottomBorder          ]
+    const availableImageWidth = maxFrameWidth - filmInfoHeight - frameBorderWidth;
+    const availableImageHeight = maxFrameHeight - frameBorderWidth * 2;
+    
+    if (imageAspectRatio > availableImageWidth / availableImageHeight) {
+      imageWidth = availableImageWidth;
+      imageHeight = imageWidth / imageAspectRatio;
+    } else {
+      imageHeight = availableImageHeight;
+      imageWidth = imageHeight * imageAspectRatio;
+    }
+    
+    // Frame size fits tightly around image
+    frameWidth = imageWidth + filmInfoHeight + frameBorderWidth;
+    frameHeight = imageHeight + frameBorderWidth * 2;
+    
+    frameX = (canvasWidth - frameWidth) / 2;
+    frameY = (canvasHeight - frameHeight) / 2;
+    
+    // Image positioned right after film info area, with top border
+    imageX = frameX + filmInfoHeight;
+    imageY = frameY + frameBorderWidth;
+  } else {
+    // Portrait: normal orientation (film info on top)
+    // Frame layout: [    filmInfo    ]
+    //               [leftBorder|image|rightBorder]
+    //               [   bottomBorder  ]
+    const availableImageWidth = maxFrameWidth - frameBorderWidth * 2;
+    const availableImageHeight = maxFrameHeight - filmInfoHeight - frameBorderWidth;
+    
+    if (imageAspectRatio > availableImageWidth / availableImageHeight) {
+      imageWidth = availableImageWidth;
+      imageHeight = imageWidth / imageAspectRatio;
+    } else {
+      imageHeight = availableImageHeight;
+      imageWidth = imageHeight * imageAspectRatio;
+    }
+    
+    // Frame size fits tightly around image
+    frameWidth = imageWidth + frameBorderWidth * 2;
+    frameHeight = imageHeight + filmInfoHeight + frameBorderWidth;
+    
+    frameX = (canvasWidth - frameWidth) / 2;
+    frameY = (canvasHeight - frameHeight) / 2;
+    
+    // Image positioned right after film info area (no gap)
+    imageX = frameX + frameBorderWidth;
+    imageY = frameY + filmInfoHeight;
+  }
+  
+  // Fill canvas background
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  
+  // Draw black frame border
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(frameX, frameY, frameWidth, frameHeight);
+  
+  // Draw image directly on frame (no white background gap)
+  ctx.drawImage(img, imageX, imageY, imageWidth, imageHeight);
+  
+  // Draw film info text
+  const fontSize = 32 * scaleFactor;
+  ctx.font = `bold ${fontSize}px "Courier New", Courier, monospace`;
+  ctx.fillStyle = '#FF6B00';
+  
+  // Film info texts
+  const leftText = '1  ◀  RVP100';
+  const rightText = '2  ◀  RVP100';
+  
+  if (isLandscape) {
+    // Rotate text for landscape (film info on left, reading bottom to top)
+    ctx.save();
+    
+    const textAreaCenterX = frameX + filmInfoHeight / 2;
+    const textAreaTop = frameY + frameBorderWidth;
+    const textAreaBottom = frameY + frameBorderWidth + imageHeight;
+    
+    // Left text (near bottom of rotated area) - becomes top when reading
+    ctx.translate(textAreaCenterX, textAreaBottom);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(leftText, 12 * scaleFactor, 0);
+    
+    ctx.restore();
+    ctx.save();
+    
+    // Right text (near top of rotated area) - becomes bottom when reading
+    ctx.translate(textAreaCenterX, textAreaTop);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(rightText, -12 * scaleFactor, 0);
+    
+    ctx.restore();
+  } else {
+    // Portrait: text on top, normal horizontal
+    const textY = frameY + filmInfoHeight / 2;
+    const textLeftX = frameX + frameBorderWidth + 12 * scaleFactor;
+    const textRightX = frameX + frameWidth - frameBorderWidth - 12 * scaleFactor;
+    
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(leftText, textLeftX, textY);
+    
+    ctx.textAlign = 'right';
+    ctx.fillText(rightText, textRightX, textY);
+  }
+  
+  return { x: imageX, y: imageY, width: imageWidth, height: imageHeight };
+}
+
 export interface DrawImageOptions {
   actualCanvasWidth: number;
   actualCanvasHeight: number;
@@ -428,6 +583,7 @@ export interface DrawImageOptions {
   shadowOffset: number;
   usePolaroid: boolean;
   useThinFrame: boolean;
+  useMediumFilmFrame: boolean;
   isSafari?: boolean;
   scaleFactor?: number;
   polaroidDate?: string;
@@ -457,6 +613,7 @@ export function drawImageWithEffects(
     shadowOffset,
     usePolaroid,
     useThinFrame,
+    useMediumFilmFrame,
     isSafari = false,
     scaleFactor = 1,
   } = options;
@@ -472,6 +629,11 @@ export function drawImageWithEffects(
   // If thin frame mode is enabled, use dedicated thin frame rendering
   if (useThinFrame) {
     return drawThinFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
+  }
+
+  // If medium film frame mode is enabled, use dedicated medium film frame rendering
+  if (useMediumFilmFrame) {
+    return drawMediumFilmFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
   }
 
   // If glass blur is enabled, draw blurred background from image

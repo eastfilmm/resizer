@@ -14,6 +14,7 @@ import {
   shadowOffsetAtom,
   polaroidModeAtom,
   thinFrameModeAtom,
+  mediumFilmFrameModeAtom,
   polaroidDateAtom,
 } from '@/atoms/imageAtoms';
 import { resetCanvas } from '@/utils/CanvasUtils';
@@ -31,6 +32,7 @@ export const DEFAULT_VALUES = {
   shadowOffset: 20,
   polaroidMode: false,
   thinFrameMode: false,
+  mediumFilmFrameMode: false,
   polaroidDate: '',
 } as const;
 
@@ -51,6 +53,7 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
   const setShadowOffset = useSetAtom(shadowOffsetAtom);
   const setPolaroidMode = useSetAtom(polaroidModeAtom);
   const setThinFrameMode = useSetAtom(thinFrameModeAtom);
+  const setMediumFilmFrameMode = useSetAtom(mediumFilmFrameModeAtom);
   const setPolaroidDate = useSetAtom(polaroidDateAtom);
 
   const resetState = useCallback(() => {
@@ -71,6 +74,7 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     setShadowOffset(DEFAULT_VALUES.shadowOffset);
     setPolaroidMode(DEFAULT_VALUES.polaroidMode);
     setThinFrameMode(DEFAULT_VALUES.thinFrameMode);
+    setMediumFilmFrameMode(DEFAULT_VALUES.mediumFilmFrameMode);
     setPolaroidDate(DEFAULT_VALUES.polaroidDate);
 
     // Reset canvas
@@ -91,6 +95,7 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     setShadowOffset,
     setPolaroidMode,
     setThinFrameMode,
+    setMediumFilmFrameMode,
     setPolaroidDate,
   ]);
 

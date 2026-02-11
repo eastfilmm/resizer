@@ -11,6 +11,7 @@ import {
   canvasAspectRatioAtom,
   polaroidModeAtom,
   thinFrameModeAtom,
+  mediumFilmFrameModeAtom,
   paddingAtom
 } from '@/atoms/imageAtoms';
 import { LayoutPanel } from './panels/LayoutPanel';
@@ -113,6 +114,7 @@ export const NavigationBar = () => {
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
   const polaroidMode = useAtomValue(polaroidModeAtom);
   const thinFrameMode = useAtomValue(thinFrameModeAtom);
+  const mediumFilmFrameMode = useAtomValue(mediumFilmFrameModeAtom);
 
   const [displayedPanel, setDisplayedPanel] = useState<NavPanelType>(null);
   const [isContentVisible, setIsContentVisible] = useState(false);
@@ -165,11 +167,11 @@ export const NavigationBar = () => {
   // Memoize active states (when the blue dot should appear)
   const activeStates = useMemo(() => ({
     layout: aspectRatio !== '1:1' || padding > 0,
-    frame: polaroidMode || thinFrameMode,
+    frame: polaroidMode || thinFrameMode || mediumFilmFrameMode,
     background: backgroundColor !== 'white',
     glassblur: glassBlur,
     shadow: shadowEnabled,
-  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, padding, polaroidMode, thinFrameMode]);
+  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, padding, polaroidMode, thinFrameMode, mediumFilmFrameMode]);
 
   const handleNavClick = useCallback((id: Exclude<NavPanelType, null>) => {
     // In Polaroid mode, only 'layout', 'frame' and 'background' are functional.
@@ -182,8 +184,13 @@ export const NavigationBar = () => {
     if (thinFrameMode && id !== 'layout' && id !== 'frame') {
       return;
     }
+    // In Medium Film Frame mode, only 'layout' and 'frame' are functional.
+    // background, glassblur and shadow are disabled in Medium Film Frame mode.
+    if (mediumFilmFrameMode && id !== 'layout' && id !== 'frame') {
+      return;
+    }
     setActivePanel(prev => prev === id ? null : id);
-  }, [setActivePanel, polaroidMode, thinFrameMode]);
+  }, [setActivePanel, polaroidMode, thinFrameMode, mediumFilmFrameMode]);
 
   // Close panel when clicking outside (except navigation bar)
   useEffect(() => {
@@ -227,9 +234,11 @@ export const NavigationBar = () => {
           {NAV_ITEMS.map(item => {
             // Polaroid mode: disable glassblur, shadow
             // Thin Frame mode: disable background, glassblur, shadow
+            // Medium Film Frame mode: disable background, glassblur, shadow
             const isPolaroidRestricted = polaroidMode && item.id !== 'layout' && item.id !== 'frame' && item.id !== 'background';
             const isThinFrameRestricted = thinFrameMode && item.id !== 'layout' && item.id !== 'frame';
-            const isDimmed = isPolaroidRestricted || isThinFrameRestricted;
+            const isMediumFilmFrameRestricted = mediumFilmFrameMode && item.id !== 'layout' && item.id !== 'frame';
+            const isDimmed = isPolaroidRestricted || isThinFrameRestricted || isMediumFilmFrameRestricted;
             const isClickable = !isDimmed;
             
             return (
