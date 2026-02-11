@@ -2,7 +2,11 @@
 
 import { useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { glassBlurAtom, blurIntensityAtom, overlayOpacityAtom } from '@/atoms/imageAtoms';
+import {
+  glassBlurAtom,
+  blurIntensityAtom,
+  overlayOpacityAtom,
+} from '@/atoms/imageAtoms';
 import {
   PanelContainer,
   PanelRow,
@@ -31,14 +35,14 @@ export const GlassBlurPanel = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setBlurIntensity(Number(e.target.value));
     },
-    [setBlurIntensity]
+    [setBlurIntensity],
   );
 
   const handleOpacityChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setOverlayOpacity(Number(e.target.value) / 100);
     },
-    [setOverlayOpacity]
+    [setOverlayOpacity],
   );
 
   return (
@@ -47,7 +51,6 @@ export const GlassBlurPanel = () => {
         <PanelLabel>Glass Blur</PanelLabel>
         <ToggleSwitch $isActive={glassBlur} onClick={toggleGlassBlur} />
       </PanelRow>
-
       <SliderSection>
         <SliderLabelRow>
           <SliderLabel>Blur</SliderLabel>

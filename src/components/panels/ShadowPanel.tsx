@@ -2,7 +2,11 @@
 
 import { useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { shadowEnabledAtom, shadowIntensityAtom, shadowOffsetAtom } from '@/atoms/imageAtoms';
+import {
+  shadowEnabledAtom,
+  shadowIntensityAtom,
+  shadowOffsetAtom,
+} from '@/atoms/imageAtoms';
 import {
   PanelContainer,
   PanelRow,
@@ -31,14 +35,14 @@ export const ShadowPanel = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setShadowIntensity(Number(e.target.value));
     },
-    [setShadowIntensity]
+    [setShadowIntensity],
   );
 
   const handleOffsetChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setShadowOffset(Number(e.target.value));
     },
-    [setShadowOffset]
+    [setShadowOffset],
   );
 
   return (
@@ -47,7 +51,6 @@ export const ShadowPanel = () => {
         <PanelLabel>Shadow</PanelLabel>
         <ToggleSwitch $isActive={shadowEnabled} onClick={toggleShadow} />
       </PanelRow>
-
       <SliderSection>
         <SliderLabelRow>
           <SliderLabel>Blur</SliderLabel>

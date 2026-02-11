@@ -12,7 +12,7 @@ import {
   polaroidModeAtom,
   thinFrameModeAtom,
   mediumFilmFrameModeAtom,
-  paddingAtom
+  paddingAtom,
 } from '@/atoms/imageAtoms';
 import { LayoutPanel } from './panels/LayoutPanel';
 import { FramePanel } from './panels/FramePanel';
@@ -46,11 +46,11 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 160,
+  layout: 148,
   frame: 200,
   background: 72,
-  glassblur: 160,
-  shadow: 160,
+  glassblur: 148,
+  shadow: 148,
 };
 
 interface NavButtonProps {
@@ -62,25 +62,41 @@ interface NavButtonProps {
   onClick: (id: Exclude<NavPanelType, null>) => void;
 }
 
-const NavButton = memo(({ item, isActive, isEnabled, isDimmed, isClickable, onClick }: NavButtonProps) => {
-  const handleClick = useCallback(() => {
-    if (!isClickable) return;
-    onClick(item.id);
-  }, [onClick, item.id, isClickable]);
+const NavButton = memo(
+  ({
+    item,
+    isActive,
+    isEnabled,
+    isDimmed,
+    isClickable,
+    onClick,
+  }: NavButtonProps) => {
+    const handleClick = useCallback(() => {
+      if (!isClickable) return;
+      onClick(item.id);
+    }, [onClick, item.id, isClickable]);
 
-  return (
-    <NavButtonStyled
-      $isActive={isActive}
-      $isEnabled={isEnabled}
-      $isClickable={isClickable}
-      onClick={handleClick}
-      disabled={!isClickable}
-    >
-      <NavIcon src={item.icon} alt={item.label} $isActive={isActive} $isDimmed={isDimmed} />
-      <ButtonLabel $isActive={isActive} $isDimmed={isDimmed}>{item.label}</ButtonLabel>
-    </NavButtonStyled>
-  );
-});
+    return (
+      <NavButtonStyled
+        $isActive={isActive}
+        $isEnabled={isEnabled}
+        $isClickable={isClickable}
+        onClick={handleClick}
+        disabled={!isClickable}
+      >
+        <NavIcon
+          src={item.icon}
+          alt={item.label}
+          $isActive={isActive}
+          $isDimmed={isDimmed}
+        />
+        <ButtonLabel $isActive={isActive} $isDimmed={isDimmed}>
+          {item.label}
+        </ButtonLabel>
+      </NavButtonStyled>
+    );
+  },
+);
 NavButton.displayName = 'NavButton';
 
 const PanelContent = memo(({ activePanel }: { activePanel: NavPanelType }) => {
@@ -165,39 +181,62 @@ export const NavigationBar = () => {
   }, [activePanel, clearTimer]); // Remove displayedPanel/isContentVisible from deps to prevent loops
 
   // Memoize active states (when the blue dot should appear)
-  const activeStates = useMemo(() => ({
-    layout: aspectRatio !== '1:1' || padding > 0,
-    frame: polaroidMode || thinFrameMode || mediumFilmFrameMode,
-    background: backgroundColor !== 'white',
-    glassblur: glassBlur,
-    shadow: shadowEnabled,
-  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, padding, polaroidMode, thinFrameMode, mediumFilmFrameMode]);
+  const activeStates = useMemo(
+    () => ({
+      layout: aspectRatio !== '1:1' || padding > 0,
+      frame: polaroidMode || thinFrameMode || mediumFilmFrameMode,
+      background: backgroundColor !== 'white',
+      glassblur: glassBlur,
+      shadow: shadowEnabled,
+    }),
+    [
+      aspectRatio,
+      backgroundColor,
+      glassBlur,
+      shadowEnabled,
+      padding,
+      polaroidMode,
+      thinFrameMode,
+      mediumFilmFrameMode,
+    ],
+  );
 
-  const handleNavClick = useCallback((id: Exclude<NavPanelType, null>) => {
-    // In Polaroid mode, only 'layout', 'frame' and 'background' are functional.
-    // glassblur and shadow are disabled in Polaroid mode.
-    if (polaroidMode && id !== 'layout' && id !== 'frame' && id !== 'background') {
-      return;
-    }
-    // In Thin Frame mode, only 'layout' and 'frame' are functional.
-    // background, glassblur and shadow are disabled in Thin Frame mode.
-    if (thinFrameMode && id !== 'layout' && id !== 'frame') {
-      return;
-    }
-    // In Medium Film Frame mode, only 'layout' and 'frame' are functional.
-    // background, glassblur and shadow are disabled in Medium Film Frame mode.
-    if (mediumFilmFrameMode && id !== 'layout' && id !== 'frame') {
-      return;
-    }
-    setActivePanel(prev => prev === id ? null : id);
-  }, [setActivePanel, polaroidMode, thinFrameMode, mediumFilmFrameMode]);
+  const handleNavClick = useCallback(
+    (id: Exclude<NavPanelType, null>) => {
+      // In Polaroid mode, only 'layout', 'frame' and 'background' are functional.
+      // glassblur and shadow are disabled in Polaroid mode.
+      if (
+        polaroidMode &&
+        id !== 'layout' &&
+        id !== 'frame' &&
+        id !== 'background'
+      ) {
+        return;
+      }
+      // In Thin Frame mode, only 'layout' and 'frame' are functional.
+      // background, glassblur and shadow are disabled in Thin Frame mode.
+      if (thinFrameMode && id !== 'layout' && id !== 'frame') {
+        return;
+      }
+      // In Medium Film Frame mode, only 'layout' and 'frame' are functional.
+      // background, glassblur and shadow are disabled in Medium Film Frame mode.
+      if (mediumFilmFrameMode && id !== 'layout' && id !== 'frame') {
+        return;
+      }
+      setActivePanel((prev) => (prev === id ? null : id));
+    },
+    [setActivePanel, polaroidMode, thinFrameMode, mediumFilmFrameMode],
+  );
 
   // Close panel when clicking outside (except navigation bar)
   useEffect(() => {
     if (activePanel === null) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setActivePanel(null);
       }
     };
@@ -215,7 +254,7 @@ export const NavigationBar = () => {
 
   const activeIndex = useMemo(() => {
     if (activePanel === null) return -1;
-    return NAV_ITEMS.findIndex(item => item.id === activePanel);
+    return NAV_ITEMS.findIndex((item) => item.id === activePanel);
   }, [activePanel]);
 
   const panelHeight = activePanel ? PANEL_HEIGHTS[activePanel] : 0;
@@ -231,16 +270,27 @@ export const NavigationBar = () => {
       <NavContainer>
         <SliderBackground $activeIndex={activeIndex} />
         <NavButtonsWrapper>
-          {NAV_ITEMS.map(item => {
+          {NAV_ITEMS.map((item) => {
             // Polaroid mode: disable glassblur, shadow
             // Thin Frame mode: disable background, glassblur, shadow
             // Medium Film Frame mode: disable background, glassblur, shadow
-            const isPolaroidRestricted = polaroidMode && item.id !== 'layout' && item.id !== 'frame' && item.id !== 'background';
-            const isThinFrameRestricted = thinFrameMode && item.id !== 'layout' && item.id !== 'frame';
-            const isMediumFilmFrameRestricted = mediumFilmFrameMode && item.id !== 'layout' && item.id !== 'frame';
-            const isDimmed = isPolaroidRestricted || isThinFrameRestricted || isMediumFilmFrameRestricted;
+            const isPolaroidRestricted =
+              polaroidMode &&
+              item.id !== 'layout' &&
+              item.id !== 'frame' &&
+              item.id !== 'background';
+            const isThinFrameRestricted =
+              thinFrameMode && item.id !== 'layout' && item.id !== 'frame';
+            const isMediumFilmFrameRestricted =
+              mediumFilmFrameMode &&
+              item.id !== 'layout' &&
+              item.id !== 'frame';
+            const isDimmed =
+              isPolaroidRestricted ||
+              isThinFrameRestricted ||
+              isMediumFilmFrameRestricted;
             const isClickable = !isDimmed;
-            
+
             return (
               <NavButton
                 key={item.id}

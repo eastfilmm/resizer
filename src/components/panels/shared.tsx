@@ -5,7 +5,7 @@ import styled from 'styled-components';
 // Panel Container
 export const PanelContainer = styled.div<{ $direction?: 'column' | 'row' }>`
   display: flex;
-  flex-direction: ${props => props.$direction || 'column'};
+  flex-direction: ${(props) => props.$direction || 'column'};
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -22,16 +22,17 @@ export const PanelRow = styled.div`
   align-items: center;
 `;
 
-export const PanelLabelWrapper = styled.div<{ $textAlign: 'center' | 'left' | 'right' }>`
-  text-align :${props => props.$textAlign || 'left'}; 
+export const PanelLabelWrapper = styled.div<{
+  $textAlign: 'center' | 'left' | 'right';
+}>`
+  text-align: ${(props) => props.$textAlign || 'left'};
   max-width: 360px;
-  width:100%;
-  
-`
+  width: 100%;
+`;
 // Label text
 export const PanelLabel = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: ${props => props.$isDimmed ? '#ffffff' : '#666'};
+  color: ${(props) => (props.$isDimmed ? '#ffffff' : '#666')};
   transition: color 0.2s ease;
 `;
 
@@ -40,17 +41,17 @@ export const ToggleSwitch = styled.div<{ $isActive: boolean }>`
   position: relative;
   width: 48px;
   height: 24px;
-  background-color: ${props => props.$isActive ? '#007bff' : '#6c757d'};
+  background-color: ${(props) => (props.$isActive ? '#007bff' : '#6c757d')};
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
   user-select: none;
-  
+
   &::after {
     content: '';
     position: absolute;
     top: 2px;
-    left: ${props => props.$isActive ? '26px' : '2px'};
+    left: ${(props) => (props.$isActive ? '26px' : '2px')};
     width: 20px;
     height: 20px;
     background-color: white;
@@ -58,7 +59,7 @@ export const ToggleSwitch = styled.div<{ $isActive: boolean }>`
     transition: left 0.2s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
@@ -84,14 +85,14 @@ export const SliderLabelRow = styled.div`
 // Slider Label
 export const SliderLabel = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: ${props => props.$isDimmed ? '#ffffff' : '#666'};
+  color: ${(props) => (props.$isDimmed ? '#ffffff' : '#666')};
   transition: color 0.2s ease;
 `;
 
 // Slider Value
 export const SliderValue = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: ${props => props.$isDimmed ? '#ffffff' : '#666'};
+  color: ${(props) => (props.$isDimmed ? '#ffffff' : '#666')};
   transition: color 0.2s ease;
 `;
 
@@ -104,11 +105,11 @@ export const Slider = styled.input`
   background: #ddd;
   border-radius: 2px;
   outline: none;
-  
+
   &:disabled {
     opacity: 0.5;
   }
-  
+
   &::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -119,17 +120,17 @@ export const Slider = styled.input`
     cursor: pointer;
     transition: background 0.2s ease;
   }
-  
+
   &::-webkit-slider-thumb:hover {
     background: #0056b3;
   }
-  
+
   &:disabled::-webkit-slider-thumb {
     background: #ffffff;
     border: 1px solid #ddd;
     cursor: not-allowed;
   }
-  
+
   &::-moz-range-thumb {
     width: 20px;
     height: 20px;
@@ -156,17 +157,31 @@ export const TextInput = styled.input`
   outline: none;
   transition: border-color 0.2s ease;
   box-sizing: border-box;
-  
+
   &:focus {
     border-color: #007bff;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     background-color: #f5f5f5;
   }
-  
+
   &::placeholder {
     color: #999;
   }
+`;
+
+export const TitleAndInputWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const SlidersWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 `;
