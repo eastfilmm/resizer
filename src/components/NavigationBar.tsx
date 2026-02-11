@@ -10,10 +10,11 @@ import {
   shadowEnabledAtom,
   canvasAspectRatioAtom,
   polaroidModeAtom,
+  thinFrameModeAtom,
   paddingAtom
 } from '@/atoms/imageAtoms';
 import { LayoutPanel } from './panels/LayoutPanel';
-import { PolaroidPanel } from './panels/PolaroidPanel';
+import { FramePanel } from './panels/FramePanel';
 import { BackgroundPanel } from './panels/BackgroundPanel';
 import { GlassBlurPanel } from './panels/GlassBlurPanel';
 import { ShadowPanel } from './panels/ShadowPanel';
@@ -37,7 +38,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'layout', label: 'Layout', icon: '/layout.svg' },
-  { id: 'polaroid', label: 'Polaroid', icon: '/polaroid.svg' },
+  { id: 'frame', label: 'Frame', icon: '/polaroid.svg' },
   { id: 'background', label: 'Background', icon: '/background.svg' },
   { id: 'glassblur', label: 'Glass Blur', icon: '/glassBlur.svg' },
   { id: 'shadow', label: 'Shadow', icon: '/shadow.svg' },
@@ -45,7 +46,7 @@ const NAV_ITEMS: NavItem[] = [
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
   layout: 160,
-  polaroid: 200,
+  frame: 200,
   background: 72,
   glassblur: 160,
   shadow: 160,
@@ -86,8 +87,8 @@ const PanelContent = memo(({ activePanel }: { activePanel: NavPanelType }) => {
     switch (activePanel) {
       case 'layout':
         return <LayoutPanel />;
-      case 'polaroid':
-        return <PolaroidPanel />;
+      case 'frame':
+        return <FramePanel />;
       case 'background':
         return <BackgroundPanel />;
       case 'glassblur':
@@ -111,6 +112,7 @@ export const NavigationBar = () => {
   const padding = useAtomValue(paddingAtom);
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
   const polaroidMode = useAtomValue(polaroidModeAtom);
+  const thinFrameMode = useAtomValue(thinFrameModeAtom);
 
   const [displayedPanel, setDisplayedPanel] = useState<NavPanelType>(null);
   const [isContentVisible, setIsContentVisible] = useState(false);
@@ -163,20 +165,25 @@ export const NavigationBar = () => {
   // Memoize active states (when the blue dot should appear)
   const activeStates = useMemo(() => ({
     layout: aspectRatio !== '1:1' || padding > 0,
-    polaroid: polaroidMode,
+    frame: polaroidMode || thinFrameMode,
     background: backgroundColor !== 'white',
     glassblur: glassBlur,
     shadow: shadowEnabled,
-  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, padding, polaroidMode]);
+  }), [aspectRatio, backgroundColor, glassBlur, shadowEnabled, padding, polaroidMode, thinFrameMode]);
 
   const handleNavClick = useCallback((id: Exclude<NavPanelType, null>) => {
-    // In Polaroid mode, only 'layout', 'polaroid' and 'background' are functional.
+    // In Polaroid mode, only 'layout', 'frame' and 'background' are functional.
     // glassblur and shadow are disabled in Polaroid mode.
-    if (polaroidMode && id !== 'layout' && id !== 'polaroid' && id !== 'background') {
+    if (polaroidMode && id !== 'layout' && id !== 'frame' && id !== 'background') {
+      return;
+    }
+    // In Thin Frame mode, only 'layout' and 'frame' are functional.
+    // background, glassblur and shadow are disabled in Thin Frame mode.
+    if (thinFrameMode && id !== 'layout' && id !== 'frame') {
       return;
     }
     setActivePanel(prev => prev === id ? null : id);
-  }, [setActivePanel, polaroidMode]);
+  }, [setActivePanel, polaroidMode, thinFrameMode]);
 
   // Close panel when clicking outside (except navigation bar)
   useEffect(() => {
@@ -217,17 +224,26 @@ export const NavigationBar = () => {
       <NavContainer>
         <SliderBackground $activeIndex={activeIndex} />
         <NavButtonsWrapper>
-          {NAV_ITEMS.map(item => (
-            <NavButton
-              key={item.id}
-              item={item}
-              isActive={activePanel === item.id}
-              isEnabled={activeStates[item.id]}
-              isDimmed={polaroidMode && item.id !== 'layout' && item.id !== 'polaroid' && item.id !== 'background'}
-              isClickable={!polaroidMode || item.id === 'layout' || item.id === 'polaroid' || item.id === 'background'}
-              onClick={handleNavClick}
-            />
-          ))}
+          {NAV_ITEMS.map(item => {
+            // Polaroid mode: disable glassblur, shadow
+            // Thin Frame mode: disable background, glassblur, shadow
+            const isPolaroidRestricted = polaroidMode && item.id !== 'layout' && item.id !== 'frame' && item.id !== 'background';
+            const isThinFrameRestricted = thinFrameMode && item.id !== 'layout' && item.id !== 'frame';
+            const isDimmed = isPolaroidRestricted || isThinFrameRestricted;
+            const isClickable = !isDimmed;
+            
+            return (
+              <NavButton
+                key={item.id}
+                item={item}
+                isActive={activePanel === item.id}
+                isEnabled={activeStates[item.id]}
+                isDimmed={isDimmed}
+                isClickable={isClickable}
+                onClick={handleNavClick}
+              />
+            );
+          })}
         </NavButtonsWrapper>
       </NavContainer>
     </Container>

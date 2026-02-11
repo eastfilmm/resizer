@@ -49,9 +49,9 @@ resizer/
     │   │   └── Layout.tsx     # Layout components
 │   ├── panels/            # Effect control panels
 │   │   ├── BackgroundPanel.tsx   # Background color toggle
+│   │   ├── FramePanel.tsx        # Frame type (Polaroid/Thin) + date stamp
 │   │   ├── GlassBlurPanel.tsx    # Glass blur toggle + sliders
-│   │   ├── LayoutPanel.tsx       # Canvas ratio + Polaroid frame
-│   │   ├── PolaroidPanel.tsx      # Polaroid frame toggle
+│   │   ├── LayoutPanel.tsx       # Canvas ratio + padding
 │   │   ├── ShadowPanel.tsx       # Shadow toggle + sliders
 │   │   └── shared.tsx            # Shared panel styled components
     │   ├── ActionButtons.tsx         # Upload/Download/Reset button group

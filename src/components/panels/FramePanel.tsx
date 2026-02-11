@@ -3,7 +3,7 @@
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { polaroidModeAtom, paddingAtom, polaroidDateAtom } from '@/atoms/imageAtoms';
+import { polaroidModeAtom, thinFrameModeAtom, paddingAtom, polaroidDateAtom } from '@/atoms/imageAtoms';
 import {
   PanelContainer,
   PanelLabel,
@@ -11,11 +11,13 @@ import {
   TextInput,
 } from './shared';
 
-const POLAROID_DEFAULT_PADDING = 80;
+const FRAME_DEFAULT_PADDING = 80;
 
-export const PolaroidPanel = memo(() => {
+export const FramePanel = memo(() => {
   const polaroidMode = useAtomValue(polaroidModeAtom);
   const setPolaroidMode = useSetAtom(polaroidModeAtom);
+  const thinFrameMode = useAtomValue(thinFrameModeAtom);
+  const setThinFrameMode = useSetAtom(thinFrameModeAtom);
   const setPadding = useSetAtom(paddingAtom);
   const polaroidDate = useAtomValue(polaroidDateAtom);
   const setPolaroidDate = useSetAtom(polaroidDateAtom);
@@ -23,13 +25,31 @@ export const PolaroidPanel = memo(() => {
   const handlePolaroidToggle = useCallback(() => {
     const newPolaroidMode = !polaroidMode;
     setPolaroidMode(newPolaroidMode);
-    // Polaroid 켤 때 기본 padding 80px 적용, 끌 때 0으로 초기화
+    
+    // Polaroid 켤 때: Thin Frame 끄고, padding 80px
+    // Polaroid 끌 때: padding 0으로 초기화
     if (newPolaroidMode) {
-      setPadding(POLAROID_DEFAULT_PADDING);
+      setThinFrameMode(false);
+      setPadding(FRAME_DEFAULT_PADDING);
     } else {
       setPadding(0);
     }
-  }, [polaroidMode, setPolaroidMode, setPadding]);
+  }, [polaroidMode, setPolaroidMode, setThinFrameMode, setPadding]);
+
+  const handleThinFrameToggle = useCallback(() => {
+    const newThinFrameMode = !thinFrameMode;
+    setThinFrameMode(newThinFrameMode);
+    
+    // Thin Frame 켤 때: Polaroid 끄고, date 초기화, padding 80px
+    // Thin Frame 끌 때: padding 0으로 초기화
+    if (newThinFrameMode) {
+      setPolaroidMode(false);
+      setPolaroidDate('');
+      setPadding(FRAME_DEFAULT_PADDING);
+    } else {
+      setPadding(0);
+    }
+  }, [thinFrameMode, setThinFrameMode, setPolaroidMode, setPolaroidDate, setPadding]);
 
   const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setPolaroidDate(e.target.value);
@@ -41,18 +61,26 @@ export const PolaroidPanel = memo(() => {
 
   return (
     <PanelContainer>
-      {/* Polaroid Mode Section */}
+      {/* Frame Type Section */}
       <PanelLabelWrapper $textAlign="left">
-        <PanelLabel>Polaroid Frame</PanelLabel>
+        <PanelLabel>Frame Type</PanelLabel>
       </PanelLabelWrapper>
-      <PolaroidButton
-        $isActive={polaroidMode}
-        onClick={handlePolaroidToggle}
-        style={{ width: '100%' }}
-      >
-        <PolaroidIcon $isActive={polaroidMode} />
-        Polaroid
-      </PolaroidButton>
+      <FrameOptions>
+        <FrameButton
+          $isActive={polaroidMode}
+          onClick={handlePolaroidToggle}
+        >
+          <PolaroidIcon $isActive={polaroidMode} />
+          Polaroid
+        </FrameButton>
+        <FrameButton
+          $isActive={thinFrameMode}
+          onClick={handleThinFrameToggle}
+        >
+          <ThinFrameIcon $isActive={thinFrameMode} />
+          Thin
+        </FrameButton>
+      </FrameOptions>
       
       {/* Date Input Section */}
       <DateInputSection>
@@ -78,7 +106,40 @@ export const PolaroidPanel = memo(() => {
   );
 });
 
-PolaroidPanel.displayName = 'PolaroidPanel';
+FramePanel.displayName = 'FramePanel';
+
+const FrameOptions = styled.div`
+  display: flex;
+  gap: 8px;
+  width: 100%;
+`;
+
+const FrameButton = styled.button<{ $isActive: boolean }>`
+  height: 42px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid ${props => props.$isActive ? '#007bff' : '#ddd'};
+  border-radius: 8px;
+  background-color: ${props => props.$isActive ? '#e7f3ff' : 'white'};
+  color: ${props => props.$isActive ? '#007bff' : '#666'};
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #007bff;
+    background-color: ${props => props.$isActive ? '#e7f3ff' : '#f8f9fa'};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
 
 const PolaroidIcon = styled.div<{ $isActive: boolean }>`
   width: 18px;
@@ -103,30 +164,24 @@ const PolaroidIcon = styled.div<{ $isActive: boolean }>`
   }
 `;
 
-const PolaroidButton = styled.button<{ $isActive: boolean }>`
-  height: 42px;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  border: 1px solid ${props => props.$isActive ? '#007bff' : '#ddd'};
-  border-radius: 8px;
-  background-color: ${props => props.$isActive ? '#e7f3ff' : 'white'};
-  color: ${props => props.$isActive ? '#007bff' : '#666'};
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: #007bff;
-    background-color: ${props => props.$isActive ? '#e7f3ff' : '#f8f9fa'};
-  }
-
-  &:active {
-    transform: scale(0.98);
+const ThinFrameIcon = styled.div<{ $isActive: boolean }>`
+  width: 18px;
+  height: 16px;
+  background: white;
+  border: 2px solid ${props => props.$isActive ? '#007bff' : '#999'};
+  border-radius: 1px;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border: 1px solid ${props => props.$isActive ? '#007bff' : '#333'};
   }
 `;
 

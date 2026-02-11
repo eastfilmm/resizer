@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 
 // 네비게이션 활성 패널 타입
-export type NavPanelType = 'layout' | 'polaroid' | 'background' | 'glassblur' | 'shadow' | null;
+export type NavPanelType = 'layout' | 'frame' | 'background' | 'glassblur' | 'shadow' | null;
 
 // 현재 활성화된 네비게이션 패널
 export const activeNavPanelAtom = atom<NavPanelType>(null);
@@ -40,6 +40,9 @@ export const canvasAspectRatioAtom = atom<'1:1' | '4:5' | '9:16'>('1:1');
 // 폴라로이드 프레임 모드 활성화 여부
 export const polaroidModeAtom = atom<boolean>(false);
 
+// Thin Frame 모드 활성화 여부 (얇은 검정색 프레임)
+export const thinFrameModeAtom = atom<boolean>(false);
+
 // Polaroid date text
 export const polaroidDateAtom = atom<string>('');
 
@@ -56,6 +59,7 @@ export const canResetAtom = atom((get) => {
     get(shadowIntensityAtom) !== 30 ||
     get(shadowOffsetAtom) !== 20 ||
     get(polaroidModeAtom) !== false ||
+    get(thinFrameModeAtom) !== false ||
     get(polaroidDateAtom) !== '';
 
   return hasImage || hasFilterChanges;

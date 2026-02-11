@@ -13,6 +13,7 @@ import {
   shadowIntensityAtom,
   shadowOffsetAtom,
   polaroidModeAtom,
+  thinFrameModeAtom,
   polaroidDateAtom,
 } from '@/atoms/imageAtoms';
 import { useResetState } from '@/hooks/useResetState';
@@ -44,6 +45,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
   const shadowIntensity = useAtomValue(shadowIntensityAtom);
   const shadowOffset = useAtomValue(shadowOffsetAtom);
   const isPolaroid = useAtomValue(polaroidModeAtom);
+  const isThinFrame = useAtomValue(thinFrameModeAtom);
   const polaroidDate = useAtomValue(polaroidDateAtom);
   const resetState = useResetState({ canvasRef, fileInputRef });
   const isSafari = useIsSafari();
@@ -109,6 +111,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
         shadowIntensity,
         shadowOffset,
         usePolaroid: isPolaroid,
+        useThinFrame: isThinFrame,
         isSafari: true,
         polaroidDate,
       });
@@ -142,6 +145,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     resetState,
     aspectRatio,
     isPolaroid,
+    isThinFrame,
     polaroidDate,
   ]);
 

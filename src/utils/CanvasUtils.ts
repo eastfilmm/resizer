@@ -346,6 +346,73 @@ export function drawPolaroidFrame(
   return { x: imageX, y: imageY, width: drawWidth, height: drawHeight };
 }
 
+/**
+ * Draw thin black frame around image
+ * Simple minimal frame with thin black border (no gap between image and frame)
+ */
+export function drawThinFrame(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  canvasWidth: number,
+  canvasHeight: number,
+  bgColor: string,
+  scaleFactor: number = 1,
+  canvasPadding: number = 0
+): ImagePosition {
+  // Thin frame border thickness (scaled) - increased for visibility
+  const frameBorderWidth = 12 * scaleFactor;
+  
+  // Available space for the frame (canvas minus canvas padding)
+  const maxFrameWidth = canvasWidth - canvasPadding * 2;
+  const maxFrameHeight = canvasHeight - canvasPadding * 2;
+  
+  // Calculate image aspect ratio
+  const imageAspectRatio = img.width / img.height;
+  
+  // Available space for image inside frame (frame border on each side)
+  const availableImageWidth = maxFrameWidth - frameBorderWidth * 2;
+  const availableImageHeight = maxFrameHeight - frameBorderWidth * 2;
+  
+  // Fit image to available space
+  let imageWidth: number;
+  let imageHeight: number;
+  
+  if (imageAspectRatio > availableImageWidth / availableImageHeight) {
+    // Image is wider - fit to width
+    imageWidth = availableImageWidth;
+    imageHeight = imageWidth / imageAspectRatio;
+  } else {
+    // Image is taller - fit to height
+    imageHeight = availableImageHeight;
+    imageWidth = imageHeight * imageAspectRatio;
+  }
+  
+  // Frame size = image + border on all sides
+  const frameWidth = imageWidth + frameBorderWidth * 2;
+  const frameHeight = imageHeight + frameBorderWidth * 2;
+  
+  // Center frame on canvas
+  const frameX = (canvasWidth - frameWidth) / 2;
+  const frameY = (canvasHeight - frameHeight) / 2;
+  
+  // Fill canvas background
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  
+  // Draw black frame border
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(frameX, frameY, frameWidth, frameHeight);
+  
+  // Calculate image position (directly inside frame, no gap)
+  const imageX = frameX + frameBorderWidth;
+  const imageY = frameY + frameBorderWidth;
+  
+  // Draw image
+  ctx.drawImage(img, imageX, imageY, imageWidth, imageHeight);
+  
+  return { x: imageX, y: imageY, width: imageWidth, height: imageHeight };
+}
+
 export interface DrawImageOptions {
   actualCanvasWidth: number;
   actualCanvasHeight: number;
@@ -360,6 +427,7 @@ export interface DrawImageOptions {
   shadowIntensity: number;
   shadowOffset: number;
   usePolaroid: boolean;
+  useThinFrame: boolean;
   isSafari?: boolean;
   scaleFactor?: number;
   polaroidDate?: string;
@@ -388,6 +456,7 @@ export function drawImageWithEffects(
     shadowIntensity,
     shadowOffset,
     usePolaroid,
+    useThinFrame,
     isSafari = false,
     scaleFactor = 1,
   } = options;
@@ -398,6 +467,11 @@ export function drawImageWithEffects(
   // If polaroid mode is enabled, use dedicated polaroid rendering
   if (usePolaroid) {
     return drawPolaroidFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding, options.polaroidDate || '');
+  }
+
+  // If thin frame mode is enabled, use dedicated thin frame rendering
+  if (useThinFrame) {
+    return drawThinFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
   }
 
   // If glass blur is enabled, draw blurred background from image

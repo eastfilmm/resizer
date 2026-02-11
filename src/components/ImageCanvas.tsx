@@ -14,6 +14,7 @@ import {
   shadowIntensityAtom,
   shadowOffsetAtom,
   polaroidModeAtom,
+  thinFrameModeAtom,
   polaroidDateAtom,
 } from '@/atoms/imageAtoms';
 import { drawImageWithEffects, ImagePosition, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/CanvasUtils';
@@ -40,6 +41,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   const shadowIntensityRef = useRef(store.get(shadowIntensityAtom));
   const shadowOffsetRef = useRef(store.get(shadowOffsetAtom));
   const polaroidModeRef = useRef(store.get(polaroidModeAtom));
+  const thinFrameModeRef = useRef(store.get(thinFrameModeAtom));
   const polaroidDateRef = useRef(store.get(polaroidDateAtom));
   const aspectRatioRef = useRef(aspectRatio);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -79,6 +81,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
           shadowIntensity: shadowIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),
           shadowOffset: shadowOffsetRef.current * (isSafari ? SCALE_FACTOR : 1),
           usePolaroid: polaroidModeRef.current,
+          useThinFrame: thinFrameModeRef.current,
           scaleFactor: SCALE_FACTOR,
           isSafari,
           polaroidDate: polaroidDateRef.current,
@@ -157,6 +160,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
       shadowIntensityAtom,
       shadowOffsetAtom,
       polaroidModeAtom,
+      thinFrameModeAtom,
       polaroidDateAtom,
     ];
 
@@ -182,6 +186,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
         shadowIntensityRef.current = store.get(shadowIntensityAtom);
         shadowOffsetRef.current = store.get(shadowOffsetAtom);
         polaroidModeRef.current = store.get(polaroidModeAtom);
+        thinFrameModeRef.current = store.get(thinFrameModeAtom);
         polaroidDateRef.current = store.get(polaroidDateAtom);
 
         // Update container background color imperatively (no re-render)
