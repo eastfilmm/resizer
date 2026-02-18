@@ -9,6 +9,7 @@ import {
   mediumFilmFrameModeAtom,
   paddingAtom,
   polaroidDateAtom,
+  backgroundColorAtom,
 } from '@/atoms/imageAtoms';
 import {
   PanelContainer,
@@ -30,6 +31,7 @@ export const FramePanel = memo(() => {
   const setPadding = useSetAtom(paddingAtom);
   const polaroidDate = useAtomValue(polaroidDateAtom);
   const setPolaroidDate = useSetAtom(polaroidDateAtom);
+  const setBackgroundColor = useSetAtom(backgroundColorAtom);
 
   const handlePolaroidToggle = useCallback(() => {
     const newPolaroidMode = !polaroidMode;
@@ -56,13 +58,14 @@ export const FramePanel = memo(() => {
     const newThinFrameMode = !thinFrameMode;
     setThinFrameMode(newThinFrameMode);
 
-    // Thin Frame 켤 때: Polaroid, Medium Film 끄고, date 초기화, padding 80px
+    // Thin Frame 켤 때: Polaroid, Medium Film 끄고, date 초기화, padding 80px, background white
     // Thin Frame 끌 때: padding 0으로 초기화
     if (newThinFrameMode) {
       setPolaroidMode(false);
       setMediumFilmFrameMode(false);
       setPolaroidDate('');
       setPadding(FRAME_DEFAULT_PADDING);
+      setBackgroundColor('white');
     } else {
       setPadding(0);
     }
@@ -73,19 +76,21 @@ export const FramePanel = memo(() => {
     setMediumFilmFrameMode,
     setPolaroidDate,
     setPadding,
+    setBackgroundColor,
   ]);
 
   const handleMediumFilmFrameToggle = useCallback(() => {
     const newMediumFilmFrameMode = !mediumFilmFrameMode;
     setMediumFilmFrameMode(newMediumFilmFrameMode);
 
-    // Medium Film 켤 때: Polaroid, Thin Frame 끄고, date 초기화, padding 80px
+    // Medium Film 켤 때: Polaroid, Thin Frame 끄고, date 초기화, padding 80px, background white
     // Medium Film 끌 때: padding 0으로 초기화
     if (newMediumFilmFrameMode) {
       setPolaroidMode(false);
       setThinFrameMode(false);
       setPolaroidDate('');
       setPadding(FRAME_DEFAULT_PADDING);
+      setBackgroundColor('white');
     } else {
       setPadding(0);
     }
@@ -96,6 +101,7 @@ export const FramePanel = memo(() => {
     setThinFrameMode,
     setPolaroidDate,
     setPadding,
+    setBackgroundColor,
   ]);
 
   const handleDateChange = useCallback(
