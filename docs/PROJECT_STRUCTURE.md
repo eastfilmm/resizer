@@ -32,7 +32,7 @@ resizer/
 │   ├── padding.svg
 │   ├── polaroid.svg
 │   ├── refresh_icon.svg
-│   ├── resizer_icon.png
+│   ├── picture_drucker_icon.png
 │   ├── shadow.svg
 │   └── upload.svg
 ├── README.md
