@@ -58,13 +58,13 @@ export const metadata: Metadata = {
     title: "Picture Drucker - Add Background for Instagram Feed & Story",
     description:
       "Free online tool to add background to Instagram photos and stories. Resize images for Instagram Story (9:16) and Feed (1:1, 4:5). Add white or black background, glass blur, padding, borders, and polaroid frames.",
-    url: `${getSiteUrl()}/`,
+    url: "/",
     siteName: "Picture Drucker",
     images: [
       {
-        url: `${getSiteUrl()}/picture_drucker_icon.png`,
-        width: 600,
-        height: 600,
+        url: "/picture_drucker_icon.png",
+        width: 1024,
+        height: 1024,
         alt: "Picture Drucker - Add Background for Instagram Feed & Story",
       },
     ],
@@ -72,11 +72,11 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Picture Drucker - Add Background for Instagram Feed & Story",
     description:
       "Free online tool to add background to Instagram photos and stories. Resize images for Instagram Story (9:16) and Feed (1:1, 4:5). Add white or black background, glass blur, padding, borders, and polaroid frames.",
-    images: [`${getSiteUrl()}/picture_drucker_icon.png`],
+    images: ["/picture_drucker_icon.png"],
   },
   robots: {
     index: true,

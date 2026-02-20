@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import ClientPage from './client-page';
-import { getSiteUrl } from '@/utils/siteConfig';
 
 // 서버 컴포넌트에서 메타데이터와 기본 HTML 구조 제공
 export const metadata: Metadata = {
@@ -11,7 +10,15 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    url: `${getSiteUrl()}/`,
+    url: '/',
+    images: [
+      {
+        url: '/picture_drucker_icon.png',
+        width: 1024,
+        height: 1024,
+        alt: 'Picture Drucker - Add Background for Instagram Feed & Story',
+      },
+    ],
   },
 };
 
