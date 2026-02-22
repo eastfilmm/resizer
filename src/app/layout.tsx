@@ -1,19 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import StyledComponentsRegistry from "@/lib/styled-components-registry";
 import { getSiteUrl, getSiteUrlObject } from "@/utils/siteConfig";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -21,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | Picture Drucker",
   },
   description:
-    "Free online tool to add background to Instagram photos and stories. Resize images for Instagram Story (9:16) and Feed (1:1, 4:5). Add white or black background, glass blur, padding, borders, and polaroid frames.",
+    "Free online tool to add backgrounds to Instagram photos and stories. Resize for Story (9:16) and Feed (1:1, 4:5) with blur, padding, frames.",
   keywords: [
     "instagram story background",
     "instagram story size",
@@ -58,7 +47,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Picture Drucker - Add Background for Instagram Feed & Story",
     description:
-      "Free online tool to add background to Instagram photos and stories. Resize images for Instagram Story (9:16) and Feed (1:1, 4:5). Add white or black background, glass blur, padding, borders, and polaroid frames.",
+      "Free online tool to add backgrounds to Instagram photos and stories. Resize for Story (9:16) and Feed (1:1, 4:5) with blur, padding, frames.",
     url: "/",
     siteName: "Picture Drucker",
     images: [
@@ -76,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Picture Drucker - Add Background for Instagram Feed & Story",
     description:
-      "Free online tool to add background to Instagram photos and stories. Resize images for Instagram Story (9:16) and Feed (1:1, 4:5). Add white or black background, glass blur, padding, borders, and polaroid frames.",
+      "Free online tool to add backgrounds to Instagram photos and stories. Resize for Story (9:16) and Feed (1:1, 4:5) with blur, padding, frames.",
     images: ["/picture_drucker_icon.png"],
   },
   robots: {
@@ -133,7 +122,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
