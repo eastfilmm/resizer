@@ -10,6 +10,7 @@
     "test:seo": "node scripts/test-seo.js"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "jotai": "^2.16.1",
     "next": "16.1.1",
     "react": "19.1.0",
@@ -29,6 +30,9 @@
     "typescript": "^5"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["sharp", "unrs-resolver"]
+    "onlyBuiltDependencies": [
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }
