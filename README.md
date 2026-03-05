@@ -18,8 +18,9 @@
 - **Next.js** 16.1.1 (App Router)
 - **React** 19.1.0
 - **TypeScript**
-- **Jotai** - 상태 관리
+- **Jotai** (+ jotai-optics) - 상태 관리
 - **Styled Components** - 스타일링
+- **Vitest** - 단위 테스트
 
 ## 시작하기
 
@@ -35,7 +36,11 @@ pnpm install
 pnpm dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+### 테스트 실행
+
+```bash
+pnpm test
+```
 
 ### 빌드
 
@@ -49,27 +54,28 @@ pnpm build
 pnpm start
 ```
 
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+
 ## 사용 방법
 
 1. "Select Image" 버튼을 클릭하여 이미지 파일을 선택합니다
-2. 선택한 이미지가 캔버스에 표시됩니다
+2. 하단 네비게이션 메뉴를 통해 비율(1:1, 4:5, 9:16), 프레임(Polaroid, Thin, Film), 블러, 그림자 등을 조절합니다.
 3. "Download" 버튼을 클릭하여 리사이즈된 이미지를 다운로드합니다
-4. "Reset" 버튼을 클릭하여 이미지를 제거하고 새로 시작할 수 있습니다
+4. "Reset" 버튼을 클릭하여 모든 설정을 초기화하고 새로 시작할 수 있습니다
 
 ## 프로젝트 구조
 
 ```
 src/
 ├── app/              # Next.js App Router 페이지
+├── atoms/            # Jotai 상태 관리 (imageSettingsAtom)
 ├── components/       # React 컴포넌트
-│   ├── ActionButtons.tsx    # 다운로드/리셋 버튼
-│   ├── BottomSection.tsx    # 하단 설정 섹션 (패딩, 배경색, 블러)
-│   ├── ImageCanvas.tsx      # 이미지 미리보기 캔버스
-│   ├── ImageUploader.tsx    # 이미지 업로드 컴포넌트
-│   └── styled/              # 스타일 컴포넌트
-├── atoms/            # Jotai 상태 관리
-├── lib/              # 유틸리티 및 설정
-└── utils/            # 헬퍼 함수
+│   ├── panels/       # 개별 설정 패널 UI
+│   ├── styled/       # 공통 스타일 컴포넌트 디자인 시스템
+│   └── ...
+├── hooks/            # 커스텀 훅 (PanelTransition, ClickOutside 등)
+├── utils/canvas/     # 모듈화된 캔버스 렌더링 엔진
+└── __tests__/        # Vitest 테스트 스위트
 ```
 
 ## 라이선스
