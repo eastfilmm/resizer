@@ -146,9 +146,9 @@ export const NavigationBar = () => {
     () => ({
       layout: aspectRatio !== '1:1' || padding > 0,
       frame: frameType !== 'none',
-      background: backgroundColor !== 'white',
-      glassblur: glassBlur,
-      shadow: shadowEnabled,
+      background: backgroundColor !== 'white' && isPanelAllowedInFrameMode('background', frameType),
+      glassblur: glassBlur && isPanelAllowedInFrameMode('glassblur', frameType),
+      shadow: shadowEnabled && isPanelAllowedInFrameMode('shadow', frameType),
     }),
     [
       aspectRatio,
