@@ -1,7 +1,9 @@
 'use client';
 
-import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
+import { useClickOutside } from '@/hooks/useClickOutside';
+import { usePanelTransition } from '@/hooks/usePanelTransition';
 import {
   activeNavPanelAtom,
   NavPanelType,
@@ -28,6 +30,14 @@ import {
   ButtonLabel,
   NavIcon,
 } from './NavigationBar.styles';
+
+function isPanelAllowedInFrameMode(panelId: string, frameType: string): boolean {
+  if (frameType === 'none') return true;
+  if (frameType === 'polaroid') {
+    return panelId === 'layout' || panelId === 'frame' || panelId === 'background';
+  }
+  return panelId === 'layout' || panelId === 'frame';
+}
 
 type NavItem = {
   id: Exclude<NavPanelType, null>;
@@ -128,53 +138,8 @@ export const NavigationBar = () => {
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
   const frameType = useAtomValue(frameTypeAtom);
 
-  const [displayedPanel, setDisplayedPanel] = useState<NavPanelType>(null);
-  const [isContentVisible, setIsContentVisible] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Cleanup timer helper
-  const clearTimer = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => clearTimer, [clearTimer]);
-
-  // Handle panel transition with fade out -> height change -> fade in
-  useEffect(() => {
-    clearTimer();
-
-    if (activePanel === null) {
-      // Closing: fade out first, then collapse
-      setIsContentVisible(false);
-      timerRef.current = setTimeout(() => {
-        setDisplayedPanel(null);
-      }, 150); // Match opacity transition
-    } else {
-      // Opening or switching panels
-      if (displayedPanel === null) {
-        // Opening from closed: set panel immediately, then fade in
-        setDisplayedPanel(activePanel);
-        timerRef.current = setTimeout(() => {
-          setIsContentVisible(true);
-        }, 50); // Small delay to ensure height transition started
-      } else if (activePanel !== displayedPanel) {
-        // Switching panels: fade out -> change panel -> fade in
-        setIsContentVisible(false);
-        timerRef.current = setTimeout(() => {
-          setDisplayedPanel(activePanel);
-          setIsContentVisible(true);
-        }, 150); // Wait for fade out then switch and fade in at once
-      } else {
-        // Same panel: ensure it's visible
-        setIsContentVisible(true);
-      }
-    }
-  }, [activePanel, clearTimer]); // Remove displayedPanel/isContentVisible from deps to prevent loops
+  const { displayedPanel, isContentVisible } = usePanelTransition(activePanel);
 
   // Memoize active states (when the blue dot should appear)
   const activeStates = useMemo(
@@ -197,48 +162,17 @@ export const NavigationBar = () => {
 
   const handleNavClick = useCallback(
     (id: Exclude<NavPanelType, null>) => {
-      // 프레임 활성화 시 일부 패널 비활성화
-      const isFrameActive = frameType !== 'none';
-      const isPolaroid = frameType === 'polaroid';
-
-      if (isFrameActive) {
-        // Polaroid: layout, frame, background만 허용
-        // Thin/MediumFilm: layout, frame만 허용
-        const allowedPanels: Set<string> = isPolaroid
-          ? new Set(['layout', 'frame', 'background'])
-          : new Set(['layout', 'frame']);
-
-        if (!allowedPanels.has(id)) return;
-      }
-
+      if (!isPanelAllowedInFrameMode(id, frameType)) return;
       setActivePanel((prev) => (prev === id ? null : id));
     },
     [setActivePanel, frameType],
   );
 
-  // Close panel when clicking outside (except navigation bar)
-  useEffect(() => {
-    if (activePanel === null) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setActivePanel(null);
-      }
-    };
-
-    // Add listener on next tick to avoid immediate closure
-    const timeoutId = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-    }, 0);
-
-    return () => {
-      clearTimeout(timeoutId);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [activePanel, setActivePanel]);
+  useClickOutside(
+    containerRef,
+    useCallback(() => setActivePanel(null), [setActivePanel]),
+    activePanel !== null
+  );
 
   const activeIndex = useMemo(() => {
     if (activePanel === null) return -1;
@@ -259,17 +193,8 @@ export const NavigationBar = () => {
         <SliderBackground $activeIndex={activeIndex} />
         <NavButtonsWrapper>
           {NAV_ITEMS.map((item) => {
-            const isFrameActive = frameType !== 'none';
-            const isPolaroid = frameType === 'polaroid';
-
-            let isDimmed = false;
-            if (isFrameActive) {
-              const allowedPanels: Set<string> = isPolaroid
-                ? new Set(['layout', 'frame', 'background'])
-                : new Set(['layout', 'frame']);
-              isDimmed = !allowedPanels.has(item.id);
-            }
-            const isClickable = !isDimmed;
+            const isClickable = isPanelAllowedInFrameMode(item.id, frameType);
+            const isDimmed = !isClickable;
 
             return (
               <NavButton
