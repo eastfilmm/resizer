@@ -2,22 +2,8 @@
 
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
-import { useAtomValue, useSetAtom, useStore } from 'jotai';
-import {
-  imageUrlAtom,
-  backgroundColorAtom,
-  glassBlurAtom,
-  blurIntensityAtom,
-  overlayOpacityAtom,
-  paddingAtom,
-  shadowEnabledAtom,
-  shadowIntensityAtom,
-  shadowOffsetAtom,
-  polaroidModeAtom,
-  thinFrameModeAtom,
-  mediumFilmFrameModeAtom,
-  polaroidDateAtom,
-} from '@/atoms/imageAtoms';
+import { useAtomValue, useStore } from 'jotai';
+import { imageUrlAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import { drawImageWithEffects, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/canvas';
 import type { ImagePosition } from '@/utils/canvas';
 import { CANVAS_DISPLAY_SIZE, CANVAS_PREVIEW_SIZE } from '@/constants/CanvasContents';
@@ -34,18 +20,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   const { aspectRatio } = useAspectRatio();
 
   // Refs to access current values in callbacks without re-triggering effects
-  const backgroundColorRef = useRef(store.get(backgroundColorAtom));
-  const glassBlurRef = useRef(store.get(glassBlurAtom));
-  const blurIntensityRef = useRef(store.get(blurIntensityAtom));
-  const overlayOpacityRef = useRef(store.get(overlayOpacityAtom));
-  const paddingRef = useRef(store.get(paddingAtom));
-  const shadowEnabledRef = useRef(store.get(shadowEnabledAtom));
-  const shadowIntensityRef = useRef(store.get(shadowIntensityAtom));
-  const shadowOffsetRef = useRef(store.get(shadowOffsetAtom));
-  const polaroidModeRef = useRef(store.get(polaroidModeAtom));
-  const thinFrameModeRef = useRef(store.get(thinFrameModeAtom));
-  const mediumFilmFrameModeRef = useRef(store.get(mediumFilmFrameModeAtom));
-  const polaroidDateRef = useRef(store.get(polaroidDateAtom));
+  const settingsRef = useRef(store.get(imageSettingsAtom));
   const aspectRatioRef = useRef(aspectRatio);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<ImagePosition | null>(null);
@@ -64,7 +39,8 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   const redrawImage = useCallback(
     (ctx: CanvasRenderingContext2D, img: HTMLImageElement | null) => {
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatioRef.current, isSafari);
-      const padding = paddingRef.current;
+      const settings = settingsRef.current;
+      const padding = settings.padding;
       const effectivePadding = isSafari ? padding * SCALE_FACTOR : padding;
       const imageAreaWidth = canvasWidth - effectivePadding * 2;
       const imageAreaHeight = canvasHeight - effectivePadding * 2;
@@ -76,23 +52,23 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
           imageAreaWidth,
           imageAreaHeight,
           padding: effectivePadding,
-          bgColor: backgroundColorRef.current,
-          useGlassBlur: glassBlurRef.current,
-          blurIntensity: blurIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),
-          overlayOpacity: overlayOpacityRef.current,
-          useShadow: shadowEnabledRef.current,
-          shadowIntensity: shadowIntensityRef.current * (isSafari ? SCALE_FACTOR : 1),
-          shadowOffset: shadowOffsetRef.current * (isSafari ? SCALE_FACTOR : 1),
-          usePolaroid: polaroidModeRef.current,
-          useThinFrame: thinFrameModeRef.current,
-          useMediumFilmFrame: mediumFilmFrameModeRef.current,
+          bgColor: settings.backgroundColor,
+          useGlassBlur: settings.glassBlurEnabled,
+          blurIntensity: settings.blurIntensity * (isSafari ? SCALE_FACTOR : 1),
+          overlayOpacity: settings.overlayOpacity,
+          useShadow: settings.shadowEnabled,
+          shadowIntensity: settings.shadowIntensity * (isSafari ? SCALE_FACTOR : 1),
+          shadowOffset: settings.shadowOffset * (isSafari ? SCALE_FACTOR : 1),
+          usePolaroid: settings.polaroidMode,
+          useThinFrame: settings.thinFrameMode,
+          useMediumFilmFrame: settings.mediumFilmFrameMode,
           scaleFactor: SCALE_FACTOR,
           isSafari,
-          polaroidDate: polaroidDateRef.current,
+          polaroidDate: settings.polaroidDate,
         });
       } else {
         // Fill background with solid color (no image loaded)
-        ctx.fillStyle = backgroundColorRef.current;
+        ctx.fillStyle = settings.backgroundColor;
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     },
@@ -146,7 +122,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
 
-        ctx.fillStyle = backgroundColorRef.current;
+        ctx.fillStyle = settingsRef.current.backgroundColor;
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     }
@@ -154,21 +130,6 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
 
   // Handle effect changes imperatively with conditional RAF throttle for Safari
   useEffect(() => {
-    const atomsToWatch = [
-      backgroundColorAtom,
-      glassBlurAtom,
-      blurIntensityAtom,
-      overlayOpacityAtom,
-      paddingAtom,
-      shadowEnabledAtom,
-      shadowIntensityAtom,
-      shadowOffsetAtom,
-      polaroidModeAtom,
-      thinFrameModeAtom,
-      mediumFilmFrameModeAtom,
-      polaroidDateAtom,
-    ];
-
     const performRender = () => {
       if (canvasRef.current) {
         const ctx = canvasRef.current.getContext('2d');
@@ -178,49 +139,36 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
       }
     };
 
-    const unsubscribes = atomsToWatch.map((atom) =>
-      store.sub(atom, () => {
-        // Update refs
-        const newBackgroundColor = store.get(backgroundColorAtom);
-        backgroundColorRef.current = newBackgroundColor;
-        glassBlurRef.current = store.get(glassBlurAtom);
-        blurIntensityRef.current = store.get(blurIntensityAtom);
-        overlayOpacityRef.current = store.get(overlayOpacityAtom);
-        paddingRef.current = store.get(paddingAtom);
-        shadowEnabledRef.current = store.get(shadowEnabledAtom);
-        shadowIntensityRef.current = store.get(shadowIntensityAtom);
-        shadowOffsetRef.current = store.get(shadowOffsetAtom);
-        polaroidModeRef.current = store.get(polaroidModeAtom);
-        thinFrameModeRef.current = store.get(thinFrameModeAtom);
-        mediumFilmFrameModeRef.current = store.get(mediumFilmFrameModeAtom);
-        polaroidDateRef.current = store.get(polaroidDateAtom);
+    const unsubscribe = store.sub(imageSettingsAtom, () => {
+      // Update refs
+      const newSettings = store.get(imageSettingsAtom);
+      settingsRef.current = newSettings;
 
-        // Update container background color imperatively (no re-render)
-        if (containerRef.current) {
-          containerRef.current.style.backgroundColor = newBackgroundColor;
-        }
+      // Update container background color imperatively (no re-render)
+      if (containerRef.current) {
+        containerRef.current.style.backgroundColor = newSettings.backgroundColor;
+      }
 
-        // Safari: Use RAF throttle for smooth slider performance
-        // Non-Safari: Immediate rendering
-        if (isSafari) {
-          pendingRenderRef.current = true;
-          if (rafIdRef.current === null) {
-            rafIdRef.current = requestAnimationFrame(() => {
-              rafIdRef.current = null;
-              if (pendingRenderRef.current) {
-                pendingRenderRef.current = false;
-                performRender();
-              }
-            });
-          }
-        } else {
-          performRender();
+      // Safari: Use RAF throttle for smooth slider performance
+      // Non-Safari: Immediate rendering
+      if (isSafari) {
+        pendingRenderRef.current = true;
+        if (rafIdRef.current === null) {
+          rafIdRef.current = requestAnimationFrame(() => {
+            rafIdRef.current = null;
+            if (pendingRenderRef.current) {
+              pendingRenderRef.current = false;
+              performRender();
+            }
+          });
         }
-      })
-    );
+      } else {
+        performRender();
+      }
+    });
 
     return () => {
-      unsubscribes.forEach((unsub) => unsub());
+      unsubscribe();
       if (isSafari && rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current);
         rafIdRef.current = null;
@@ -257,7 +205,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
           canvas.height = height;
           canvas.style.width = `${displayWidth}px`;
           canvas.style.height = `${displayHeight}px`;
-          ctx.fillStyle = backgroundColorRef.current;
+          ctx.fillStyle = settingsRef.current.backgroundColor;
           ctx.fillRect(0, 0, width, height);
         }
       }
@@ -267,7 +215,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   // Initialize container background color on mount
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.style.backgroundColor = backgroundColorRef.current;
+      containerRef.current.style.backgroundColor = settingsRef.current.backgroundColor;
     }
   }, []);
 

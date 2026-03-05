@@ -2,21 +2,7 @@
 
 import { RefObject, useCallback } from 'react';
 import { useAtomValue } from 'jotai';
-import {
-  imageUrlAtom,
-  backgroundColorAtom,
-  paddingAtom,
-  glassBlurAtom,
-  blurIntensityAtom,
-  overlayOpacityAtom,
-  shadowEnabledAtom,
-  shadowIntensityAtom,
-  shadowOffsetAtom,
-  polaroidModeAtom,
-  thinFrameModeAtom,
-  mediumFilmFrameModeAtom,
-  polaroidDateAtom,
-} from '@/atoms/imageAtoms';
+import { imageUrlAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import { useResetState } from '@/hooks/useResetState';
 import { useIsSafari } from '@/hooks/useIsSafari';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
@@ -37,18 +23,7 @@ interface DownloadButtonProps {
 
 export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps) => {
   const imageUrl = useAtomValue(imageUrlAtom);
-  const backgroundColor = useAtomValue(backgroundColorAtom);
-  const padding = useAtomValue(paddingAtom);
-  const glassBlur = useAtomValue(glassBlurAtom);
-  const blurIntensity = useAtomValue(blurIntensityAtom);
-  const overlayOpacity = useAtomValue(overlayOpacityAtom);
-  const shadowEnabled = useAtomValue(shadowEnabledAtom);
-  const shadowIntensity = useAtomValue(shadowIntensityAtom);
-  const shadowOffset = useAtomValue(shadowOffsetAtom);
-  const isPolaroid = useAtomValue(polaroidModeAtom);
-  const isThinFrame = useAtomValue(thinFrameModeAtom);
-  const isMediumFilmFrame = useAtomValue(mediumFilmFrameModeAtom);
-  const polaroidDate = useAtomValue(polaroidDateAtom);
+  const settings = useAtomValue(imageSettingsAtom);
   const resetState = useResetState({ canvasRef, fileInputRef });
   const isSafari = useIsSafari();
   const { aspectRatio } = useAspectRatio();
@@ -96,27 +71,27 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
-      const imageAreaWidth = canvasWidth - padding * 2;
-      const imageAreaHeight = canvasHeight - padding * 2;
+      const imageAreaWidth = canvasWidth - settings.padding * 2;
+      const imageAreaHeight = canvasHeight - settings.padding * 2;
 
       drawImageWithEffects(ctx, img, {
         actualCanvasWidth: canvasWidth,
         actualCanvasHeight: canvasHeight,
         imageAreaWidth,
         imageAreaHeight,
-        padding,
-        bgColor: backgroundColor,
-        useGlassBlur: glassBlur,
-        blurIntensity,
-        overlayOpacity,
-        useShadow: shadowEnabled,
-        shadowIntensity,
-        shadowOffset,
-        usePolaroid: isPolaroid,
-        useThinFrame: isThinFrame,
-        useMediumFilmFrame: isMediumFilmFrame,
+        padding: settings.padding,
+        bgColor: settings.backgroundColor,
+        useGlassBlur: settings.glassBlurEnabled,
+        blurIntensity: settings.blurIntensity,
+        overlayOpacity: settings.overlayOpacity,
+        useShadow: settings.shadowEnabled,
+        shadowIntensity: settings.shadowIntensity,
+        shadowOffset: settings.shadowOffset,
+        usePolaroid: settings.polaroidMode,
+        useThinFrame: settings.thinFrameMode,
+        useMediumFilmFrame: settings.mediumFilmFrameMode,
         isSafari: true,
-        polaroidDate,
+        polaroidDate: settings.polaroidDate,
       });
 
       dataUrl = fullResCanvas.toDataURL('image/png', 1.0);
@@ -135,22 +110,11 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
     resetState();
   }, [
     imageUrl,
-    backgroundColor,
-    padding,
-    glassBlur,
-    blurIntensity,
-    overlayOpacity,
-    shadowEnabled,
-    shadowIntensity,
-    shadowOffset,
+    settings,
     isSafari,
     canvasRef,
     resetState,
     aspectRatio,
-    isPolaroid,
-    isThinFrame,
-    isMediumFilmFrame,
-    polaroidDate,
   ]);
 
   return (
