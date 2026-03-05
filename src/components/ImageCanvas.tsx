@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
 import { useAtomValue, useStore } from 'jotai';
 import { imageUrlAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
+import type { AspectRatio } from '@/atoms/imageAtoms';
 import { drawImageWithEffects, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/canvas';
 import type { ImagePosition } from '@/utils/canvas';
 import { CANVAS_DISPLAY_SIZE, CANVAS_PREVIEW_SIZE } from '@/constants/CanvasContents';
@@ -220,7 +221,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
   return (
     <CanvasContainer
       ref={containerRef}
-      $aspectRatio={aspectRatio as '1:1' | '4:5' | '9:16'}
+      $aspectRatio={aspectRatio as AspectRatio}
     >
       <Canvas ref={canvasRef} />
     </CanvasContainer>
@@ -228,7 +229,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
 }
 
 const CanvasContainer = styled.div<{
-  $aspectRatio: '1:1' | '4:5' | '9:16';
+  $aspectRatio: AspectRatio;
 }>`
   width: ${props => props.$aspectRatio === '4:5'
     ? '256px'

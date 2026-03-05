@@ -7,14 +7,7 @@ import { useResetState } from '@/hooks/useResetState';
 import { useIsSafari } from '@/hooks/useIsSafari';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
-import {
-  CANVAS_ACTUAL_SIZE,
-  CANVAS_ACTUAL_SIZE_4_5_WIDTH,
-  CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
-  CANVAS_ACTUAL_SIZE_9_16_WIDTH,
-  CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
-} from '@/constants/CanvasContents';
-import { drawImageWithEffects } from '@/utils/canvas';
+import { drawImageWithEffects, getCanvasDimensions } from '@/utils/canvas';
 
 interface DownloadButtonProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -33,27 +26,9 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
 
     let dataUrl: string;
 
-    const getCanvasDimensions = () => {
-      if (aspectRatio === '4:5') {
-        return {
-          width: CANVAS_ACTUAL_SIZE_4_5_WIDTH,
-          height: CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
-        };
-      }
-      if (aspectRatio === '9:16') {
-        return {
-          width: CANVAS_ACTUAL_SIZE_9_16_WIDTH,
-          height: CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
-        };
-      }
-      return {
-        width: CANVAS_ACTUAL_SIZE,
-        height: CANVAS_ACTUAL_SIZE,
-      };
-    };
-
     if (isSafari) {
       // Safari: Create full-resolution canvas for download
+      // (Safari preview uses scaled-down 800px canvas, so we need a fresh 2000px canvas)
       const img = new Image();
       img.src = imageUrl;
       await new Promise<void>((resolve) => {
@@ -61,7 +36,8 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
         img.onerror = () => resolve();
       });
 
-      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions();
+      // Use shared getCanvasDimensions with isSafari=false to get full-res dimensions
+      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
       const fullResCanvas = document.createElement('canvas');
       fullResCanvas.width = canvasWidth;
       fullResCanvas.height = canvasHeight;

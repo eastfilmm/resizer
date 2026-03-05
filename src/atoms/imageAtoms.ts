@@ -10,10 +10,12 @@ export const activeNavPanelAtom = atom<NavPanelType>(null);
 // 이미지 Blob URL
 export const imageUrlAtom = atom<string | null>(null);
 
+export type AspectRatio = '1:1' | '4:5' | '9:16';
+export type BackgroundColor = 'white' | 'black';
 export type FrameType = 'none' | 'polaroid' | 'thin' | 'mediumFilm';
 
 export interface ImageSettings {
-  backgroundColor: 'white' | 'black';
+  backgroundColor: BackgroundColor;
   glassBlurEnabled: boolean;
   blurIntensity: number;
   overlayOpacity: number;
@@ -21,7 +23,7 @@ export interface ImageSettings {
   shadowEnabled: boolean;
   shadowIntensity: number;
   shadowOffset: number;
-  canvasAspectRatio: '1:1' | '4:5' | '9:16';
+  canvasAspectRatio: AspectRatio;
   frameType: FrameType;
   polaroidDate: string;
 }

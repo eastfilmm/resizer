@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { paddingAtom } from '@/atoms/imageAtoms';
+import type { AspectRatio } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import {
   PanelContainer,
@@ -50,7 +51,7 @@ const AspectRatioButton = styled.button<{ $isActive: boolean }>`
 `;
 
 const RatioIcon = styled.div<{
-  $ratio: '1:1' | '4:5' | '9:16';
+  $ratio: AspectRatio;
   $isActive: boolean;
 }>`
   width: ${(props) =>
@@ -67,7 +68,7 @@ export const LayoutPanel = memo(() => {
   const { aspectRatio, updateAspectRatio } = useAspectRatio();
 
   const handleAspectRatioChange = useCallback(
-    (ratio: '1:1' | '4:5' | '9:16') => {
+    (ratio: AspectRatio) => {
       if (aspectRatio !== ratio) {
         updateAspectRatio(ratio);
       }
