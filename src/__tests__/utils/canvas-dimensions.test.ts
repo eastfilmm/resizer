@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCanvasDimensions, getCanvasDisplaySize } from '@/utils/CanvasUtils';
+import { getCanvasDimensions, getCanvasDisplaySize } from '@/utils/canvas';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_PREVIEW_SIZE,

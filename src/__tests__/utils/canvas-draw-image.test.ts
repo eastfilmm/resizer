@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { drawImageWithEffects } from '@/utils/CanvasUtils';
-import type { DrawImageOptions } from '@/utils/CanvasUtils';
+import { drawImageWithEffects } from '@/utils/canvas';
+import type { DrawImageOptions } from '@/utils/canvas';
 
 /**
  * Integration tests for drawImageWithEffects.

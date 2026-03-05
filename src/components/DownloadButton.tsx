@@ -28,7 +28,7 @@ import {
   CANVAS_ACTUAL_SIZE_9_16_WIDTH,
   CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
 } from '@/constants/CanvasContents';
-import { drawImageWithEffects } from '@/utils/CanvasUtils';
+import { drawImageWithEffects } from '@/utils/canvas';
 
 interface DownloadButtonProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;

@@ -17,7 +17,7 @@ import {
   mediumFilmFrameModeAtom,
   polaroidDateAtom,
 } from '@/atoms/imageAtoms';
-import { resetCanvas } from '@/utils/CanvasUtils';
+import { resetCanvas } from '@/utils/canvas';
 
 // Default values for all settings (single source of truth)
 export const DEFAULT_VALUES = {

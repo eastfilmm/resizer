@@ -18,7 +18,8 @@ import {
   mediumFilmFrameModeAtom,
   polaroidDateAtom,
 } from '@/atoms/imageAtoms';
-import { drawImageWithEffects, ImagePosition, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/CanvasUtils';
+import { drawImageWithEffects, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/canvas';
+import type { ImagePosition } from '@/utils/canvas';
 import { CANVAS_DISPLAY_SIZE, CANVAS_PREVIEW_SIZE } from '@/constants/CanvasContents';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 

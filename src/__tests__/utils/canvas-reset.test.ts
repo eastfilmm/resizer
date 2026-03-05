@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { resetCanvas } from '@/utils/CanvasUtils';
+import { resetCanvas } from '@/utils/canvas';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_DISPLAY_SIZE,

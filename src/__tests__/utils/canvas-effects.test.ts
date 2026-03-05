@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { drawGlassBlurBackground } from '@/utils/CanvasUtils';
+import { drawGlassBlurBackground } from '@/utils/canvas';
 
 describe('drawGlassBlurBackground', () => {
   let canvas: HTMLCanvasElement;
