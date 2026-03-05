@@ -87,9 +87,7 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
         useShadow: settings.shadowEnabled,
         shadowIntensity: settings.shadowIntensity,
         shadowOffset: settings.shadowOffset,
-        usePolaroid: settings.polaroidMode,
-        useThinFrame: settings.thinFrameMode,
-        useMediumFilmFrame: settings.mediumFilmFrameMode,
+        frameType: settings.frameType,
         isSafari: true,
         polaroidDate: settings.polaroidDate,
       });

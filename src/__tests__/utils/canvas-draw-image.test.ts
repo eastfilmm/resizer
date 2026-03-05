@@ -27,9 +27,7 @@ describe('drawImageWithEffects', () => {
     useShadow: false,
     shadowIntensity: 30,
     shadowOffset: 20,
-    usePolaroid: false,
-    useThinFrame: false,
-    useMediumFilmFrame: false,
+    frameType: 'none',
     isSafari: false,
     scaleFactor: 1,
     polaroidDate: '',
@@ -201,7 +199,7 @@ describe('drawImageWithEffects', () => {
     it('dispatches to polaroid rendering', () => {
       const result = drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
-        usePolaroid: true,
+        frameType: 'polaroid',
       });
       // Polaroid draws roundRect for frame
       const roundRectCalls = ctx.calls.filter((c: any) => c.method === 'roundRect');
@@ -212,7 +210,7 @@ describe('drawImageWithEffects', () => {
     it('passes date text to polaroid frame', () => {
       drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
-        usePolaroid: true,
+        frameType: 'polaroid',
         polaroidDate: '2024.01.01',
       });
       const fillTextCalls = ctx.calls.filter((c: any) => c.method === 'fillText');
@@ -222,7 +220,7 @@ describe('drawImageWithEffects', () => {
     it('polaroid takes priority over other effects (no shadow/blur applied)', () => {
       drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
-        usePolaroid: true,
+        frameType: 'polaroid',
         useShadow: true,
         useGlassBlur: true,
       });
@@ -231,7 +229,7 @@ describe('drawImageWithEffects', () => {
       // The function should still succeed
       const result = drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
-        usePolaroid: true,
+        frameType: 'polaroid',
       });
       expect(result.width).toBeGreaterThan(0);
     });
@@ -243,7 +241,7 @@ describe('drawImageWithEffects', () => {
     it('dispatches to thin frame rendering', () => {
       const result = drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
-        useThinFrame: true,
+        frameType: 'thin',
       });
       expect(result.width).toBeGreaterThan(0);
       // Thin frame uses fillRect for black border (no roundRect)
@@ -258,7 +256,7 @@ describe('drawImageWithEffects', () => {
     it('dispatches to medium film frame rendering', () => {
       const result = drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
-        useMediumFilmFrame: true,
+        frameType: 'mediumFilm',
       });
       expect(result.width).toBeGreaterThan(0);
       // Film frame has fillText calls for film info
@@ -269,25 +267,23 @@ describe('drawImageWithEffects', () => {
 
   // ─── Frame mode priority ───
 
-  describe('frame mode priority', () => {
-    it('polaroid takes priority over thin frame', () => {
+  describe('frame type exclusivity', () => {
+    it('polaroid frame renders correctly', () => {
       ctx.calls = [];
       drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
-        usePolaroid: true,
-        useThinFrame: true,
+        frameType: 'polaroid',
       });
-      // Polaroid uses roundRect, thin frame does not
+      // Polaroid uses roundRect
       const roundRectCalls = ctx.calls.filter((c: any) => c.method === 'roundRect');
       expect(roundRectCalls.length).toBeGreaterThan(0);
     });
 
-    it('thin frame takes priority over medium film frame', () => {
+    it('thin frame does not use roundRect', () => {
       ctx.calls = [];
       drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
-        useThinFrame: true,
-        useMediumFilmFrame: true,
+        frameType: 'thin',
       });
       // Thin frame does NOT draw film info text
       const fillTextCalls = ctx.calls.filter((c: any) => c.method === 'fillText');

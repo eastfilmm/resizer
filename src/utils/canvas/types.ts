@@ -1,3 +1,5 @@
+import type { FrameType } from '@/atoms/imageAtoms';
+
 export interface ImagePosition {
   x: number;
   y: number;
@@ -18,9 +20,7 @@ export interface DrawImageOptions {
   useShadow: boolean;
   shadowIntensity: number;
   shadowOffset: number;
-  usePolaroid: boolean;
-  useThinFrame: boolean;
-  useMediumFilmFrame: boolean;
+  frameType: FrameType;
   isSafari?: boolean;
   scaleFactor?: number;
   polaroidDate?: string;

@@ -20,25 +20,20 @@ export function drawImageWithEffects(
     useShadow,
     shadowIntensity,
     shadowOffset,
-    usePolaroid,
-    useThinFrame,
-    useMediumFilmFrame,
+    frameType,
     isSafari = false,
     scaleFactor = 1,
   } = options;
 
   ctx.clearRect(0, 0, actualCanvasWidth, actualCanvasHeight);
 
-  if (usePolaroid) {
-    return drawPolaroidFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding, options.polaroidDate || '');
-  }
-
-  if (useThinFrame) {
-    return drawThinFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
-  }
-
-  if (useMediumFilmFrame) {
-    return drawMediumFilmFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
+  switch (frameType) {
+    case 'polaroid':
+      return drawPolaroidFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding, options.polaroidDate || '');
+    case 'thin':
+      return drawThinFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
+    case 'mediumFilm':
+      return drawMediumFilmFrame(ctx, img, actualCanvasWidth, actualCanvasHeight, bgColor, scaleFactor, padding);
   }
 
   if (useGlassBlur) {

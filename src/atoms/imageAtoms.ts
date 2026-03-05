@@ -10,6 +10,8 @@ export const activeNavPanelAtom = atom<NavPanelType>(null);
 // 이미지 Blob URL
 export const imageUrlAtom = atom<string | null>(null);
 
+export type FrameType = 'none' | 'polaroid' | 'thin' | 'mediumFilm';
+
 export interface ImageSettings {
   backgroundColor: 'white' | 'black';
   glassBlurEnabled: boolean;
@@ -20,9 +22,7 @@ export interface ImageSettings {
   shadowIntensity: number;
   shadowOffset: number;
   canvasAspectRatio: '1:1' | '4:5' | '9:16';
-  polaroidMode: boolean;
-  thinFrameMode: boolean;
-  mediumFilmFrameMode: boolean;
+  frameType: FrameType;
   polaroidDate: string;
 }
 
@@ -36,9 +36,7 @@ export const DEFAULT_IMAGE_SETTINGS: ImageSettings = {
   shadowIntensity: 30,
   shadowOffset: 20,
   canvasAspectRatio: '1:1',
-  polaroidMode: false,
-  thinFrameMode: false,
-  mediumFilmFrameMode: false,
+  frameType: 'none',
   polaroidDate: '',
 };
 
@@ -53,9 +51,7 @@ export const shadowEnabledAtom = focusAtom(imageSettingsAtom, (optic) => optic.p
 export const shadowIntensityAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('shadowIntensity'));
 export const shadowOffsetAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('shadowOffset'));
 export const canvasAspectRatioAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('canvasAspectRatio'));
-export const polaroidModeAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('polaroidMode'));
-export const thinFrameModeAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('thinFrameMode'));
-export const mediumFilmFrameModeAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('mediumFilmFrameMode'));
+export const frameTypeAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('frameType'));
 export const polaroidDateAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('polaroidDate'));
 
 export const canResetAtom = atom((get) => {

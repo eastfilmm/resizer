@@ -4,13 +4,12 @@ import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
-  polaroidModeAtom,
-  thinFrameModeAtom,
-  mediumFilmFrameModeAtom,
+  frameTypeAtom,
   paddingAtom,
   polaroidDateAtom,
   backgroundColorAtom,
 } from '@/atoms/imageAtoms';
+import type { FrameType } from '@/atoms/imageAtoms';
 import {
   PanelContainer,
   PanelLabel,
@@ -22,87 +21,30 @@ import {
 const FRAME_DEFAULT_PADDING = 80;
 
 export const FramePanel = memo(() => {
-  const polaroidMode = useAtomValue(polaroidModeAtom);
-  const setPolaroidMode = useSetAtom(polaroidModeAtom);
-  const thinFrameMode = useAtomValue(thinFrameModeAtom);
-  const setThinFrameMode = useSetAtom(thinFrameModeAtom);
-  const mediumFilmFrameMode = useAtomValue(mediumFilmFrameModeAtom);
-  const setMediumFilmFrameMode = useSetAtom(mediumFilmFrameModeAtom);
+  const frameType = useAtomValue(frameTypeAtom);
+  const setFrameType = useSetAtom(frameTypeAtom);
   const setPadding = useSetAtom(paddingAtom);
   const polaroidDate = useAtomValue(polaroidDateAtom);
   const setPolaroidDate = useSetAtom(polaroidDateAtom);
   const setBackgroundColor = useSetAtom(backgroundColorAtom);
 
-  const handlePolaroidToggle = useCallback(() => {
-    const newPolaroidMode = !polaroidMode;
-    setPolaroidMode(newPolaroidMode);
-
-    // Polaroid 켤 때: Thin Frame, Medium Film 끄고, padding 80px
-    // Polaroid 끌 때: padding 0으로 초기화
-    if (newPolaroidMode) {
-      setThinFrameMode(false);
-      setMediumFilmFrameMode(false);
-      setPadding(FRAME_DEFAULT_PADDING);
-    } else {
+  const handleFrameToggle = useCallback((type: FrameType) => {
+    if (frameType === type) {
+      // 이미 활성화된 프레임을 다시 누르면 끔
+      setFrameType('none');
       setPadding(0);
-    }
-  }, [
-    polaroidMode,
-    setPolaroidMode,
-    setThinFrameMode,
-    setMediumFilmFrameMode,
-    setPadding,
-  ]);
-
-  const handleThinFrameToggle = useCallback(() => {
-    const newThinFrameMode = !thinFrameMode;
-    setThinFrameMode(newThinFrameMode);
-
-    // Thin Frame 켤 때: Polaroid, Medium Film 끄고, date 초기화, padding 80px, background white
-    // Thin Frame 끌 때: padding 0으로 초기화
-    if (newThinFrameMode) {
-      setPolaroidMode(false);
-      setMediumFilmFrameMode(false);
-      setPolaroidDate('');
-      setPadding(FRAME_DEFAULT_PADDING);
-      setBackgroundColor('white');
     } else {
-      setPadding(0);
-    }
-  }, [
-    thinFrameMode,
-    setThinFrameMode,
-    setPolaroidMode,
-    setMediumFilmFrameMode,
-    setPolaroidDate,
-    setPadding,
-    setBackgroundColor,
-  ]);
-
-  const handleMediumFilmFrameToggle = useCallback(() => {
-    const newMediumFilmFrameMode = !mediumFilmFrameMode;
-    setMediumFilmFrameMode(newMediumFilmFrameMode);
-
-    // Medium Film 켤 때: Polaroid, Thin Frame 끄고, date 초기화, padding 80px, background white
-    // Medium Film 끌 때: padding 0으로 초기화
-    if (newMediumFilmFrameMode) {
-      setPolaroidMode(false);
-      setThinFrameMode(false);
-      setPolaroidDate('');
+      // 새 프레임 활성화 (상호배제 자동)
+      setFrameType(type);
       setPadding(FRAME_DEFAULT_PADDING);
-      setBackgroundColor('white');
-    } else {
-      setPadding(0);
+
+      // Polaroid가 아닌 프레임은 date 초기화 & 배경 white 고정
+      if (type !== 'polaroid') {
+        setPolaroidDate('');
+        setBackgroundColor('white');
+      }
     }
-  }, [
-    mediumFilmFrameMode,
-    setMediumFilmFrameMode,
-    setPolaroidMode,
-    setThinFrameMode,
-    setPolaroidDate,
-    setPadding,
-    setBackgroundColor,
-  ]);
+  }, [frameType, setFrameType, setPadding, setPolaroidDate, setBackgroundColor]);
 
   const handleDateChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,19 +65,13 @@ export const FramePanel = memo(() => {
           <PanelLabel>Frame</PanelLabel>
         </PanelLabelWrapper>
         <FrameOptions>
-          <FrameButton $isActive={polaroidMode} onClick={handlePolaroidToggle}>
+          <FrameButton $isActive={frameType === 'polaroid'} onClick={() => handleFrameToggle('polaroid')}>
             Polaroid
           </FrameButton>
-          <FrameButton
-            $isActive={thinFrameMode}
-            onClick={handleThinFrameToggle}
-          >
+          <FrameButton $isActive={frameType === 'thin'} onClick={() => handleFrameToggle('thin')}>
             Thin
           </FrameButton>
-          <FrameButton
-            $isActive={mediumFilmFrameMode}
-            onClick={handleMediumFilmFrameToggle}
-          >
+          <FrameButton $isActive={frameType === 'mediumFilm'} onClick={() => handleFrameToggle('mediumFilm')}>
             Film
           </FrameButton>
         </FrameOptions>
@@ -152,9 +88,9 @@ export const FramePanel = memo(() => {
             value={polaroidDate}
             onChange={handleDateChange}
             placeholder="e.g. 2024.01.01"
-            disabled={!polaroidMode}
+            disabled={frameType !== 'polaroid'}
           />
-          {polaroidDate && polaroidMode && (
+          {polaroidDate && frameType === 'polaroid' && (
             <ClearButton onClick={handleDateClear} type="button">
               ×
             </ClearButton>

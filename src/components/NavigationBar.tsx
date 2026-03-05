@@ -9,9 +9,7 @@ import {
   glassBlurAtom,
   shadowEnabledAtom,
   canvasAspectRatioAtom,
-  polaroidModeAtom,
-  thinFrameModeAtom,
-  mediumFilmFrameModeAtom,
+  frameTypeAtom,
   paddingAtom,
 } from '@/atoms/imageAtoms';
 import { LayoutPanel } from './panels/LayoutPanel';
@@ -128,9 +126,7 @@ export const NavigationBar = () => {
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
   const padding = useAtomValue(paddingAtom);
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
-  const polaroidMode = useAtomValue(polaroidModeAtom);
-  const thinFrameMode = useAtomValue(thinFrameModeAtom);
-  const mediumFilmFrameMode = useAtomValue(mediumFilmFrameModeAtom);
+  const frameType = useAtomValue(frameTypeAtom);
 
   const [displayedPanel, setDisplayedPanel] = useState<NavPanelType>(null);
   const [isContentVisible, setIsContentVisible] = useState(false);
@@ -184,7 +180,7 @@ export const NavigationBar = () => {
   const activeStates = useMemo(
     () => ({
       layout: aspectRatio !== '1:1' || padding > 0,
-      frame: polaroidMode || thinFrameMode || mediumFilmFrameMode,
+      frame: frameType !== 'none',
       background: backgroundColor !== 'white',
       glassblur: glassBlur,
       shadow: shadowEnabled,
@@ -195,37 +191,29 @@ export const NavigationBar = () => {
       glassBlur,
       shadowEnabled,
       padding,
-      polaroidMode,
-      thinFrameMode,
-      mediumFilmFrameMode,
+      frameType,
     ],
   );
 
   const handleNavClick = useCallback(
     (id: Exclude<NavPanelType, null>) => {
-      // In Polaroid mode, only 'layout', 'frame' and 'background' are functional.
-      // glassblur and shadow are disabled in Polaroid mode.
-      if (
-        polaroidMode &&
-        id !== 'layout' &&
-        id !== 'frame' &&
-        id !== 'background'
-      ) {
-        return;
+      // 프레임 활성화 시 일부 패널 비활성화
+      const isFrameActive = frameType !== 'none';
+      const isPolaroid = frameType === 'polaroid';
+
+      if (isFrameActive) {
+        // Polaroid: layout, frame, background만 허용
+        // Thin/MediumFilm: layout, frame만 허용
+        const allowedPanels: Set<string> = isPolaroid
+          ? new Set(['layout', 'frame', 'background'])
+          : new Set(['layout', 'frame']);
+
+        if (!allowedPanels.has(id)) return;
       }
-      // In Thin Frame mode, only 'layout' and 'frame' are functional.
-      // background, glassblur and shadow are disabled in Thin Frame mode.
-      if (thinFrameMode && id !== 'layout' && id !== 'frame') {
-        return;
-      }
-      // In Medium Film Frame mode, only 'layout' and 'frame' are functional.
-      // background, glassblur and shadow are disabled in Medium Film Frame mode.
-      if (mediumFilmFrameMode && id !== 'layout' && id !== 'frame') {
-        return;
-      }
+
       setActivePanel((prev) => (prev === id ? null : id));
     },
-    [setActivePanel, polaroidMode, thinFrameMode, mediumFilmFrameMode],
+    [setActivePanel, frameType],
   );
 
   // Close panel when clicking outside (except navigation bar)
@@ -271,24 +259,16 @@ export const NavigationBar = () => {
         <SliderBackground $activeIndex={activeIndex} />
         <NavButtonsWrapper>
           {NAV_ITEMS.map((item) => {
-            // Polaroid mode: disable glassblur, shadow
-            // Thin Frame mode: disable background, glassblur, shadow
-            // Medium Film Frame mode: disable background, glassblur, shadow
-            const isPolaroidRestricted =
-              polaroidMode &&
-              item.id !== 'layout' &&
-              item.id !== 'frame' &&
-              item.id !== 'background';
-            const isThinFrameRestricted =
-              thinFrameMode && item.id !== 'layout' && item.id !== 'frame';
-            const isMediumFilmFrameRestricted =
-              mediumFilmFrameMode &&
-              item.id !== 'layout' &&
-              item.id !== 'frame';
-            const isDimmed =
-              isPolaroidRestricted ||
-              isThinFrameRestricted ||
-              isMediumFilmFrameRestricted;
+            const isFrameActive = frameType !== 'none';
+            const isPolaroid = frameType === 'polaroid';
+
+            let isDimmed = false;
+            if (isFrameActive) {
+              const allowedPanels: Set<string> = isPolaroid
+                ? new Set(['layout', 'frame', 'background'])
+                : new Set(['layout', 'frame']);
+              isDimmed = !allowedPanels.has(item.id);
+            }
             const isClickable = !isDimmed;
 
             return (
