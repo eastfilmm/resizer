@@ -38,19 +38,19 @@
 
 **작업 내용**:
 1. `docs/FeatureName.md` 파일을 참조하여 구현
-2. **토큰 최적화**: 파일 디렉토리 구조 활용
-   - 필요한 파일만 선별적으로 읽기 (전체 파일 읽지 말 것)
-   - `codebase_search`로 관련 코드 패턴 먼저 탐색
-   - 유사 기능의 기존 파일 구조 참조 (예: `ShadowPanel.tsx` → `BorderPanel.tsx`)
-   - `glob_file_search`로 유사 컴포넌트 찾기
-3. 명세서에 명시된 파일 경로에 따라 구현
-4. 기존 코드 패턴 준수 (styled-components, Jotai atoms, hooks 등)
+2. **최신 아키텍처 패턴 준수**:
+   - **State**: `imageAtoms.ts`의 `ImageSettings` 인터페이스에 속성을 추가하고 `focusAtom`을 생성하여 사용하세요.
+   - **Canvas**: `src/utils/canvas/` 내 적절한 모듈(`effects.ts`, `frames.ts` 등)에 로직을 구현하세요.
+   - **Components**: 모든 컴포넌트는 화살표 함수(`const Component = () => { ... }`)를 사용하세요.
+3. **토큰 최적화**: 파일 디렉토리 구조 활용
+   - `utils/canvas/` 디렉토리 내 필요한 파일만 선별적으로 읽기
+   - 유사 기능의 기존 패턴 참조 (예: `ShadowPanel.tsx` → `NewEffectPanel.tsx`)
+4. 기존 코드 패턴 준수 (styled-components, Jotai focusAtoms, hooks 등)
 
 **최적화 가이드**:
-- ❌ 전체 파일을 읽기 전에 grep이나 codebase_search로 패턴 확인
-- ✅ 유사 기능의 패널 컴포넌트 하나만 읽고 패턴 파악
-- ✅ atoms 파일은 전체가 아닌 관련 섹션만 수정
-- ✅ 타입이 필요한 경우 types 디렉토리 먼저 확인
+- ✅ `imageSettingsAtom` 객체 전체를 구독하지 말고, `useAtom(derivedAtom)` 패턴을 사용하세요.
+- ✅ 캔버스 엔진 수정 시 `src/utils/canvas/index.ts`에 Export를 잊지 마세요.
+- ✅ 컴포넌트 로직이 복잡해지면 `src/hooks/`로 분리하세요.
 
 **사용 예시**:
 ```
@@ -61,27 +61,25 @@
 
 ---
 
-## ⚡ 서브에이전트 3: Code Optimization
+## ⚡ 서브에이전트 3: Quality Assurance & Testing
 
-**역할**: 구현된 코드 최적화 및 품질 개선
+**역할**: 구현된 코드 검증 및 품질 개선
 
 **작업 내용**:
-1. 서브에이전트 2가 구현한 코드 검토
+1. **테스트 필수 수행**: 
+   - `src/__tests__/utils/`에 신규 기능에 대한 단위 테스트를 추가하거나 기존 테스트를 업데이트하세요.
+   - `pnpm test`를 실행하여 모든 테스트가 통과하는지 확인하세요.
 2. 다음 항목 체크 및 최적화:
-   - **성능**: 불필요한 리렌더링 방지, 메모이제이션 필요 여부
-   - **코드 품질**: ESLint 규칙 준수, 타입 안정성
-   - **코드 중복**: 기존 유틸리티 함수 활용 가능 여부
-   - **브라우저 호환성**: Safari 최적화 필요 여부 (SCALE_FACTOR 등)
-   - **일관성**: 기존 코드 스타일 및 패턴 준수
-3. `pnpm lint` 실행하여 린트 에러 확인 및 수정
-4. 필요한 경우 리팩토링 수행
+   - **성능**: 불필요한 리렌더링 방지 (Jotai Optics 활용 여부)
+   - **코드 품질**: ESLint 규칙 준수, 타입 안정성 (`any` 사용 자제)
+   - **브라우저 호환성**: Safari 최적화 (`SCALE_FACTOR` 적용 등)
+3. `pnpm build`를 실행하여 Turbopack 빌드에 이상이 없는지 확인하세요.
 
 **체크리스트**:
-- [ ] ESLint 에러 없음 (`pnpm lint` 통과)
-- [ ] TypeScript 타입 에러 없음
-- [ ] Safari 최적화 적용 (SafariImageCanvas.tsx 포함)
-- [ ] 불필요한 리렌더링 없음
-- [ ] 기존 코드 패턴과 일관성 유지
+- [ ] `pnpm test` 모든 테스트 통과 (필수)
+- [ ] `pnpm build` 성공
+- [ ] ESLint 에러 없음
+- [ ] Safari 최적화 패턴 적용 (`ImageCanvas.tsx` 내 분기)
 
 **사용 예시**:
 ```

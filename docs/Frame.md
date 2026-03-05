@@ -1,139 +1,42 @@
 # Frame 기능 명세서
 
 ## 개요
+이미지 주변에 다양한 형태의 프레임(테두리)을 추가하는 기능입니다. 세 가지 프레임 타입은 서로 상호 배타적으로 동작합니다.
 
-기존 "Polaroid" 패널을 "Frame" 패널로 이름을 변경하고, 새로운 "Thin Frame" 기능을 추가합니다.
+## 기능 스펙
 
----
+### 1. 프레임 타입 (`FrameType`)
+- **None**: 프레임 없음.
+- **Polaroid**: 하단에 날짜를 기입할 수 있는 폴라로이드 스타일 프레임.
+- **Thin**: 얇은 검정색(#000000) 테두리.
+- **Medium Film**: 아날로그 필름 느낌의 두꺼운 프레임과 장식 텍스트.
 
-## 변경 사항
+### 2. 세부 동작 방식
+- **상호 배제**: 하나의 프레임을 선택하면 이전 프레임은 자동으로 해제됩니다.
+- **Padding 연동**: 프레임 적용 시 적절한 기본 패딩이 설정되거나, 사용자가 직접 패딩을 조절할 수 있습니다.
+- **Polaroid Date**: Polaroid 프레임 선택 시에만 하단에 텍스트(날짜 등)를 입력할 수 있는 입력란이 활성화됩니다.
+- **제한 로직**: 프레임이 활성화된 상태(None이 아닐 때)에서는 일부 효과(Glass Blur, Shadow 등)가 비활성화되거나 제한됩니다.
 
-### 1. 패널 이름 변경
+## 기술 구현 상세
 
-| Before | After |
-|--------|-------|
-| Polaroid | Frame |
+### 상태 관리 (Jotai)
+- `frameTypeAtom`: `focusAtom`을 통해 `imageSettingsAtom.frameType`을 관리합니다.
+- 타입: `'none' | 'polaroid' | 'thin' | 'mediumFilm'`
 
-- 네비게이션 바의 라벨: `Polaroid` → `Frame`
-- 패널 ID: `polaroid` → `frame`
-- 컴포넌트 파일명: `PolaroidPanel.tsx` → `FramePanel.tsx`
+### 렌더링 파이프라인
+- `src/utils/canvas/frames.ts`에서 각 프레임별 전용 그리기 함수 구현:
+  - `drawPolaroidFrame()`
+  - `drawThinFrame()`
+  - `drawMediumFilmFrame()`
+- `drawImageWithEffects()`에서 `frameType`에 따라 스위치 분기하여 처리.
 
----
+## 관련 파일 목록
 
-### 2. UI 레이아웃 변경
+- `src/atoms/imageAtoms.ts`: `FrameType` 타입 정의 및 `frameTypeAtom` 선언.
+- `src/utils/canvas/frames.ts`: 실제 Canvas API 기반 프레임 렌더링 로직.
+- `src/components/panels/FramePanel.tsx`: 프레임 선택 및 데이터 입력을 위한 UI 패널.
+- `src/utils/canvas/drawImage.ts`: 프레임 로직 오케스트레이션.
+- `src/__tests__/utils/canvas-frames.test.ts`: 프레임 렌더링 정확도 테스트.
 
-기존 세로 배열에서 **가로 배열**로 변경 (LayoutPanel의 AspectRatioOptions 스타일 참조)
-
-```
-Before:
-┌─────────────────────┐
-│ [Polaroid Button]   │
-├─────────────────────┤
-│ Date Input          │
-└─────────────────────┘
-
-After:
-┌─────────────────────┐
-│ Frame Type          │
-├──────────┬──────────┤
-│ Polaroid │ Thin     │
-├──────────┴──────────┤
-│ Date Input          │
-└─────────────────────┘
-```
-
----
-
-### 3. 새로운 기능: Thin Frame
-
-얇은 검정색 프레임을 이미지 주변에 추가하는 기능
-
-#### 시각적 스펙
-
-- 프레임 색상: **검정색 (#000000)**
-- 프레임 두께: **얇은 테두리** (약 2-4px 정도, 캔버스 기준)
-- 이미지와 프레임 사이: 약간의 여백X
-
-#### 상태 관리
-
-- 새로운 atom: `thinFrameModeAtom` (boolean, 기본값: false)
-- Polaroid와 Thin Frame은 **상호 배타적** (둘 중 하나만 활성화 가능)
-
----
-
-## 동작 규칙
-
-### Thin Frame 활성화 시 제한 사항
-
-Thin Frame이 활성화되면 다음 기능들이 **비활성화/제한**됩니다:
-
-| 기능 | 상태 | 설명 |
-|------|------|------|
-| Date Stamp | 비활성화 | 입력 불가 |
-| Glass Blur | 비활성화 | 네비게이션 버튼 dimmed 처리 |
-| Shadow | 비활성화 | 네비게이션 버튼 dimmed 처리 |
-| Background Color | 비활성화 | 네비게이션 버튼 dimmed 처리, 선택 불가 |
-| Padding | 활성화 | 사용 가능 |
-
-> Polaroid 모드의 제한 사항과 동일하지만, **Background Color도 추가로 비활성화**됨
-
-### 상호 배타적 동작
-
-```
-Polaroid ON → Thin Frame OFF (자동)
-Thin Frame ON → Polaroid OFF (자동)
-```
-
----
-
-## 수정 대상 파일
-
-### 필수 수정
-
-1. **`src/atoms/imageAtoms.ts`**
-   - `thinFrameModeAtom` 추가
-   - `NavPanelType`에서 `'polaroid'` → `'frame'` 변경
-   - `canResetAtom`에 thin frame 상태 추가
-
-2. **`src/components/panels/PolaroidPanel.tsx`** → **`FramePanel.tsx`**
-   - 컴포넌트 이름 변경
-   - 가로 배열 UI로 변경
-   - Thin Frame 버튼 추가
-   - 상호 배타적 토글 로직
-
-3. **`src/components/NavigationBar.tsx`**
-   - NAV_ITEMS에서 `polaroid` → `frame` 변경
-   - Thin Frame 모드 제한 로직 추가 (background 포함)
-
-4. **`src/components/ImageCanvas.tsx`**
-   - Thin Frame 렌더링 로직 추가
-
-5. **`src/components/DownloadButton.tsx`**
-   - Thin Frame 렌더링 로직 추가
-
-6. **`src/hooks/useResetState.ts`**
-   - thinFrameMode 리셋 추가
-
-7. **`src/utils/CanvasUtils.ts`**
-   - Thin Frame 그리기 함수 추가
-
-8. **`docs/PROJECT_STRUCTURE.md`**
-   - 파일명 변경 반영
-
----
-
-## 구현 우선순위
-
-1. atom 및 타입 정의 변경
-2. FramePanel UI 구현 (가로 배열 + Thin Frame 버튼)
-3. NavigationBar 제한 로직 수정
-4. Canvas 렌더링 로직 구현
-5. Reset/Download 로직 업데이트
-6. 문서 업데이트
-
----
-
-## 참고
-
-- Polaroid 제한 로직: `NavigationBar.tsx` 172-179번 라인
-- 가로 버튼 배열 예시: `LayoutPanel.tsx` AspectRatioOptions
+## UI 위치
+하단 네비게이션 바의 **Frame** 아이콘을 통해 진입하며, 가로 버튼 형태의 옵션 제공.

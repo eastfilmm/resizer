@@ -1,53 +1,37 @@
-# Glass Blur 기능
+# Glass Blur 기능 명세서
 
 ## 개요
-이미지의 중앙 정사각형 영역을 blur 처리하여 배경으로 사용하는 기능입니다.
+이미지의 중앙 영역을 샘플링하고 블러 처리를 적용하여 캔버스의 배경으로 사용하는 시각 효과입니다.
 
-## 기능 상세
+## 기능 스펙
 
-### 1. Glass Blur 토글
-- Background Color와 동일한 UI 스타일의 토글 스위치
-- 활성화 시 파란색(#007bff)으로 표시
+### 1. 주요 파라미터
+- **Enabled**: 효과 활성화 여부 (Toggle).
+- **Blur Intensity**: 블러의 강도 (1% - 100%, 기본값 30%).
+- **Overlay Opacity**: 배경색(Tint)이 블러 배경 위에 씌워지는 불투명도 (0% - 100%, 기본값 30%).
 
-### 2. 배경 처리 방식
-- **토글 ON**: 선택한 이미지의 정중앙을 기준으로 정사각형으로 잘라서 캔버스에 가득 채움
-- 채워진 이미지에 blur 처리 적용
-- 기존 이미지는 정중앙에 그대로 표시 (blur 배경 위에 원본 이미지)
+### 2. 동작 방식
+- 원본 이미지의 정중앙 정사각형 영역을 추출하여 캔버스 전체 크기로 확대 렌더링합니다.
+- 확대된 배경 이미지에 StackBlur 알고리즘을 적용합니다.
+- 설정된 `BackgroundColor` (White/Black)와 `Overlay Opacity`에 따라 배경색 오버레이가 투명하게 겹쳐집니다.
+- 그 위에 원본 이미지가 설정된 비율과 패딩에 맞춰 렌더링됩니다.
 
-### 3. Blur 강도 조절
-- **범위**: 1% ~ 100%
-- **기본값**: 30%
-- 토글 ON 시 슬라이더로 실시간 조정 가능
+## 기술 구현 상세
 
-### 4. Tint (색상 오버레이) 강도 조절
-- **범위**: 0% ~ 100%
-- **기본값**: 30%
-- Background Color(white/black)가 blur 위에 반투명하게 적용됨
-- 토글 ON 시 슬라이더로 실시간 조정 가능
+### 상태 관리 (Jotai)
+- `glassBlurAtom`, `blurIntensityAtom`, `overlayOpacityAtom`이 각각 `imageSettingsAtom`의 하위 속성을 관리합니다.
 
-### 5. Background Color 연동
-- Glass Blur 활성화 시에도 Background Color 토글 사용 가능
-- White 선택: blur 배경이 밝아짐
-- Black 선택: blur 배경이 어두워짐
-- Tint 값으로 색상 적용 강도 조절
+### 렌더링 로직
+- `src/utils/canvas/effects.ts` 내의 `drawGlassBlurBackground()` 함수에서 구현됩니다.
+- **Edge Clamp**: 블러 적용 시 가장자리가 어두워지는 비네팅을 방지하기 위해 픽셀 복제 기법을 사용하여 여유 공간을 확보한 뒤 블러를 처리합니다.
+- **Safari 최적화**: Safari 브라우저에서는 성능을 위해 `SCALE_FACTOR` (0.4)가 적용된 상태로 렌더링되며, CSS filter 대신 JS 연산 기반 블러를 사용합니다.
 
-## 기술 상세
+## 관련 파일 목록
 
-### Edge Clamp 기법
-blur 적용 시 캔버스 가장자리에서 발생하는 비네팅(어두워짐) 효과를 방지하기 위해 Edge Clamp 기법을 사용합니다.
+- `src/atoms/imageAtoms.ts`: 관련 3종 Atom 정의.
+- `src/utils/canvas/effects.ts`: 핵심 렌더링 및 Edge Clamp 로직.
+- `src/components/panels/GlassBlurPanel.tsx`: 토글 및 슬라이더 UI.
+- `src/__tests__/utils/canvas-effects.test.ts`: 블러 배경 생성 및 Tint 적용 테스트.
 
-1. blur 강도의 3배 크기로 마진을 계산
-2. 마진만큼 확장된 임시 캔버스에 이미지를 그림
-3. 가장자리 픽셀을 복제하여 마진 영역을 채움 (이미지 확대 없음)
-4. blur 적용 후 중앙의 2000×2000 영역만 잘라서 사용
-
-이 방식으로 가장자리까지 균일한 blur 효과를 얻을 수 있습니다.
-
-## 관련 파일
-
-| 파일 | 설명 |
-|------|------|
-| `src/atoms/imageAtoms.ts` | glassBlurAtom, blurIntensityAtom, overlayOpacityAtom, canResetAtom 정의 |
-| `src/components/GlassBlurSelector.tsx` | 토글 및 슬라이더 UI 컴포넌트 |
-| `src/components/ImageCanvas.tsx` | blur 배경 렌더링 로직 (drawGlassBlurBackground) |
-| `src/components/BottomSection.tsx` | GlassBlurSelector 컴포넌트 배치 |
+## UI 위치
+하단 네비게이션 바의 **Glass Blur** 아이콘 패널.
