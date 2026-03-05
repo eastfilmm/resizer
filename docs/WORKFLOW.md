@@ -14,20 +14,20 @@
 
 **작업 내용**:
 1. 기능 요구사항 분석
-2. `docs/FeatureName.md` 파일 생성
+2. `docs/feature-name.md` 파일 생성
 3. 다음 구조로 문서 작성:
    - 개요
    - 기능 상세 (UI, 동작 방식)
    - 기술 상세 (구현 방식, 기술 스택)
    - 관련 파일 목록 (추가/수정할 파일 경로)
-4. `@AGENTS.md`의 "새로운 효과 추가" 섹션 참조하여 누락된 파일 없이 계획
+4. `@agents.md`의 "새로운 효과 추가" 섹션 참조하여 누락된 파일 없이 계획
 
-**출력물**: 완성된 `docs/FeatureName.md`
+**출력물**: 완성된 `docs/feature-name.md`
 
 **사용 예시**:
 ```
-서브에이전트 1로 "Border" 기능을 위한 docs/Border.md 파일을 만들어줘.
-@AGENTS.md의 "Adding new effects" 섹션을 참조해서 필요한 파일들을 모두 포함해줘.
+서브에이전트 1로 "Border" 기능을 위한 docs/border.md 파일을 만들어줘.
+@agents.md의 "Adding new effects" 섹션을 참조해서 필요한 파일들을 모두 포함해줘.
 ```
 
 ---
@@ -37,7 +37,7 @@
 **역할**: 명세서 기반 기능 구현
 
 **작업 내용**:
-1. `docs/FeatureName.md` 파일을 참조하여 구현
+1. `docs/feature-name.md` 파일을 참조하여 구현
 2. **최신 아키텍처 패턴 준수**:
    - **State**: `imageAtoms.ts`의 `ImageSettings` 인터페이스에 속성을 추가하고 `focusAtom`을 생성하여 사용하세요.
    - **Canvas**: `src/utils/canvas/` 내 적절한 모듈(`effects.ts`, `frames.ts` 등)에 로직을 구현하세요.
@@ -121,7 +121,7 @@ ESLint 체크하고, Safari 최적화도 확인해줘.
 **사용 예시**:
 ```
 서브에이전트 1-3에서 완료한 Border 기능의 작업 내용을 
-docs/Border.md에 정리하고 업데이트해줘.
+docs/border.md에 정리하고 업데이트해줘.
 ```
 
 ---
@@ -129,8 +129,8 @@ docs/Border.md에 정리하고 업데이트해줘.
 ## 워크플로우 전체 예시
 
 ```
-1. 서브에이전트 1: "Border 기능을 위한 docs/Border.md 생성"
-2. 서브에이전트 2: "@docs/Border.md 기준으로 구현"
+1. 서브에이전트 1: "Border 기능을 위한 docs/border.md 생성"
+2. 서브에이전트 2: "@docs/border.md 기준으로 구현"
 3. 서브에이전트 3: "구현된 Border 코드 최적화"
 4. 서브에이전트 4: "Border 기능 문서 최종 업데이트"
 ```
@@ -143,7 +143,7 @@ docs/Border.md에 정리하고 업데이트해줘.
 
 ```
 "Border" 기능을 추가해줘. @docs/WORKFLOW.md의 4단계 서브 에이전트 워크플로우를 따라서:
-1. 서브에이전트 1: docs/Border.md 생성
+1. 서브에이전트 1: docs/border.md 생성
 2. 서브에이전트 2: 구현
 3. 서브에이전트 3: 최적화
 4. 서브에이전트 4: 문서 업데이트

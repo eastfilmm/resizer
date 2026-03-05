@@ -9,13 +9,13 @@ resizer/
 ├── .vscode/                   # VSCode 설정
 ├── .agents/                   # 에이전트 워크플로우 (있을 경우)
 ├── docs/                      # 기능별 기술 문서
-│   ├── CanvasPadding.md       # 패딩 기능 명세
-│   ├── CommitAutomation.md    # 커밋 자동화 가이드
-│   ├── Frame.md               # 프레임 기능 명세 (Polaroid, Thin, Film)
-│   ├── GlassBlur.md           # Glass Blur 기능 명세
-│   ├── PROJECT_STRUCTURE.md   # 프로젝트 구조 문서 (이 파일)
-│   ├── Shadow.md              # Shadow 기능 명세
-│   └── WORKFLOW.md            # 서브 에이전트 워크플로우 가이드
+│   ├── canvas-padding.md      # 패딩 기능 명세
+│   ├── commit-automation.md   # 커밋 자동화 가이드
+│   ├── frame.md               # 프레임 기능 명세 (Polaroid, Thin, Film)
+│   ├── glass-blur.md          # Glass Blur 기능 명세
+│   ├── project-structure.md   # 프로젝트 구조 문서 (이 파일)
+│   ├── shadow.md              # Shadow 기능 명세
+│   └── workflow.md            # 서브 에이전트 워크플로우 가이드
 ├── public/                    # 정적 자산 (SVG 아이콘, 로고)
 ├── src/
 │   ├── app/                   # Next.js App Router (Layout, Page, Robots, Sitemap)
