@@ -14,9 +14,15 @@ importers:
       jotai:
         specifier: ^2.16.1
         version: 2.16.1(@babel/core@7.28.5)(@babel/template@7.28.6)(@types/react@19.2.2)(react@19.1.0)
+      jotai-optics:
+        specifier: ^0.4.0
+        version: 0.4.0(jotai@2.16.1(@babel/core@7.28.5)(@babel/template@7.28.6)(@types/react@19.2.2)(react@19.1.0))(optics-ts@2.4.1)
       next:
         specifier: 16.1.1
         version: 16.1.1(@babel/core@7.28.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      optics-ts:
+        specifier: ^2.4.1
+        version: 2.4.1
       react:
         specifier: 19.1.0
         version: 19.1.0
@@ -1869,6 +1875,12 @@ packages:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
     engines: {node: '>= 0.4'}
 
+  jotai-optics@0.4.0:
+    resolution: {integrity: sha512-osbEt9AgS55hC4YTZDew2urXKZkaiLmLqkTS/wfW5/l0ib8bmmQ7kBXSFaosV6jDDWSp00IipITcJARFHdp42g==}
+    peerDependencies:
+      jotai: '>=2.0.0'
+      optics-ts: '>=2.0.0'
+
   jotai@2.16.1:
     resolution: {integrity: sha512-vrHcAbo3P7Br37C8Bv6JshMtlKMPqqmx0DDREtTjT4nf3QChDrYdbH+4ik/9V0cXA57dK28RkJ5dctYvavcIlg==}
     engines: {node: '>=12.20.0'}
@@ -2068,6 +2080,9 @@ packages:
 
   obug@2.1.1:
     resolution: {integrity: sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==}
+
+  optics-ts@2.4.1:
+    resolution: {integrity: sha512-HaYzMHvC80r7U/LqAd4hQyopDezC60PO2qF5GuIwALut2cl5rK1VWHsqTp0oqoJJWjiv6uXKqsO+Q2OO0C3MmQ==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -4513,6 +4528,11 @@ snapshots:
       has-symbols: 1.1.0
       set-function-name: 2.0.2
 
+  jotai-optics@0.4.0(jotai@2.16.1(@babel/core@7.28.5)(@babel/template@7.28.6)(@types/react@19.2.2)(react@19.1.0))(optics-ts@2.4.1):
+    dependencies:
+      jotai: 2.16.1(@babel/core@7.28.5)(@babel/template@7.28.6)(@types/react@19.2.2)(react@19.1.0)
+      optics-ts: 2.4.1
+
   jotai@2.16.1(@babel/core@7.28.5)(@babel/template@7.28.6)(@types/react@19.2.2)(react@19.1.0):
     optionalDependencies:
       '@babel/core': 7.28.5
@@ -4709,6 +4729,8 @@ snapshots:
       es-object-atoms: 1.1.1
 
   obug@2.1.1: {}
+
+  optics-ts@2.4.1: {}
 
   optionator@0.9.4:
     dependencies:
