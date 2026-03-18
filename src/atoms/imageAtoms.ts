@@ -5,7 +5,7 @@ import { focusAtom } from 'jotai-optics';
 export type NavPanelType = 'layout' | 'frame' | 'background' | 'glassblur' | 'shadow' | null;
 
 // 현재 활성화된 네비게이션 패널
-export const activeNavPanelAtom = atom<NavPanelType>(null);
+export const activeNavPanelAtom = atom<NavPanelType>('layout');
 
 // 이미지 Blob URL
 export const imageUrlAtom = atom<string | null>(null);
