@@ -35,7 +35,7 @@ export const PanelContentWrapper = styled.div<{ $isVisible: boolean }>`
 `;
 
 export const NavContainer = styled.div`
-  height: 68px;
+  height: 64px;
   background-color: #e0e0e0;
   display: flex;
   width: 100%;
