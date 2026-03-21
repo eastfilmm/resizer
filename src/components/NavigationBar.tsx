@@ -54,11 +54,11 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 148,
-  frame: 200,
-  background: 72,
-  glassblur: 148,
-  shadow: 148,
+  layout: 132,
+  frame: 180,
+  background: 56,
+  glassblur: 132,
+  shadow: 132,
 };
 
 interface NavButtonProps {

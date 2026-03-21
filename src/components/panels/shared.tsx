@@ -9,7 +9,7 @@ export const PanelContainer = styled.div<{ $direction?: 'column' | 'row' }>`
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 20px;
+  padding: 12px 20px;
   max-width: 360px;
   width: 100%;
 `;
