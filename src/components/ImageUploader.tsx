@@ -2,8 +2,13 @@
 
 import styled from 'styled-components';
 import { RefObject } from 'react';
-import { useSetAtom } from 'jotai';
-import { imageUrlAtom } from '@/atoms/imageAtoms';
+import { useAtomValue, useSetAtom } from 'jotai';
+import {
+  MAX_UPLOADED_IMAGES,
+  selectedImageIdAtom,
+  uploadedImagesAtom,
+  type UploadedImage,
+} from '@/atoms/imageAtoms';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
 
 interface ImageUploaderProps {
@@ -11,14 +16,35 @@ interface ImageUploaderProps {
 }
 
 export const ImageUploader = ({ fileInputRef }: ImageUploaderProps) => {
-  const setImageUrl = useSetAtom(imageUrlAtom);
+  const uploadedImages = useAtomValue(uploadedImagesAtom);
+  const setUploadedImages = useSetAtom(uploadedImagesAtom);
+  const setSelectedImageId = useSetAtom(selectedImageIdAtom);
+
+  const createImageId = () => {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return crypto.randomUUID();
+    }
+
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  };
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setImageUrl(url);
+    const files = Array.from(event.target.files ?? []).filter((file) => file.type.startsWith('image/'));
+    const nextImages: UploadedImage[] = files.slice(0, MAX_UPLOADED_IMAGES).map((file) => ({
+      id: createImageId(),
+      fileName: file.name,
+      objectUrl: URL.createObjectURL(file),
+    }));
+
+    uploadedImages.forEach((image) => URL.revokeObjectURL(image.objectUrl));
+    setUploadedImages(nextImages);
+    setSelectedImageId(nextImages[0]?.id ?? null);
+
+    if (fileInputRef.current && nextImages.length === 0) {
+      fileInputRef.current.value = '';
     }
+
+    event.target.value = '';
   };
 
   return (
@@ -27,6 +53,7 @@ export const ImageUploader = ({ fileInputRef }: ImageUploaderProps) => {
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        multiple
         onChange={handleImageSelect}
         id="image-upload"
       />

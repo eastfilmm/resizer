@@ -1,48 +1,63 @@
 'use client';
 
-import { RefObject, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useAtomValue } from 'jotai';
-import { imageUrlAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
-import { useResetState } from '@/hooks/useResetState';
-import { useIsSafari } from '@/hooks/useIsSafari';
+import JSZip from 'jszip';
+import { uploadedImagesAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
 import { drawImageWithEffects, getCanvasDimensions } from '@/utils/canvas';
 
-interface DownloadButtonProps {
-  canvasRef: RefObject<HTMLCanvasElement | null>;
-  fileInputRef: RefObject<HTMLInputElement | null>;
-}
+const loadImage = async (src: string) => {
+  const img = new Image();
+  img.src = src;
 
-export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps) => {
-  const imageUrl = useAtomValue(imageUrlAtom);
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+  });
+
+  return img;
+};
+
+const canvasToBlob = (canvas: HTMLCanvasElement) =>
+  new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error('Failed to create PNG blob'));
+        return;
+      }
+
+      resolve(blob);
+    }, 'image/png', 1.0);
+  });
+
+const getPngFileName = (fileName: string, index: number) => {
+  const trimmedName = fileName.trim();
+  const baseName = trimmedName.length > 0 ? trimmedName.replace(/\.[^/.]+$/, '') : `image-${index + 1}`;
+  const sanitizedName = baseName.replace(/[^a-zA-Z0-9-_]+/g, '-').replace(/^-+|-+$/g, '');
+  return `${sanitizedName || `image-${index + 1}`}.png`;
+};
+
+export const DownloadButton = () => {
+  const uploadedImages = useAtomValue(uploadedImagesAtom);
   const settings = useAtomValue(imageSettingsAtom);
-  const resetState = useResetState({ canvasRef, fileInputRef });
-  const isSafari = useIsSafari();
   const { aspectRatio } = useAspectRatio();
 
   const handleDownload = useCallback(async () => {
-    if (!imageUrl) return;
+    if (uploadedImages.length === 0) return;
 
-    let dataUrl: string;
+    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
+    const zip = new JSZip();
 
-    if (isSafari) {
-      // Safari: Create full-resolution canvas for download
-      // (Safari preview uses scaled-down 800px canvas, so we need a fresh 2000px canvas)
-      const img = new Image();
-      img.src = imageUrl;
-      await new Promise<void>((resolve) => {
-        img.onload = () => resolve();
-        img.onerror = () => resolve();
-      });
-
-      // Use shared getCanvasDimensions with isSafari=false to get full-res dimensions
-      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
+    for (const [index, uploadedImage] of uploadedImages.entries()) {
+      const img = await loadImage(uploadedImage.objectUrl);
       const fullResCanvas = document.createElement('canvas');
       fullResCanvas.width = canvasWidth;
       fullResCanvas.height = canvasHeight;
+
       const ctx = fullResCanvas.getContext('2d');
-      if (!ctx) return;
+      if (!ctx) continue;
 
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
@@ -64,35 +79,27 @@ export const DownloadButton = ({ canvasRef, fileInputRef }: DownloadButtonProps)
         shadowIntensity: settings.shadowIntensity,
         shadowOffset: settings.shadowOffset,
         frameType: settings.frameType,
-        isSafari: true,
         polaroidDate: settings.polaroidDate,
       });
 
-      dataUrl = fullResCanvas.toDataURL('image/png', 1.0);
-    } else {
-      // Chrome/Firefox: Use existing canvas
-      if (!canvasRef.current) return;
-      dataUrl = canvasRef.current.toDataURL('image/png', 1.0);
+      zip.file(getPngFileName(uploadedImage.fileName, index), await canvasToBlob(fullResCanvas));
     }
 
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const dataUrl = URL.createObjectURL(zipBlob);
     const link = document.createElement('a');
-    link.download = `resized-image-${Date.now()}.png`;
+    link.download = `resized-images-${Date.now()}.zip`;
     link.href = dataUrl;
     link.click();
-
-    // Reset all state after download
-    resetState();
+    window.setTimeout(() => URL.revokeObjectURL(dataUrl), 1000);
   }, [
-    imageUrl,
+    uploadedImages,
     settings,
-    isSafari,
-    canvasRef,
-    resetState,
     aspectRatio,
   ]);
 
   return (
-    <IconButton $variant="primary" disabled={!imageUrl} onClick={handleDownload}>
+    <IconButton $variant="primary" disabled={uploadedImages.length === 0} onClick={handleDownload}>
       <ButtonIcon src="/download.svg" alt="Download" />
     </IconButton>
   );

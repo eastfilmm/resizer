@@ -20,7 +20,7 @@ resizer/
 ├── src/
 │   ├── app/                   # Next.js App Router (Layout, Page, Robots, Sitemap)
 │   ├── atoms/                 # Jotai 상태 관리
-│   │   └── imageAtoms.ts      # 중앙 집중식 imageSettingsAtom 및 focusAtom들
+│   │   └── imageAtoms.ts      # 공통 설정 + 멀티 업로드/선택 상태 atom
 │   ├── components/            # React 컴포넌트
 │   │   ├── panels/            # 개별 설정 패널 (Layout, Frame, Background, Blur, Shadow)
 │   │   │   ├── BackgroundPanel.tsx
@@ -30,11 +30,13 @@ resizer/
 │   │   │   ├── ShadowPanel.tsx
 │   │   │   └── shared.tsx      # 공통 패너 스타일 및 컴포넌트
 │   │   ├── styled/            # 공통 스타일 컴포넌트 (버튼, 레이아웃)
+│   │   ├── thumbnail-strip/   # 썸네일 스트립 전용 컴포넌트/훅/스타일
 │   │   ├── ActionButtons.tsx  # Upload/Download/Reset 버튼 그룹
 │   │   ├── DownloadButton.tsx # 이미지 익스포트 및 다운로드
 │   │   ├── ImageCanvas.tsx    # 핵심 Canvas 프리뷰 컴포넌트
 │   │   ├── ImageUploader.tsx  # 이미지 파일 선택 처리
 │   │   ├── NavigationBar.tsx  # 하단 네비게이션 및 패널 관리
+│   │   ├── ThumbnailStrip.tsx # 멀티 업로드 결과 썸네일 프리뷰
 │   │   └── ...
 │   ├── hooks/                 # 커스텀 React 훅
 │   │   ├── useAspectRatio.ts    # 비율 상태 및 영속성 관리
@@ -67,7 +69,7 @@ resizer/
 - **`dimensions.ts`**: 브라우저별(Safari 등) 권장 해상도와 비율별 캔버스 크기를 계산합니다.
 
 ### `src/atoms/` (Optimized)
-개별적인 15개 Atom 대신, `imageSettingsAtom`이라는 하나의 거대한 상태 객체를 중심으로 관리합니다. 성능을 위해 `focusAtom`을 사용하여 필요한 부분(패널)만 개별적으로 구독하도록 구현되어 있습니다.
+공통 편집 설정은 `imageSettingsAtom` 중심으로 관리하고, 멀티 업로드를 위한 이미지 목록/선택 상태 atom이 함께 존재합니다. 성능을 위해 `focusAtom`을 사용하여 필요한 부분(패널)만 개별적으로 구독하도록 구현되어 있습니다.
 
 ### `src/hooks/` (Decoupled)
 UI 컴포넌트(`NavigationBar` 등) 내부에 복잡하게 얽혀 있던 애니메이션 타이머와 이벤트 리스너 로직이 `usePanelTransition`, `useClickOutside` 등으로 분리되어 코드 가독성과 재사용성을 높였습니다.

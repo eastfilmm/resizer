@@ -7,8 +7,29 @@ export type NavPanelType = 'layout' | 'frame' | 'background' | 'glassblur' | 'sh
 // 현재 활성화된 네비게이션 패널
 export const activeNavPanelAtom = atom<NavPanelType>('layout');
 
-// 이미지 Blob URL
-export const imageUrlAtom = atom<string | null>(null);
+export interface UploadedImage {
+  id: string;
+  fileName: string;
+  objectUrl: string;
+}
+
+export const MAX_UPLOADED_IMAGES = 5;
+
+export const uploadedImagesAtom = atom<UploadedImage[]>([]);
+export const selectedImageIdAtom = atom<string | null>(null);
+export const selectedImageAtom = atom((get) => {
+  const selectedImageId = get(selectedImageIdAtom);
+  const uploadedImages = get(uploadedImagesAtom);
+
+  if (!selectedImageId) {
+    return uploadedImages[0] ?? null;
+  }
+
+  return uploadedImages.find((image) => image.id === selectedImageId) ?? uploadedImages[0] ?? null;
+});
+
+// 선택된 이미지 URL을 기존 단일 프리뷰 흐름에서 그대로 사용할 수 있도록 유지합니다.
+export const imageUrlAtom = atom((get) => get(selectedImageAtom)?.objectUrl ?? null);
 
 export type AspectRatio = '1:1' | '4:5' | '9:16';
 export type BackgroundColor = 'white' | 'black';
@@ -59,7 +80,7 @@ export const polaroidDateAtom = focusAtom(imageSettingsAtom, (optic) => optic.pr
 export const prevBackgroundColorAtom = atom<BackgroundColor | null>(null);
 
 export const canResetAtom = atom((get) => {
-  const hasImage = get(imageUrlAtom) !== null;
+  const hasImage = get(uploadedImagesAtom).length > 0;
   const currentSettings = get(imageSettingsAtom);
 
   const hasFilterChanges = JSON.stringify(currentSettings) !== JSON.stringify(DEFAULT_IMAGE_SETTINGS);

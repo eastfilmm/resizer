@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { Container, Main, Title, SubTitle } from '@/components/styled/Layout';
 import ImageCanvas from '@/components/ImageCanvas';
 import ActionButtons from '@/components/ActionButtons';
+import { ThumbnailStrip } from '@/components/ThumbnailStrip';
 import { NavigationBar } from '@/components/NavigationBar';
 import { useIsSafari } from '@/hooks/useIsSafari';
 
@@ -26,6 +27,7 @@ export default function ClientPage() {
         <CanvasWrapper>
           <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} />
         </CanvasWrapper>
+        <ThumbnailStrip isSafari={isSafari} />
         {/* 이미지 업로드 및 다운로드 버튼 */}
         <ActionButtons canvasRef={canvasRef} fileInputRef={fileInputRef} />
 
@@ -40,8 +42,12 @@ export default function ClientPage() {
 }
 
 const CanvasWrapper = styled.div`
-  flex-shrink:0;
-`
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+`;
 
 const NavSpacer = styled.div`
   height: ${NAV_HEIGHT}px;

@@ -45,6 +45,22 @@ export function getCanvasDisplaySize(
   return { width: CANVAS_DISPLAY_SIZE, height: CANVAS_DISPLAY_SIZE };
 }
 
+export function getThumbnailCanvasSize(
+  aspectRatio: AspectRatio,
+  displayHeight: number,
+  renderScale: number = 2
+): { width: number; height: number; displayWidth: number; displayHeight: number } {
+  const ratio = aspectRatio === '4:5' ? 4 / 5 : aspectRatio === '9:16' ? 9 / 16 : 1;
+  const displayWidth = Math.round(displayHeight * ratio);
+
+  return {
+    width: Math.round(displayWidth * renderScale),
+    height: Math.round(displayHeight * renderScale),
+    displayWidth,
+    displayHeight,
+  };
+}
+
 export function resetCanvas(
   canvas: HTMLCanvasElement,
   backgroundColor: BackgroundColor = 'white',

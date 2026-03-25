@@ -7,15 +7,15 @@ import { DownloadButton } from './DownloadButton';
 import { ResetButton } from './ResetButton';
 
 interface ActionButtonsProps {
-  canvasRef: RefObject<HTMLCanvasElement | null>;
   fileInputRef: RefObject<HTMLInputElement | null>;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
 }
 
 export default function ActionButtons({ canvasRef, fileInputRef }: ActionButtonsProps) {
   return (
     <ButtonGroup>
       <ImageUploader fileInputRef={fileInputRef} />
-      <DownloadButton canvasRef={canvasRef} fileInputRef={fileInputRef} />
+      <DownloadButton />
       <ResetButton canvasRef={canvasRef} fileInputRef={fileInputRef} />
     </ButtonGroup>
   );

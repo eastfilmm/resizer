@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCanvasDimensions, getCanvasDisplaySize } from '@/utils/canvas';
+import { getCanvasDimensions, getCanvasDisplaySize, getThumbnailCanvasSize } from '@/utils/canvas';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_PREVIEW_SIZE,
@@ -131,5 +131,37 @@ describe('getCanvasDisplaySize', () => {
     const size916 = getCanvasDisplaySize('9:16');
     expect(size1.width).toBeGreaterThan(size45.width);
     expect(size45.width).toBeGreaterThan(size916.width);
+  });
+});
+
+describe('getThumbnailCanvasSize', () => {
+  it('returns square thumbnail dimensions for 1:1', () => {
+    const result = getThumbnailCanvasSize('1:1', 88, 2);
+    expect(result).toEqual({
+      width: 176,
+      height: 176,
+      displayWidth: 88,
+      displayHeight: 88,
+    });
+  });
+
+  it('returns portrait thumbnail dimensions for 4:5', () => {
+    const result = getThumbnailCanvasSize('4:5', 90, 2);
+    expect(result).toEqual({
+      width: 144,
+      height: 180,
+      displayWidth: 72,
+      displayHeight: 90,
+    });
+  });
+
+  it('returns narrow portrait thumbnail dimensions for 9:16', () => {
+    const result = getThumbnailCanvasSize('9:16', 96, 2);
+    expect(result).toEqual({
+      width: 108,
+      height: 192,
+      displayWidth: 54,
+      displayHeight: 96,
+    });
   });
 });
