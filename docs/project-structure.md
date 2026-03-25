@@ -39,7 +39,7 @@ resizer/
 │   │   ├── ThumbnailStrip.tsx # 멀티 업로드 결과 썸네일 프리뷰
 │   │   └── ...
 │   ├── hooks/                 # 커스텀 React 훅
-│   │   ├── useAspectRatio.ts    # 비율 상태 및 영속성 관리
+│   │   ├── useAspectRatio.ts    # 비율 상태 관리
 │   │   ├── useClickOutside.ts   # 외부 클릭 감지
 │   │   ├── usePanelTransition.ts # 패널 애니메이션 상태 관리
 │   │   ├── useIsSafari.ts       # 브라우저 감지

@@ -16,6 +16,3 @@ export const CANVAS_ACTUAL_SIZE_9_16_HEIGHT = 2000;
 export const CANVAS_DISPLAY_SIZE_9_16_WIDTH = 180;
 export const CANVAS_PREVIEW_SIZE_9_16_WIDTH = 450;
 export const CANVAS_PREVIEW_SIZE_9_16_HEIGHT = 800;
-
-// LocalStorage keys
-export const ASPECT_RATIO_STORAGE_KEY = 'resizer-aspect-ratio';
