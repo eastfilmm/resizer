@@ -5,9 +5,7 @@
   "build": {
     "base": {
       "node": "22.0.0",
-      "pnpm": {
-        "version": "10.29.3"
-      }
+      "pnpm": "10.29.3"
     },
     "development": {
       "extends": "base",
