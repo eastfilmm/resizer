@@ -126,30 +126,52 @@ const ImageCanvas = forwardRef<CanvasRef>(function ImageCanvas(_props, ref) {
 
         {skImage && imageLayout && (
           <>
-            {/* Glass blur background */}
-            {settings.glassBlurEnabled && imageLayout.type === 'none' && (
-              <Group>
-                <SkiaImage
-                  image={skImage}
-                  x={0}
-                  y={0}
-                  width={actual.width}
-                  height={actual.height}
-                  fit="cover"
-                />
-                <Blur blur={settings.blurIntensity} />
-                <Rect
-                  x={0}
-                  y={0}
-                  width={actual.width}
-                  height={actual.height}
-                  color={settings.backgroundColor === 'white'
-                    ? `rgba(255,255,255,${settings.overlayOpacity})`
-                    : `rgba(0,0,0,${settings.overlayOpacity})`
-                  }
-                />
-              </Group>
-            )}
+            {/* Glass blur background - center crop maintaining aspect ratio, then blur */}
+            {settings.glassBlurEnabled && imageLayout.type === 'none' && (() => {
+              const imgW = skImage.width();
+              const imgH = skImage.height();
+              const canvasRatio = actual.width / actual.height;
+              const imgRatio = imgW / imgH;
+
+              let srcX = 0, srcY = 0, srcW = imgW, srcH = imgH;
+              if (imgRatio > canvasRatio) {
+                // Image is wider - crop sides
+                srcW = imgH * canvasRatio;
+                srcX = (imgW - srcW) / 2;
+              } else {
+                // Image is taller - crop top/bottom
+                srcH = imgW / canvasRatio;
+                srcY = (imgH - srcH) / 2;
+              }
+
+              return (
+                <>
+                  <Group
+                    clip={{ x: 0, y: 0, width: actual.width, height: actual.height }}
+                  >
+                    <SkiaImage
+                      image={skImage}
+                      x={0}
+                      y={0}
+                      width={actual.width}
+                      height={actual.height}
+                      fit="cover"
+                    />
+                    <Blur blur={settings.blurIntensity} />
+                  </Group>
+                  <Rect
+                    x={0}
+                    y={0}
+                    width={actual.width}
+                    height={actual.height}
+                    color={settings.backgroundColor === 'white'
+                      ? `rgba(255,255,255,${settings.overlayOpacity})`
+                      : `rgba(0,0,0,${settings.overlayOpacity})`
+                    }
+                  />
+                </>
+              );
+            })()}
 
             {/* Polaroid frame */}
             {imageLayout.type === 'polaroid' && (

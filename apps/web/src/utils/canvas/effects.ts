@@ -10,9 +10,24 @@ export function drawGlassBlurBackground(
   opacity: number,
   isSafari: boolean = false
 ): void {
-  const minDim = Math.min(img.width, img.height);
-  const sx = (img.width - minDim) / 2;
-  const sy = (img.height - minDim) / 2;
+  // Crop source image to match canvas aspect ratio (center crop, no distortion)
+  const canvasRatio = canvasWidth / canvasHeight;
+  const imgRatio = img.width / img.height;
+
+  let cropW: number, cropH: number, sx: number, sy: number;
+  if (imgRatio > canvasRatio) {
+    // Image is wider than canvas ratio - crop sides
+    cropH = img.height;
+    cropW = img.height * canvasRatio;
+    sx = (img.width - cropW) / 2;
+    sy = 0;
+  } else {
+    // Image is taller than canvas ratio - crop top/bottom
+    cropW = img.width;
+    cropH = img.width / canvasRatio;
+    sx = 0;
+    sy = (img.height - cropH) / 2;
+  }
 
   const margin = Math.ceil(intensity * 3);
   const expandedWidth = canvasWidth + margin * 2;
@@ -24,7 +39,7 @@ export function drawGlassBlurBackground(
   const tempCtx = tempCanvas.getContext('2d');
   if (!tempCtx) return;
 
-  tempCtx.drawImage(img, sx, sy, minDim, minDim, margin, margin, canvasWidth, canvasHeight);
+  tempCtx.drawImage(img, sx, sy, cropW, cropH, margin, margin, canvasWidth, canvasHeight);
 
   // Edge clamp
   tempCtx.drawImage(tempCanvas, margin, margin, canvasWidth, 1, margin, 0, canvasWidth, margin);
