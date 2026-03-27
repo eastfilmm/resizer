@@ -1,4 +1,4 @@
-import type { FrameType } from '@/atoms/imageAtoms';
+import type { FrameType } from '../atoms/imageAtoms';
 
 export interface ImagePosition {
   x: number;

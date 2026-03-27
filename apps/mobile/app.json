@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "Picture Drucker",
+    "slug": "picture-drucker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.picturedrucker.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "사진을 선택하여 편집하기 위해 갤러리 접근 권한이 필요합니다.",
+        "NSPhotoLibraryAddUsageDescription": "편집된 사진을 갤러리에 저장하기 위해 권한이 필요합니다."
+      }
+    },
+    "android": {
+      "package": "com.picturedrucker.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "READ_MEDIA_IMAGES",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "사진을 선택하여 편집하기 위해 갤러리 접근 권한이 필요합니다."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "편집된 사진을 갤러리에 저장하기 위해 권한이 필요합니다.",
+          "savePhotosPermission": "편집된 사진을 갤러리에 저장하기 위해 권한이 필요합니다."
+        }
+      ]
+    ]
+  }
+}

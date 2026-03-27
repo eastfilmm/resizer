@@ -1,0 +1,43 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:seo": "node scripts/test-seo.js"
+  },
+  "dependencies": {
+    "@resizer/shared": "workspace:*",
+    "@vercel/analytics": "^1.6.1",
+    "jotai": "^2.16.1",
+    "jotai-optics": "^0.4.0",
+    "jszip": "^3.10.1",
+    "next": "16.1.1",
+    "optics-ts": "^2.4.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "stackblur-canvas": "^2.7.0",
+    "styled-components": "^6.1.19"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/styled-components": "^5.1.34",
+    "@vitejs/plugin-react": "^5.1.4",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1",
+    "eslint-config-prettier": "^10.1.8",
+    "jsdom": "^28.1.0",
+    "prettier": "^3.8.0",
+    "typescript": "^5",
+    "vitest": "^4.0.18"
+  }
+}

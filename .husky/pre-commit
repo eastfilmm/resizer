@@ -1,1 +1,1 @@
-pnpm test
+pnpm --filter web test
