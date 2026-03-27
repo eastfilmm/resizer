@@ -3,7 +3,14 @@
     "version": ">= 15.0.0"
   },
   "build": {
+    "base": {
+      "node": "22.0.0",
+      "pnpm": {
+        "version": "10.29.3"
+      }
+    },
     "development": {
+      "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
       "android": {
@@ -11,11 +18,13 @@
       }
     },
     "preview": {
+      "extends": "base",
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
+      "extends": "base",
       "android": {
         "buildType": "app-bundle"
       }
