@@ -3,28 +3,33 @@
     "version": ">= 15.0.0"
   },
   "build": {
-    "base": {
-      "node": "22.0.0",
-      "pnpm": "10.29.3"
-    },
     "development": {
-      "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
+      "node": "22.0.0",
+      "pnpm": "10.29.3",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "image": "latest",
+        "ndk": "27.1.12297006"
       }
     },
     "preview": {
-      "extends": "base",
+      "node": "22.0.0",
+      "pnpm": "10.29.3",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "image": "latest",
+        "ndk": "27.1.12297006"
       }
     },
     "production": {
-      "extends": "base",
+      "node": "22.0.0",
+      "pnpm": "10.29.3",
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "image": "latest",
+        "ndk": "27.1.12297006"
       }
     }
   },

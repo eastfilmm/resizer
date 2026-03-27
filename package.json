@@ -13,7 +13,8 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "sharp",
-      "unrs-resolver"
+      "unrs-resolver",
+      "@shopify/react-native-skia"
     ]
   }
 }
