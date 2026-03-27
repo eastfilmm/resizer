@@ -1,73 +1,54 @@
 import React, { useRef } from 'react';
-import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
+import { StyleSheet, SafeAreaView, BackHandler, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Provider as JotaiProvider } from 'jotai';
-import type { CanvasRef } from '@shopify/react-native-skia';
-import ImageCanvas from './src/components/ImageCanvas';
-import ImagePicker from './src/components/ImagePicker';
-import SaveButton from './src/components/SaveButton';
-import ThumbnailStrip from './src/components/ThumbnailStrip';
-import NavigationBar from './src/components/NavigationBar';
+import { WebView } from 'react-native-webview';
+
+const WEB_URL = 'https://picturedrucker.com';
 
 export default function App() {
-  const canvasRef = useRef<CanvasRef>(null);
+  const webViewRef = useRef<WebView>(null);
+
+  // Android 뒤로가기 버튼으로 웹뷰 내 뒤로가기
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') return;
+
+    const onBackPress = () => {
+      if (webViewRef.current) {
+        webViewRef.current.goBack();
+        return true;
+      }
+      return false;
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, []);
 
   return (
-    <JotaiProvider>
-      <SafeAreaView style={styles.container}>
-        <StatusBar style="dark" />
-
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Picture Drucker</Text>
-        </View>
-
-        {/* Canvas */}
-        <View style={styles.canvasArea}>
-          <ImageCanvas ref={canvasRef} />
-        </View>
-
-        {/* Thumbnail strip */}
-        <ThumbnailStrip />
-
-        {/* Action buttons */}
-        <View style={styles.actions}>
-          <ImagePicker />
-          <SaveButton canvasRef={canvasRef} />
-        </View>
-
-        {/* Navigation panels */}
-        <NavigationBar />
-      </SafeAreaView>
-    </JotaiProvider>
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
+      <WebView
+        ref={webViewRef}
+        source={{ uri: WEB_URL }}
+        style={styles.webview}
+        allowsInlineMediaPlayback
+        allowFileAccess
+        javaScriptEnabled
+        domStorageEnabled
+        startInLoadingState
+        scalesPageToFit={false}
+        allowsBackForwardNavigationGestures
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  canvasArea: {
+  webview: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
   },
 });
