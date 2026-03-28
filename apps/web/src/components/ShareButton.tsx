@@ -24,7 +24,8 @@ export const ShareButton = () => {
   const settings = useAtomValue(imageSettingsAtom);
   const { aspectRatio } = useAspectRatio();
 
-  const canShare = uploadedImages.length === 1 && typeof navigator !== 'undefined' && !!navigator.share;
+  const isWebView = typeof window !== 'undefined' && !!(window as any).ReactNativeWebView;
+  const canShare = uploadedImages.length === 1 && (isWebView || (typeof navigator !== 'undefined' && !!navigator.share));
 
   const handleShare = useCallback(async () => {
     if (uploadedImages.length !== 1) return;
@@ -61,6 +62,13 @@ export const ShareButton = () => {
       frameType: settings.frameType,
       polaroidDate: settings.polaroidDate,
     });
+
+    const webView = (window as any).ReactNativeWebView;
+    if (webView) {
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
+      webView.postMessage(JSON.stringify({ type: 'share', data: dataUrl }));
+      return;
+    }
 
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((b) => {

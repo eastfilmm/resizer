@@ -83,6 +83,20 @@ export const DownloadButton = () => {
   const handleDownload = useCallback(async () => {
     if (uploadedImages.length === 0) return;
 
+    const webView = (window as any).ReactNativeWebView;
+
+    if (webView) {
+      // WebView: send base64 data to native app for saving
+      const dataUrls: string[] = [];
+      for (const [index, uploadedImage] of uploadedImages.entries()) {
+        const result = await renderImage(uploadedImage, index);
+        if (!result) continue;
+        dataUrls.push(result.canvas.toDataURL('image/png', 1.0));
+      }
+      webView.postMessage(JSON.stringify({ type: 'download', data: dataUrls }));
+      return;
+    }
+
     if (uploadedImages.length === 1) {
       const result = await renderImage(uploadedImages[0], 0);
       if (!result) return;
