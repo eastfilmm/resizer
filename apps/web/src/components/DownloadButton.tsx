@@ -114,7 +114,7 @@ export const DownloadButton = () => {
   }, [uploadedImages, renderImage]);
 
   return (
-    <IconButton $variant="blue" disabled={uploadedImages.length === 0} onClick={handleDownload} style={{ opacity: 0.7 }}>
+    <IconButton $variant="blue" disabled={uploadedImages.length === 0} onClick={handleDownload} style={{ opacity: 0.5 }}>
       <ButtonIcon src="/download.svg" alt="Download" />
     </IconButton>
   );

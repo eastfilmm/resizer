@@ -87,7 +87,7 @@ export const ShareButton = () => {
       $variant="blue"
       onClick={handleShare}
       style={{
-        opacity: 0.7,
+        opacity: 0.5,
         background: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
       }}
     >
