@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import styled from 'styled-components';
-import { Container, Main, Title, SubTitle } from '@/components/styled/Layout';
+import { Container, Main } from '@/components/styled/Layout';
 import ImageCanvas from '@/components/ImageCanvas';
 import ActionButtons from '@/components/ActionButtons';
 import { ThumbnailStrip } from '@/components/ThumbnailStrip';
@@ -19,10 +19,6 @@ export default function ClientPage() {
   return (
     <Container>
       <Main>
-        <HeaderWrapper>
-        <Title>Picture Drucker</Title>
-        <SubTitle>for Instagram</SubTitle>
-        </HeaderWrapper>
         {/* 이미지 캔버스 */}
         <CanvasWrapper>
           <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} />
@@ -52,12 +48,4 @@ const CanvasWrapper = styled.div`
 const NavSpacer = styled.div`
   height: ${NAV_HEIGHT}px;
   flex-shrink: 0;
-`;
-
-const HeaderWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
 `;

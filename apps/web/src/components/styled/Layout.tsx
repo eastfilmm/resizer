@@ -8,7 +8,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
-  
+
   @media (min-width: 768px) {
     max-width: 428px;
     margin: 0 auto;
@@ -20,7 +20,7 @@ export const Main = styled.main`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px;
+  padding: 16px 12px 12px 12px;
   gap: 12px;
   overflow: hidden;
   min-height: 0;
@@ -30,9 +30,9 @@ export const Title = styled.h1`
   font-size: 1.25rem;
   font-weight: bold;
   color: #333;
-  
+
   @media (max-width: 480px) {
-    font-size: 1.0rem;
+    font-size: 1rem;
   }
 `;
 
