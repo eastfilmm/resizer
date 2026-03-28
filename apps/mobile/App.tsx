@@ -1,5 +1,15 @@
-import React, { useRef, useCallback } from 'react';
-import { StyleSheet, SafeAreaView, BackHandler, Platform, Alert } from 'react-native';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  SafeAreaView,
+  BackHandler,
+  Platform,
+  Alert,
+  View,
+  Text,
+  Animated,
+  TouchableOpacity,
+} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { File, Paths } from 'expo-file-system';
@@ -8,11 +18,130 @@ import * as Sharing from 'expo-sharing';
 
 const WEB_URL = 'https://picturedrucker.com';
 
+type ModalInfo = {
+  title: string;
+  message: string;
+  type: 'success' | 'error';
+};
+
+function CustomModal({ info, onClose }: { info: ModalInfo; onClose: () => void }) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(0.9)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
+      Animated.spring(scale, { toValue: 1, friction: 8, tension: 100, useNativeDriver: true }),
+    ]).start();
+  }, [opacity, scale]);
+
+  const handleClose = () => {
+    Animated.parallel([
+      Animated.timing(opacity, { toValue: 0, duration: 150, useNativeDriver: true }),
+      Animated.timing(scale, { toValue: 0.9, duration: 150, useNativeDriver: true }),
+    ]).start(() => onClose());
+  };
+
+  return (
+    <Animated.View style={[modalStyles.overlay, { opacity }]}>
+      <Animated.View style={[modalStyles.card, { transform: [{ scale }] }]}>
+        <View style={modalStyles.iconCircle}>
+          <Text style={modalStyles.iconText}>
+            {info.type === 'success' ? '✓' : '!'}
+          </Text>
+        </View>
+        <Text style={modalStyles.title}>{info.title}</Text>
+        <Text style={modalStyles.message}>{info.message}</Text>
+        <TouchableOpacity
+          style={[
+            modalStyles.button,
+            info.type === 'success' ? modalStyles.buttonSuccess : modalStyles.buttonError,
+          ]}
+          onPress={handleClose}
+          activeOpacity={0.8}
+        >
+          <Text style={modalStyles.buttonText}>확인</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    </Animated.View>
+  );
+}
+
+const modalStyles = StyleSheet.create({
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    paddingTop: 32,
+    paddingBottom: 24,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+    width: 280,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  iconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#007bff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  iconText: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  title: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 8,
+  },
+  message: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+  },
+  button: {
+    width: '100%',
+    height: 44,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonSuccess: {
+    backgroundColor: '#007bff',
+  },
+  buttonError: {
+    backgroundColor: '#dc3545',
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+});
+
 export default function App() {
   const webViewRef = useRef<WebView>(null);
+  const [modal, setModal] = useState<ModalInfo | null>(null);
 
   // Android 뒤로가기 버튼으로 웹뷰 내 뒤로가기
-  React.useEffect(() => {
+  useEffect(() => {
     if (Platform.OS !== 'android') return;
 
     const onBackPress = () => {
@@ -41,7 +170,11 @@ export default function App() {
       if (message.type === 'download') {
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('권한 필요', '사진을 저장하려면 사진 라이브러리 접근 권한이 필요합니다.');
+          setModal({
+            title: '권한 필요',
+            message: '사진을 저장하려면 사진 라이브러리\n접근 권한이 필요합니다.',
+            type: 'error',
+          });
           return;
         }
 
@@ -51,7 +184,11 @@ export default function App() {
           await MediaLibrary.saveToLibraryAsync(fileUri);
         }
 
-        Alert.alert('저장 완료', `${dataUrls.length}장의 사진이 앨범에 저장되었습니다.`);
+        setModal({
+          title: '저장 완료',
+          message: `${dataUrls.length}장의 사진이 앨범에 저장되었습니다.`,
+          type: 'success',
+        });
       }
 
       if (message.type === 'share') {
@@ -63,7 +200,11 @@ export default function App() {
             UTI: 'public.png',
           });
         } else {
-          Alert.alert('공유 불가', '이 기기에서는 공유 기능을 사용할 수 없습니다.');
+          setModal({
+            title: '공유 불가',
+            message: '이 기기에서는 공유 기능을\n사용할 수 없습니다.',
+            type: 'error',
+          });
         }
       }
     } catch {
@@ -87,6 +228,7 @@ export default function App() {
         allowsBackForwardNavigationGestures
         onMessage={handleMessage}
       />
+      {modal && <CustomModal info={modal} onClose={() => setModal(null)} />}
     </SafeAreaView>
   );
 }
