@@ -12,10 +12,9 @@ import { resetCanvas } from '@/utils/canvas';
 
 interface UseResetStateProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
-export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) => {
+export const useResetState = ({ canvasRef }: UseResetStateProps) => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);
   const setUploadedImages = useSetAtom(uploadedImagesAtom);
   const setSelectedImageId = useSetAtom(selectedImageIdAtom);
@@ -26,10 +25,6 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     setUploadedImages([]);
     setSelectedImageId(null);
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-
     setImageSettings(DEFAULT_IMAGE_SETTINGS);
 
     if (canvasRef.current) {
@@ -37,7 +32,6 @@ export const useResetState = ({ canvasRef, fileInputRef }: UseResetStateProps) =
     }
   }, [
     canvasRef,
-    fileInputRef,
     setImageSettings,
     setSelectedImageId,
     setUploadedImages,

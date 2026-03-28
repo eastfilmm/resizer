@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import styled from 'styled-components';
 import { Container, Main } from '@/components/styled/Layout';
 import ImageCanvas from '@/components/ImageCanvas';
+import { ResetButton } from '@/components/ResetButton';
 import { DownloadButton } from '@/components/DownloadButton';
 import { ShareButton } from '@/components/ShareButton';
 import { ThumbnailStrip } from '@/components/ThumbnailStrip';
@@ -22,8 +23,9 @@ export default function ClientPage() {
         <CanvasWrapper>
           <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} />
           <FloatingButtons>
-            <ShareButton />
+            <ResetButton canvasRef={canvasRef} />
             <DownloadButton />
+            <ShareButton />
           </FloatingButtons>
         </CanvasWrapper>
         <ThumbnailStrip isSafari={isSafari} />

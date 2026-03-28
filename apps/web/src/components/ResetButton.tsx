@@ -8,18 +8,18 @@ import { IconButton, ButtonIcon } from '@/components/styled/Button';
 
 interface ResetButtonProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  fileInputRef: RefObject<HTMLInputElement | null>;
 }
 
-export const ResetButton = ({ canvasRef, fileInputRef }: ResetButtonProps) => {
+export const ResetButton = ({ canvasRef }: ResetButtonProps) => {
   const canReset = useAtomValue(canResetAtom);
-  const resetState = useResetState({ canvasRef, fileInputRef });
+  const resetState = useResetState({ canvasRef });
 
   return (
     <IconButton
       $variant={canReset ? 'danger' : 'secondary'}
       disabled={!canReset}
       onClick={resetState}
+      style={{ opacity: 0.9 }}
     >
       <ButtonIcon src="/refresh_icon.svg" alt="Reset" />
     </IconButton>
