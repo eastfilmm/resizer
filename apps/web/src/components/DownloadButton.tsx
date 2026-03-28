@@ -44,62 +44,77 @@ export const DownloadButton = () => {
   const settings = useAtomValue(imageSettingsAtom);
   const { aspectRatio } = useAspectRatio();
 
+  const renderImage = useCallback(async (uploadedImage: typeof uploadedImages[0], index: number) => {
+    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
+    const img = await loadImage(uploadedImage.objectUrl);
+    const fullResCanvas = document.createElement('canvas');
+    fullResCanvas.width = canvasWidth;
+    fullResCanvas.height = canvasHeight;
+
+    const ctx = fullResCanvas.getContext('2d');
+    if (!ctx) return null;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const imageAreaWidth = canvasWidth - settings.padding * 2;
+    const imageAreaHeight = canvasHeight - settings.padding * 2;
+
+    drawImageWithEffects(ctx, img, {
+      actualCanvasWidth: canvasWidth,
+      actualCanvasHeight: canvasHeight,
+      imageAreaWidth,
+      imageAreaHeight,
+      padding: settings.padding,
+      bgColor: settings.backgroundColor,
+      useGlassBlur: settings.glassBlurEnabled,
+      blurIntensity: settings.blurIntensity,
+      overlayOpacity: settings.overlayOpacity,
+      useShadow: settings.shadowEnabled,
+      shadowIntensity: settings.shadowIntensity,
+      shadowOffset: settings.shadowOffset,
+      frameType: settings.frameType,
+      polaroidDate: settings.polaroidDate,
+    });
+
+    return { canvas: fullResCanvas, fileName: getPngFileName(uploadedImage.fileName, index) };
+  }, [aspectRatio, settings]);
+
   const handleDownload = useCallback(async () => {
     if (uploadedImages.length === 0) return;
 
-    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
+    if (uploadedImages.length === 1) {
+      const result = await renderImage(uploadedImages[0], 0);
+      if (!result) return;
+
+      const blob = await canvasToBlob(result.canvas);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = result.fileName;
+      link.href = url;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      return;
+    }
+
     const zip = new JSZip();
-
     for (const [index, uploadedImage] of uploadedImages.entries()) {
-      const img = await loadImage(uploadedImage.objectUrl);
-      const fullResCanvas = document.createElement('canvas');
-      fullResCanvas.width = canvasWidth;
-      fullResCanvas.height = canvasHeight;
-
-      const ctx = fullResCanvas.getContext('2d');
-      if (!ctx) continue;
-
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-
-      const imageAreaWidth = canvasWidth - settings.padding * 2;
-      const imageAreaHeight = canvasHeight - settings.padding * 2;
-
-      drawImageWithEffects(ctx, img, {
-        actualCanvasWidth: canvasWidth,
-        actualCanvasHeight: canvasHeight,
-        imageAreaWidth,
-        imageAreaHeight,
-        padding: settings.padding,
-        bgColor: settings.backgroundColor,
-        useGlassBlur: settings.glassBlurEnabled,
-        blurIntensity: settings.blurIntensity,
-        overlayOpacity: settings.overlayOpacity,
-        useShadow: settings.shadowEnabled,
-        shadowIntensity: settings.shadowIntensity,
-        shadowOffset: settings.shadowOffset,
-        frameType: settings.frameType,
-        polaroidDate: settings.polaroidDate,
-      });
-
-      zip.file(getPngFileName(uploadedImage.fileName, index), await canvasToBlob(fullResCanvas));
+      const result = await renderImage(uploadedImage, index);
+      if (!result) continue;
+      zip.file(result.fileName, await canvasToBlob(result.canvas));
     }
 
     const zipBlob = await zip.generateAsync({ type: 'blob' });
-    const dataUrl = URL.createObjectURL(zipBlob);
+    const url = URL.createObjectURL(zipBlob);
     const link = document.createElement('a');
     link.download = `resized-images-${Date.now()}.zip`;
-    link.href = dataUrl;
+    link.href = url;
     link.click();
-    window.setTimeout(() => URL.revokeObjectURL(dataUrl), 1000);
-  }, [
-    uploadedImages,
-    settings,
-    aspectRatio,
-  ]);
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, [uploadedImages, renderImage]);
 
   return (
-    <IconButton $variant="primary" disabled={uploadedImages.length === 0} onClick={handleDownload}>
+    <IconButton $variant="blue" disabled={uploadedImages.length === 0} onClick={handleDownload} style={{ opacity: 0.7 }}>
       <ButtonIcon src="/download.svg" alt="Download" />
     </IconButton>
   );

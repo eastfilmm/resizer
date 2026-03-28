@@ -57,6 +57,29 @@ export const ThumbnailButton = styled.button<{ $isSelected: boolean }>`
   }
 `;
 
+export const AddButton = styled.button`
+  border: 1px dashed #d8dde3;
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  width: ${THUMBNAIL_SLOT_SIZE}px;
+  height: ${THUMBNAIL_SLOT_SIZE}px;
+  flex: 0 0 ${THUMBNAIL_SLOT_SIZE}px;
+  font-size: 24px;
+  color: #999;
+
+  &:hover {
+    border-color: #007bff;
+    color: #007bff;
+    background: #eef6ff;
+  }
+`;
+
 export const ThumbnailCanvas = styled.canvas`
   display: block;
   background: #ffffff;

@@ -8,7 +8,7 @@ import {
   getCanvasDimensions,
   getThumbnailCanvasSize,
 } from '@/utils/canvas';
-import { THUMBNAIL_HEIGHT, THUMBNAIL_RENDER_SCALE } from './constants';
+import { THUMBNAIL_INNER_SIZE, THUMBNAIL_RENDER_SCALE } from './constants';
 
 interface UseThumbnailRenderOptions {
   objectUrl: string;
@@ -27,6 +27,7 @@ export const useThumbnailRender = ({
   const settingsRef = useRef(store.get(imageSettingsAtom));
   const rafIdRef = useRef<number | null>(null);
   const pendingRenderRef = useRef(false);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const renderThumbnail = useCallback(() => {
     if (!canvasRef.current || !imageRef.current) return;
@@ -37,7 +38,7 @@ export const useThumbnailRender = ({
 
     const size = getThumbnailCanvasSize(
       aspectRatio,
-      THUMBNAIL_HEIGHT,
+      THUMBNAIL_INNER_SIZE,
       THUMBNAIL_RENDER_SCALE,
     );
     const fullResCanvas = getCanvasDimensions(aspectRatio, false);
@@ -87,10 +88,9 @@ export const useThumbnailRender = ({
   }, [objectUrl, renderThumbnail]);
 
   useEffect(() => {
-    const performRender = () => renderThumbnail();
-    const unsubscribe = store.sub(imageSettingsAtom, () => {
-      settingsRef.current = store.get(imageSettingsAtom);
+    const DEBOUNCE_MS = 300;
 
+    const performRender = () => {
       if (isSafari) {
         pendingRenderRef.current = true;
 
@@ -99,7 +99,7 @@ export const useThumbnailRender = ({
             rafIdRef.current = null;
             if (pendingRenderRef.current) {
               pendingRenderRef.current = false;
-              performRender();
+              renderThumbnail();
             }
           });
         }
@@ -107,11 +107,28 @@ export const useThumbnailRender = ({
         return;
       }
 
-      performRender();
+      renderThumbnail();
+    };
+
+    const unsubscribe = store.sub(imageSettingsAtom, () => {
+      settingsRef.current = store.get(imageSettingsAtom);
+
+      if (debounceTimerRef.current !== null) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      debounceTimerRef.current = setTimeout(() => {
+        debounceTimerRef.current = null;
+        performRender();
+      }, DEBOUNCE_MS);
     });
 
     return () => {
       unsubscribe();
+      if (debounceTimerRef.current !== null) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
       if (rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current);
         rafIdRef.current = null;
