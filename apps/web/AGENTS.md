@@ -71,8 +71,10 @@ pnpm build     # Build with Turbopack
 ```
 
 ### Documentation & Resources
+- **Claude Code Guide**: `@CLAUDE.md` (루트)
 - **Project Structure**: `@docs/project-structure.md`
 - **Sub-Agent Workflows**: `@docs/workflow.md`
+- **Native Bridge**: `@docs/native-bridge.md`
 - **Feature Specs**: `@docs/canvas-padding.md`, `@docs/glass-blur.md`, `@docs/shadow.md`, `@docs/frame.md`
 - **Commit Automation**: `@docs/commit-automation.md`
 
