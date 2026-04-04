@@ -2,7 +2,6 @@
 
 import { useCallback } from 'react';
 import { useAtomValue } from 'jotai';
-import JSZip from 'jszip';
 import { uploadedImagesAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
@@ -111,6 +110,7 @@ export const DownloadButton = () => {
       return;
     }
 
+    const { default: JSZip } = await import('jszip');
     const zip = new JSZip();
     for (const [index, uploadedImage] of uploadedImages.entries()) {
       const result = await renderImage(uploadedImage, index);

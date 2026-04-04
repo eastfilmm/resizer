@@ -7,6 +7,10 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  @media (min-width: 768px) {
+    max-width: 600px;
+  }
 `;
 
 export const MetaRow = styled.div`

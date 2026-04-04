@@ -12,6 +12,9 @@ import {
   CANVAS_PREVIEW_SIZE_9_16_WIDTH,
   CANVAS_PREVIEW_SIZE_9_16_HEIGHT,
   CANVAS_DISPLAY_SIZE,
+  CANVAS_DISPLAY_SIZE_DESKTOP,
+  CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
+  CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
 } from '@/constants/CanvasContents';
 
 describe('getCanvasDimensions', () => {
@@ -131,6 +134,41 @@ describe('getCanvasDisplaySize', () => {
     const size916 = getCanvasDisplaySize('9:16');
     expect(size1.width).toBeGreaterThan(size45.width);
     expect(size45.width).toBeGreaterThan(size916.width);
+  });
+
+  describe('desktop (isDesktop=true)', () => {
+    it('returns 600x600 for 1:1', () => {
+      const result = getCanvasDisplaySize('1:1', true);
+      expect(result).toEqual({ width: CANVAS_DISPLAY_SIZE_DESKTOP, height: CANVAS_DISPLAY_SIZE_DESKTOP });
+    });
+
+    it('returns 480x600 for 4:5', () => {
+      const result = getCanvasDisplaySize('4:5', true);
+      expect(result).toEqual({ width: CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP, height: CANVAS_DISPLAY_SIZE_DESKTOP });
+    });
+
+    it('returns 338x600 for 9:16', () => {
+      const result = getCanvasDisplaySize('9:16', true);
+      expect(result).toEqual({ width: CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP, height: CANVAS_DISPLAY_SIZE_DESKTOP });
+    });
+
+    it('all desktop display sizes have the same height (600px)', () => {
+      const ratios: ('1:1' | '4:5' | '9:16')[] = ['1:1', '4:5', '9:16'];
+      for (const ratio of ratios) {
+        const result = getCanvasDisplaySize(ratio, true);
+        expect(result.height).toBe(CANVAS_DISPLAY_SIZE_DESKTOP);
+      }
+    });
+
+    it('desktop sizes are larger than mobile sizes', () => {
+      const ratios: ('1:1' | '4:5' | '9:16')[] = ['1:1', '4:5', '9:16'];
+      for (const ratio of ratios) {
+        const mobile = getCanvasDisplaySize(ratio, false);
+        const desktop = getCanvasDisplaySize(ratio, true);
+        expect(desktop.width).toBeGreaterThan(mobile.width);
+        expect(desktop.height).toBeGreaterThan(mobile.height);
+      }
+    });
   });
 });
 

@@ -3,6 +3,9 @@ import {
   CANVAS_DISPLAY_SIZE,
   CANVAS_DISPLAY_SIZE_4_5_WIDTH,
   CANVAS_DISPLAY_SIZE_9_16_WIDTH,
+  CANVAS_DISPLAY_SIZE_DESKTOP,
+  CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
+  CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
   CANVAS_PREVIEW_SIZE,
   CANVAS_ACTUAL_SIZE_4_5_WIDTH,
   CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
@@ -34,8 +37,18 @@ export function getCanvasDimensions(
 }
 
 export function getCanvasDisplaySize(
-  aspectRatio: AspectRatio
+  aspectRatio: AspectRatio,
+  isDesktop: boolean = false
 ): { width: number; height: number } {
+  if (isDesktop) {
+    if (aspectRatio === '4:5') {
+      return { width: CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP, height: CANVAS_DISPLAY_SIZE_DESKTOP };
+    }
+    if (aspectRatio === '9:16') {
+      return { width: CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP, height: CANVAS_DISPLAY_SIZE_DESKTOP };
+    }
+    return { width: CANVAS_DISPLAY_SIZE_DESKTOP, height: CANVAS_DISPLAY_SIZE_DESKTOP };
+  }
   if (aspectRatio === '4:5') {
     return { width: CANVAS_DISPLAY_SIZE_4_5_WIDTH, height: CANVAS_DISPLAY_SIZE };
   }

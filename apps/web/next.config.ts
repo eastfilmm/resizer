@@ -1,12 +1,14 @@
 import type { NextConfig } from "next";
+import { fileURLToPath } from "node:url";
+
+const workspaceRoot = fileURLToPath(new URL("../../", import.meta.url));
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: workspaceRoot,
+  },
   compiler: {
     styledComponents: true,
-  },
-  experimental: {
-    // @ts-expect-error - Next.js 15+ feature, type might be missing in some versions
-    allowedDevOrigins: ['localhost'],
   },
 };
 

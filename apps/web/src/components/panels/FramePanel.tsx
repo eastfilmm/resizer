@@ -107,31 +107,40 @@ export const FramePanel = memo(() => {
         </FrameOptions>
       </TitleAndInputWrapper>
 
-      {/* Date Input Section */}
-      <TitleAndInputWrapper>
-        <PanelLabelWrapper $textAlign="left">
-          <PanelLabel>Date</PanelLabel>
-        </PanelLabelWrapper>
-        <DateInputWrapper>
-          <DateInput
-            type="text"
-            value={polaroidDate}
-            onChange={handleDateChange}
-            placeholder="e.g. 2024.01.01"
-            disabled={frameType !== 'polaroid'}
-          />
-          {polaroidDate && frameType === 'polaroid' && (
-            <ClearButton onClick={handleDateClear} type="button">
-              ×
-            </ClearButton>
-          )}
-        </DateInputWrapper>
-      </TitleAndInputWrapper>
+      {/* Date Input Section - visible only when polaroid is selected */}
+      <DateSection $isOpen={frameType === 'polaroid'}>
+        <TitleAndInputWrapper>
+          <PanelLabelWrapper $textAlign="left">
+            <PanelLabel>Date</PanelLabel>
+          </PanelLabelWrapper>
+          <DateInputWrapper>
+            <DateInput
+              type="text"
+              value={polaroidDate}
+              onChange={handleDateChange}
+              placeholder="e.g. 2024.01.01"
+            />
+            {polaroidDate && (
+              <ClearButton onClick={handleDateClear} type="button">
+                ×
+              </ClearButton>
+            )}
+          </DateInputWrapper>
+        </TitleAndInputWrapper>
+      </DateSection>
     </PanelContainer>
   );
 });
 
 FramePanel.displayName = 'FramePanel';
+
+const DateSection = styled.div<{ $isOpen: boolean }>`
+  width: 100%;
+  overflow: hidden;
+  height: ${props => props.$isOpen ? '66px' : '0'};
+  opacity: ${props => props.$isOpen ? 1 : 0};
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+`;
 
 const FrameOptions = styled.div`
   display: flex;

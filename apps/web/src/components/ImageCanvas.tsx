@@ -7,15 +7,22 @@ import { imageUrlAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import type { AspectRatio } from '@/atoms/imageAtoms';
 import { drawImageWithEffects, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/canvas';
 import type { ImagePosition } from '@/utils/canvas';
-import { CANVAS_DISPLAY_SIZE, CANVAS_PREVIEW_SIZE } from '@/constants/CanvasContents';
+import {
+  CANVAS_DISPLAY_SIZE,
+  CANVAS_DISPLAY_SIZE_DESKTOP,
+  CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
+  CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
+  CANVAS_PREVIEW_SIZE,
+} from '@/constants/CanvasContents';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   isSafari?: boolean;
+  isDesktop?: boolean;
 }
 
-export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvasProps) {
+export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = false }: ImageCanvasProps) {
   const store = useStore();
   const imageUrl = useAtomValue(imageUrlAtom);
   const { aspectRatio } = useAspectRatio();
@@ -82,7 +89,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatioRef.current, isSafari);
-    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatioRef.current);
+    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatioRef.current, isDesktop);
 
     // Set canvas actual size
     canvas.width = canvasWidth;
@@ -109,7 +116,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
       redrawImage(ctx, newImg);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, redrawImage, isSafari]);
+  }, [imageUrl, canvasRef, redrawImage, isSafari, isDesktop]);
 
   // Initialize canvas on mount (skip when image is already loaded to avoid double-clear flicker)
   useEffect(() => {
@@ -199,7 +206,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
         const ctx = canvas.getContext('2d');
         if (ctx) {
           const { width, height } = getCanvasDimensions(aspectRatio, isSafari);
-          const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatio);
+          const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatio, isDesktop);
           canvas.width = width;
           canvas.height = height;
           canvas.style.width = `${displayWidth}px`;
@@ -209,7 +216,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false }: ImageCanvas
         }
       }
     }
-  }, [imageUrl, aspectRatio, drawImageOnCanvas, isSafari]);
+  }, [imageUrl, aspectRatio, drawImageOnCanvas, isSafari, isDesktop]);
 
   // Initialize container background color on mount
   useEffect(() => {
@@ -234,7 +241,7 @@ const CanvasContainer = styled.div<{
   width: ${props => props.$aspectRatio === '4:5'
     ? '256px'
     : props.$aspectRatio === '9:16'
-      ? '180px' // 320 * 9/16 for display (rounded)
+      ? '180px'
       : `${CANVAS_DISPLAY_SIZE}px`};
   height: ${CANVAS_DISPLAY_SIZE}px;
   background-color: white; /* Initial value, updated imperatively via ref */
@@ -244,8 +251,17 @@ const CanvasContainer = styled.div<{
   justify-content: center;
   position: relative;
   overflow: hidden;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   ${props => props.$aspectRatio === '1:1' ? 'will-change: transform;' : ''}
+
+  @media (min-width: 768px) {
+    width: ${props => props.$aspectRatio === '4:5'
+      ? `${CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP}px`
+      : props.$aspectRatio === '9:16'
+        ? `${CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP}px`
+        : `${CANVAS_DISPLAY_SIZE_DESKTOP}px`};
+    height: ${CANVAS_DISPLAY_SIZE_DESKTOP}px;
+  }
 `;
 
 const Canvas = styled.canvas`

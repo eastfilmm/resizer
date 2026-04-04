@@ -3,6 +3,11 @@ export const CANVAS_ACTUAL_SIZE = 2000;
 export const CANVAS_DISPLAY_SIZE = 320;
 export const CANVAS_PREVIEW_SIZE = 800;
 
+// Desktop display sizes (1.875x scale for screens >= 768px)
+export const CANVAS_DISPLAY_SIZE_DESKTOP = 600;
+export const CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP = 480;
+export const CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP = 338;
+
 // 4:5 Aspect ratio dimensions (vertical fixed, 2000px height)
 export const CANVAS_ACTUAL_SIZE_4_5_WIDTH = 1600;
 export const CANVAS_ACTUAL_SIZE_4_5_HEIGHT = 2000;

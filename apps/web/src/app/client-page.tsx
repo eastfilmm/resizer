@@ -1,6 +1,8 @@
 'use client';
 
 import { useRef } from 'react';
+import { useAtomValue } from 'jotai';
+import { imageUrlAtom } from '@/atoms/imageAtoms';
 import styled from 'styled-components';
 import { Container, Main } from '@/components/styled/Layout';
 import ImageCanvas from '@/components/ImageCanvas';
@@ -10,23 +12,29 @@ import { ShareButton } from '@/components/ShareButton';
 import { ThumbnailStrip } from '@/components/ThumbnailStrip';
 import { NavigationBar } from '@/components/NavigationBar';
 import { useIsSafari } from '@/hooks/useIsSafari';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 
 const NAV_HEIGHT = 200;
 
 export default function ClientPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isSafari = useIsSafari();
+  const isDesktop = useIsDesktop();
+  const imageUrl = useAtomValue(imageUrlAtom);
+  const hasImages = imageUrl !== null;
 
   return (
     <Container>
       <Main>
         <CanvasWrapper>
-          <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} />
-          <FloatingButtons>
-            <ResetButton canvasRef={canvasRef} />
-            <DownloadButton />
-            <ShareButton />
-          </FloatingButtons>
+          <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} isDesktop={isDesktop} />
+          {hasImages && (
+            <FloatingButtons>
+              <ResetButton canvasRef={canvasRef} />
+              <DownloadButton />
+              <ShareButton />
+            </FloatingButtons>
+          )}
         </CanvasWrapper>
         <ThumbnailStrip isSafari={isSafari} />
 

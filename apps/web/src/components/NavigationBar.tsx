@@ -1,6 +1,7 @@
 'use client';
 
 import { memo, useCallback, useMemo, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { useAtom, useAtomValue } from 'jotai';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { usePanelTransition } from '@/hooks/usePanelTransition';
@@ -14,11 +15,6 @@ import {
   frameTypeAtom,
   paddingAtom,
 } from '@/atoms/imageAtoms';
-import { LayoutPanel } from './panels/LayoutPanel';
-import { FramePanel } from './panels/FramePanel';
-import { BackgroundPanel } from './panels/BackgroundPanel';
-import { GlassBlurPanel } from './panels/GlassBlurPanel';
-import { ShadowPanel } from './panels/ShadowPanel';
 import {
   Container,
   PanelContainer,
@@ -30,6 +26,29 @@ import {
   ButtonLabel,
   NavIcon,
 } from './NavigationBar.styles';
+
+const panelLoading = () => null;
+
+const LayoutPanel = dynamic(
+  () => import('./panels/LayoutPanel').then((mod) => mod.LayoutPanel),
+  { loading: panelLoading },
+);
+const FramePanel = dynamic(
+  () => import('./panels/FramePanel').then((mod) => mod.FramePanel),
+  { loading: panelLoading },
+);
+const BackgroundPanel = dynamic(
+  () => import('./panels/BackgroundPanel').then((mod) => mod.BackgroundPanel),
+  { loading: panelLoading },
+);
+const GlassBlurPanel = dynamic(
+  () => import('./panels/GlassBlurPanel').then((mod) => mod.GlassBlurPanel),
+  { loading: panelLoading },
+);
+const ShadowPanel = dynamic(
+  () => import('./panels/ShadowPanel').then((mod) => mod.ShadowPanel),
+  { loading: panelLoading },
+);
 
 function isPanelAllowedInFrameMode(panelId: string, frameType: string): boolean {
   if (frameType === 'none') return true;
@@ -179,7 +198,10 @@ export const NavigationBar = () => {
     return NAV_ITEMS.findIndex((item) => item.id === activePanel);
   }, [activePanel]);
 
-  const panelHeight = activePanel ? PANEL_HEIGHTS[activePanel] : 0;
+  const framePanelHeight = frameType === 'polaroid' ? 180 : 112;
+  const panelHeight = activePanel
+    ? (activePanel === 'frame' ? framePanelHeight : PANEL_HEIGHTS[activePanel])
+    : 0;
 
   return (
     <Container ref={containerRef}>
