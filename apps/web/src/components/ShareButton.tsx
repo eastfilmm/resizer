@@ -25,20 +25,18 @@ export const ShareButton = () => {
   const { aspectRatio } = useAspectRatio();
 
   const isWebView = typeof window !== 'undefined' && !!(window as any).ReactNativeWebView;
-  const canShare = uploadedImages.length === 1 && (isWebView || (typeof navigator !== 'undefined' && !!navigator.share));
+  const canShare = uploadedImages.length >= 1 && (isWebView || (typeof navigator !== 'undefined' && !!navigator.share));
 
-  const handleShare = useCallback(async () => {
-    if (uploadedImages.length !== 1) return;
-
+  const renderImage = async (objectUrl: string): Promise<Blob> => {
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
-    const img = await loadImage(uploadedImages[0].objectUrl);
+    const img = await loadImage(objectUrl);
 
     const canvas = document.createElement('canvas');
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) throw new Error('Failed to get canvas context');
 
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
@@ -63,26 +61,51 @@ export const ShareButton = () => {
       polaroidDate: settings.polaroidDate,
     });
 
-    const webView = (window as any).ReactNativeWebView;
-    if (webView) {
-      const dataUrl = canvas.toDataURL('image/png', 1.0);
-      webView.postMessage(JSON.stringify({ type: 'share', data: dataUrl }));
-      return;
-    }
-
-    const blob = await new Promise<Blob>((resolve, reject) => {
+    return new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((b) => {
         if (!b) reject(new Error('Failed to create blob'));
         else resolve(b);
       }, 'image/png', 1.0);
     });
+  };
 
-    const file = new File([blob], 'photo.png', { type: 'image/png' });
+  const handleShare = useCallback(async () => {
+    if (uploadedImages.length < 1) return;
+
+    const webView = (window as any).ReactNativeWebView;
+    if (webView) {
+      const dataUrl = await (async () => {
+        const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
+        const img = await loadImage(uploadedImages[0].objectUrl);
+        const canvas = document.createElement('canvas');
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return '';
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        const imageAreaWidth = canvasWidth - settings.padding * 2;
+        const imageAreaHeight = canvasHeight - settings.padding * 2;
+        drawImageWithEffects(ctx, img, {
+          actualCanvasWidth: canvasWidth, actualCanvasHeight: canvasHeight,
+          imageAreaWidth, imageAreaHeight, padding: settings.padding,
+          bgColor: settings.backgroundColor, useGlassBlur: settings.glassBlurEnabled,
+          blurIntensity: settings.blurIntensity, overlayOpacity: settings.overlayOpacity,
+          useShadow: settings.shadowEnabled, shadowIntensity: settings.shadowIntensity,
+          shadowOffset: settings.shadowOffset, frameType: settings.frameType,
+          polaroidDate: settings.polaroidDate,
+        });
+        return canvas.toDataURL('image/png', 1.0);
+      })();
+      webView.postMessage(JSON.stringify({ type: 'share', data: dataUrl }));
+      return;
+    }
+
+    const blobs = await Promise.all(uploadedImages.map((img) => renderImage(img.objectUrl)));
+    const files = blobs.map((blob, i) => new File([blob], `photo-${i + 1}.png`, { type: 'image/png' }));
 
     try {
-      await navigator.share({
-        files: [file],
-      });
+      await navigator.share({ files });
     } catch {
       // User cancelled share sheet
     }
