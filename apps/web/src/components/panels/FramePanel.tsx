@@ -2,7 +2,13 @@
 
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
-import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG } from '@/constants/theme';
+import {
+  COLOR_PRIMARY,
+  COLOR_PRIMARY_BG,
+  COLOR_GRAY_TEXT,
+  COLOR_GRAY_BORDER,
+  COLOR_GRAY_BG,
+} from '@/constants/theme';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
   frameTypeAtom,
@@ -33,49 +39,56 @@ export const FramePanel = memo(() => {
   const prevBackgroundColor = useAtomValue(prevBackgroundColorAtom);
   const setPrevBackgroundColor = useSetAtom(prevBackgroundColorAtom);
 
-  const handleFrameToggle = useCallback((type: FrameType) => {
-    if (frameType === type) {
-      // 이미 활성화된 프레임을 다시 누르면 끔
-      setFrameType('none');
-      setPadding(0);
-      
-      // 'thin'이나 'mediumFilm' 기능에서 해제될 때 이전 색상 복원
-      if (type !== 'polaroid' && prevBackgroundColor) {
-        setBackgroundColor(prevBackgroundColor);
-        setPrevBackgroundColor(null);
-      }
-    } else {
-      // 새 프레임 활성화 (상호배제 자동)
-      setFrameType(type);
-      setPadding(FRAME_DEFAULT_PADDING);
+  const handleFrameToggle = useCallback(
+    (type: FrameType) => {
+      if (frameType === type) {
+        // 이미 활성화된 프레임을 다시 누르면 끔
+        setFrameType('none');
+        setPadding(0);
 
-      // Polaroid가 아닌 프레임은 date 초기화 & 배경 white 고정
-      if (type !== 'polaroid') {
-        setPolaroidDate('');
-        
-        // 현재 배경색이 흰색이 아닐 때만 저장
-        if (backgroundColor !== 'white') {
-          setPrevBackgroundColor(backgroundColor);
-        }
-        setBackgroundColor('white');
-      } else {
-        // Polaroid 프레임을 선택할 때는 배경색을 강제하지 않으므로 변경하지 않음 (Thin/Film -> Polaroid 전환 시 복원)
-        if (frameType !== 'none' && frameType !== 'polaroid' && prevBackgroundColor) {
+        // 'thin'이나 'mediumFilm' 기능에서 해제될 때 이전 색상 복원
+        if (type !== 'polaroid' && prevBackgroundColor) {
           setBackgroundColor(prevBackgroundColor);
           setPrevBackgroundColor(null);
         }
+      } else {
+        // 새 프레임 활성화 (상호배제 자동)
+        setFrameType(type);
+        setPadding(FRAME_DEFAULT_PADDING);
+
+        // Polaroid가 아닌 프레임은 date 초기화 & 배경 white 고정
+        if (type !== 'polaroid') {
+          setPolaroidDate('');
+
+          // 현재 배경색이 흰색이 아닐 때만 저장
+          if (backgroundColor !== 'white') {
+            setPrevBackgroundColor(backgroundColor);
+          }
+          setBackgroundColor('white');
+        } else {
+          // Polaroid 프레임을 선택할 때는 배경색을 강제하지 않으므로 변경하지 않음 (Thin/Film -> Polaroid 전환 시 복원)
+          if (
+            frameType !== 'none' &&
+            frameType !== 'polaroid' &&
+            prevBackgroundColor
+          ) {
+            setBackgroundColor(prevBackgroundColor);
+            setPrevBackgroundColor(null);
+          }
+        }
       }
-    }
-  }, [
-    frameType, 
-    setFrameType, 
-    setPadding, 
-    setPolaroidDate, 
-    backgroundColor,
-    setBackgroundColor,
-    prevBackgroundColor,
-    setPrevBackgroundColor
-  ]);
+    },
+    [
+      frameType,
+      setFrameType,
+      setPadding,
+      setPolaroidDate,
+      backgroundColor,
+      setBackgroundColor,
+      prevBackgroundColor,
+      setPrevBackgroundColor,
+    ],
+  );
 
   const handleDateChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,20 +102,29 @@ export const FramePanel = memo(() => {
   }, [setPolaroidDate]);
 
   return (
-    <PanelContainer>
+    <PanelContainer $direction="column" style={{ gap: 0 }}>
       {/* Frame Type Section */}
       <TitleAndInputWrapper>
         <PanelLabelWrapper $textAlign="left">
           <PanelLabel>Frame</PanelLabel>
         </PanelLabelWrapper>
         <FrameOptions>
-          <FrameButton $isActive={frameType === 'polaroid'} onClick={() => handleFrameToggle('polaroid')}>
+          <FrameButton
+            $isActive={frameType === 'polaroid'}
+            onClick={() => handleFrameToggle('polaroid')}
+          >
             Polaroid
           </FrameButton>
-          <FrameButton $isActive={frameType === 'thin'} onClick={() => handleFrameToggle('thin')}>
+          <FrameButton
+            $isActive={frameType === 'thin'}
+            onClick={() => handleFrameToggle('thin')}
+          >
             Thin
           </FrameButton>
-          <FrameButton $isActive={frameType === 'mediumFilm'} onClick={() => handleFrameToggle('mediumFilm')}>
+          <FrameButton
+            $isActive={frameType === 'mediumFilm'}
+            onClick={() => handleFrameToggle('mediumFilm')}
+          >
             Film
           </FrameButton>
         </FrameOptions>
@@ -138,9 +160,15 @@ FramePanel.displayName = 'FramePanel';
 const DateSection = styled.div<{ $isOpen: boolean }>`
   width: 100%;
   overflow: hidden;
-  height: ${props => props.$isOpen ? '66px' : '0'};
-  opacity: ${props => props.$isOpen ? 1 : 0};
-  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+  height: ${(props) => (props.$isOpen ? '84px' : '0')};
+  opacity: ${(props) => (props.$isOpen ? 1 : 0)};
+  transition:
+    height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease;
+
+  > * {
+    padding-top: 16px;
+  }
 `;
 
 const FrameOptions = styled.div`
@@ -158,9 +186,11 @@ const FrameButton = styled.button<{ $isActive: boolean }>`
   justify-content: center;
   gap: 8px;
   padding: 12px 16px;
-  border: 1px solid ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_BORDER)};
+  border: 1px solid
+    ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_BORDER)};
   border-radius: 8px;
-  background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY_BG : 'white')};
+  background-color: ${(props) =>
+    props.$isActive ? COLOR_PRIMARY_BG : 'white'};
   color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_TEXT)};
   font-size: 0.875rem;
   font-weight: 600;
@@ -169,7 +199,8 @@ const FrameButton = styled.button<{ $isActive: boolean }>`
 
   &:hover {
     border-color: ${COLOR_PRIMARY};
-    background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY_BG : COLOR_GRAY_BG)};
+    background-color: ${(props) =>
+      props.$isActive ? COLOR_PRIMARY_BG : COLOR_GRAY_BG};
   }
 
   &:active {

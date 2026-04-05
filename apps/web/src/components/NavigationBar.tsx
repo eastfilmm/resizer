@@ -205,7 +205,7 @@ export const NavigationBar = () => {
     return NAV_ITEMS.findIndex((item) => item.id === activePanel);
   }, [activePanel]);
 
-  const framePanelHeight = frameType === 'polaroid' ? 192 : 112;
+  const framePanelHeight = frameType === 'polaroid' ? 180 : 100;
   const panelHeight = activePanel
     ? activePanel === 'frame'
       ? framePanelHeight
