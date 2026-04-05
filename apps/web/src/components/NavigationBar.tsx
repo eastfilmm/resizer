@@ -50,10 +50,15 @@ const ShadowPanel = dynamic(
   { loading: panelLoading },
 );
 
-function isPanelAllowedInFrameMode(panelId: string, frameType: string): boolean {
+function isPanelAllowedInFrameMode(
+  panelId: string,
+  frameType: string,
+): boolean {
   if (frameType === 'none') return true;
   if (frameType === 'polaroid') {
-    return panelId === 'layout' || panelId === 'frame' || panelId === 'background';
+    return (
+      panelId === 'layout' || panelId === 'frame' || panelId === 'background'
+    );
   }
   return panelId === 'layout' || panelId === 'frame';
 }
@@ -165,7 +170,9 @@ export const NavigationBar = () => {
     () => ({
       layout: aspectRatio !== '1:1' || padding > 0,
       frame: frameType !== 'none',
-      background: backgroundColor !== 'white' && isPanelAllowedInFrameMode('background', frameType),
+      background:
+        backgroundColor !== 'white' &&
+        isPanelAllowedInFrameMode('background', frameType),
       glassblur: glassBlur && isPanelAllowedInFrameMode('glassblur', frameType),
       shadow: shadowEnabled && isPanelAllowedInFrameMode('shadow', frameType),
     }),
@@ -190,7 +197,7 @@ export const NavigationBar = () => {
   useClickOutside(
     containerRef,
     useCallback(() => setActivePanel(null), [setActivePanel]),
-    activePanel !== null
+    activePanel !== null,
   );
 
   const activeIndex = useMemo(() => {
@@ -198,9 +205,11 @@ export const NavigationBar = () => {
     return NAV_ITEMS.findIndex((item) => item.id === activePanel);
   }, [activePanel]);
 
-  const framePanelHeight = frameType === 'polaroid' ? 180 : 112;
+  const framePanelHeight = frameType === 'polaroid' ? 188 : 112;
   const panelHeight = activePanel
-    ? (activePanel === 'frame' ? framePanelHeight : PANEL_HEIGHTS[activePanel])
+    ? activePanel === 'frame'
+      ? framePanelHeight
+      : PANEL_HEIGHTS[activePanel]
     : 0;
 
   return (
