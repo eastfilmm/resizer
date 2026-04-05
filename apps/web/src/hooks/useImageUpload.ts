@@ -8,13 +8,7 @@ import {
   uploadedImagesAtom,
   type UploadedImage,
 } from '@/atoms/imageAtoms';
-
-const createImageId = () => {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-};
+import { createImageId } from '@/utils/imageUtils';
 
 export const useImageUpload = () => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);

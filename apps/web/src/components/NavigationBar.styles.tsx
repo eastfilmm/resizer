@@ -1,6 +1,7 @@
 'use client';
 
 import styled from 'styled-components';
+import { COLOR_PRIMARY, COLOR_GRAY_TEXT } from '@/constants/theme';
 
 export const Container = styled.div`
   position: fixed;
@@ -86,7 +87,7 @@ export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: b
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background-color: ${props => props.$isEnabled ? '#007bff' : 'transparent'};
+    background-color: ${props => props.$isEnabled ? COLOR_PRIMARY : 'transparent'};
     transition: background-color 0.2s ease;
   }
 
@@ -104,7 +105,7 @@ export const ButtonLabel = styled.span<{ $isActive: boolean; $isDimmed: boolean 
   font-weight: 500;
   color: ${props => {
     if (props.$isDimmed) return '#ffffff';
-    return props.$isActive ? '#007bff' : '#666666';
+    return props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_TEXT;
   }};
   white-space: nowrap;
   transition: color 0.3s ease;

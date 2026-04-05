@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { THUMBNAIL_SLOT_SIZE } from './constants';
+import { COLOR_PRIMARY, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER } from '@/constants/theme';
 
 export const Container = styled.div`
   width: 100%;
@@ -40,7 +41,7 @@ export const ThumbnailList = styled.div`
 
 export const ThumbnailButton = styled.button<{ $isSelected: boolean }>`
   border: 1px solid
-    ${({ $isSelected }) => ($isSelected ? '#007bff' : '#d8dde3')};
+    ${({ $isSelected }) => ($isSelected ? COLOR_PRIMARY : '#d8dde3')};
   background: ${({ $isSelected }) => ($isSelected ? '#eef6ff' : '#ffffff')};
   border-radius: 4px;
   padding: 4px;
@@ -57,13 +58,13 @@ export const ThumbnailButton = styled.button<{ $isSelected: boolean }>`
   overflow: hidden;
 
   &:hover {
-    border-color: #007bff;
+    border-color: ${COLOR_PRIMARY};
   }
 `;
 
 export const AddButton = styled.button`
   border: 1px dashed #d8dde3;
-  background: #f8f9fa;
+  background: ${COLOR_GRAY_BG};
   border-radius: 4px;
   padding: 4px;
   display: flex;
@@ -75,11 +76,11 @@ export const AddButton = styled.button`
   height: ${THUMBNAIL_SLOT_SIZE}px;
   flex: 0 0 ${THUMBNAIL_SLOT_SIZE}px;
   font-size: 24px;
-  color: #999;
+  color: ${COLOR_GRAY_PLACEHOLDER};
 
   &:hover {
-    border-color: #007bff;
-    color: #007bff;
+    border-color: ${COLOR_PRIMARY};
+    color: ${COLOR_PRIMARY};
     background: #eef6ff;
   }
 `;

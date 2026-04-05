@@ -2,6 +2,7 @@
 
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
+import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG } from '@/constants/theme';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
   frameTypeAtom,
@@ -157,18 +158,18 @@ const FrameButton = styled.button<{ $isActive: boolean }>`
   justify-content: center;
   gap: 8px;
   padding: 12px 16px;
-  border: 1px solid ${(props) => (props.$isActive ? '#007bff' : '#ddd')};
+  border: 1px solid ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_BORDER)};
   border-radius: 8px;
-  background-color: ${(props) => (props.$isActive ? '#e7f3ff' : 'white')};
-  color: ${(props) => (props.$isActive ? '#007bff' : '#666')};
+  background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY_BG : 'white')};
+  color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_TEXT)};
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #007bff;
-    background-color: ${(props) => (props.$isActive ? '#e7f3ff' : '#f8f9fa')};
+    border-color: ${COLOR_PRIMARY};
+    background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY_BG : COLOR_GRAY_BG)};
   }
 
   &:active {
@@ -196,10 +197,10 @@ const ClearButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ddd;
+  background: ${COLOR_GRAY_BORDER};
   border: none;
   border-radius: 50%;
-  color: #666;
+  color: ${COLOR_GRAY_TEXT};
   font-size: 18px;
   cursor: pointer;
   transition: all 0.2s ease;

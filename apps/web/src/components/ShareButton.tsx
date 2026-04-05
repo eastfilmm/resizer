@@ -5,19 +5,7 @@ import { useAtomValue } from 'jotai';
 import { uploadedImagesAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
-import { drawImageWithEffects, getCanvasDimensions } from '@/utils/canvas';
-
-const loadImage = async (src: string) => {
-  const img = new Image();
-  img.src = src;
-
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
-  });
-
-  return img;
-};
+import { renderImageToBlob, renderImageToCanvas } from '@/utils/renderCanvasImage';
 
 export const ShareButton = () => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);
@@ -27,81 +15,18 @@ export const ShareButton = () => {
   const isWebView = typeof window !== 'undefined' && !!(window as any).ReactNativeWebView;
   const canShare = uploadedImages.length >= 1 && (isWebView || (typeof navigator !== 'undefined' && !!navigator.share));
 
-  const renderImage = async (objectUrl: string): Promise<Blob> => {
-    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
-    const img = await loadImage(objectUrl);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Failed to get canvas context');
-
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-
-    const imageAreaWidth = canvasWidth - settings.padding * 2;
-    const imageAreaHeight = canvasHeight - settings.padding * 2;
-
-    drawImageWithEffects(ctx, img, {
-      actualCanvasWidth: canvasWidth,
-      actualCanvasHeight: canvasHeight,
-      imageAreaWidth,
-      imageAreaHeight,
-      padding: settings.padding,
-      bgColor: settings.backgroundColor,
-      useGlassBlur: settings.glassBlurEnabled,
-      blurIntensity: settings.blurIntensity,
-      overlayOpacity: settings.overlayOpacity,
-      useShadow: settings.shadowEnabled,
-      shadowIntensity: settings.shadowIntensity,
-      shadowOffset: settings.shadowOffset,
-      frameType: settings.frameType,
-      polaroidDate: settings.polaroidDate,
-    });
-
-    return new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((b) => {
-        if (!b) reject(new Error('Failed to create blob'));
-        else resolve(b);
-      }, 'image/png', 1.0);
-    });
-  };
-
   const handleShare = useCallback(async () => {
     if (uploadedImages.length < 1) return;
 
     const webView = (window as any).ReactNativeWebView;
     if (webView) {
-      const dataUrl = await (async () => {
-        const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
-        const img = await loadImage(uploadedImages[0].objectUrl);
-        const canvas = document.createElement('canvas');
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return '';
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
-        const imageAreaWidth = canvasWidth - settings.padding * 2;
-        const imageAreaHeight = canvasHeight - settings.padding * 2;
-        drawImageWithEffects(ctx, img, {
-          actualCanvasWidth: canvasWidth, actualCanvasHeight: canvasHeight,
-          imageAreaWidth, imageAreaHeight, padding: settings.padding,
-          bgColor: settings.backgroundColor, useGlassBlur: settings.glassBlurEnabled,
-          blurIntensity: settings.blurIntensity, overlayOpacity: settings.overlayOpacity,
-          useShadow: settings.shadowEnabled, shadowIntensity: settings.shadowIntensity,
-          shadowOffset: settings.shadowOffset, frameType: settings.frameType,
-          polaroidDate: settings.polaroidDate,
-        });
-        return canvas.toDataURL('image/png', 1.0);
-      })();
+      const canvas = await renderImageToCanvas(uploadedImages[0].objectUrl, settings, aspectRatio);
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
       webView.postMessage(JSON.stringify({ type: 'share', data: dataUrl }));
       return;
     }
 
-    const blobs = await Promise.all(uploadedImages.map((img) => renderImage(img.objectUrl)));
+    const blobs = await Promise.all(uploadedImages.map((img) => renderImageToBlob(img.objectUrl, settings, aspectRatio)));
     const files = blobs.map((blob, i) => new File([blob], `photo-${i + 1}.png`, { type: 'image/png' }));
 
     try {

@@ -9,6 +9,7 @@ import {
   getThumbnailCanvasSize,
 } from '@/utils/canvas';
 import { THUMBNAIL_INNER_SIZE, THUMBNAIL_RENDER_SCALE } from './constants';
+import { useSafariRafThrottle } from '@/hooks/useSafariRafThrottle';
 
 interface UseThumbnailRenderOptions {
   objectUrl: string;
@@ -25,9 +26,8 @@ export const useThumbnailRender = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const settingsRef = useRef(store.get(imageSettingsAtom));
-  const rafIdRef = useRef<number | null>(null);
-  const pendingRenderRef = useRef(false);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { throttle: safariThrottle } = useSafariRafThrottle(isSafari);
 
   const renderThumbnail = useCallback(() => {
     if (!canvasRef.current || !imageRef.current) return;
@@ -91,23 +91,7 @@ export const useThumbnailRender = ({
     const DEBOUNCE_MS = 300;
 
     const performRender = () => {
-      if (isSafari) {
-        pendingRenderRef.current = true;
-
-        if (rafIdRef.current === null) {
-          rafIdRef.current = requestAnimationFrame(() => {
-            rafIdRef.current = null;
-            if (pendingRenderRef.current) {
-              pendingRenderRef.current = false;
-              renderThumbnail();
-            }
-          });
-        }
-
-        return;
-      }
-
-      renderThumbnail();
+      safariThrottle(renderThumbnail);
     };
 
     const unsubscribe = store.sub(imageSettingsAtom, () => {
@@ -129,12 +113,8 @@ export const useThumbnailRender = ({
         clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = null;
       }
-      if (rafIdRef.current !== null) {
-        cancelAnimationFrame(rafIdRef.current);
-        rafIdRef.current = null;
-      }
     };
-  }, [isSafari, renderThumbnail, store]);
+  }, [safariThrottle, renderThumbnail, store]);
 
   useEffect(() => {
     renderThumbnail();

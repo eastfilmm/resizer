@@ -10,6 +10,7 @@ import {
   type UploadedImage,
 } from '@/atoms/imageAtoms';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
+import { createImageId } from '@/utils/imageUtils';
 
 interface ImageUploaderProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
@@ -19,14 +20,6 @@ export const ImageUploader = ({ fileInputRef }: ImageUploaderProps) => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);
   const setUploadedImages = useSetAtom(uploadedImagesAtom);
   const setSelectedImageId = useSetAtom(selectedImageIdAtom);
-
-  const createImageId = () => {
-    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-      return crypto.randomUUID();
-    }
-
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  };
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []).filter((file) => file.type.startsWith('image/'));

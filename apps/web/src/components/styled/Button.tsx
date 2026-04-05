@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { COLOR_PRIMARY, COLOR_PRIMARY_DARK, COLOR_GRAY } from '@/constants/theme';
 
 interface ButtonProps {
   $variant?: 'primary' | 'secondary' | 'danger' | 'blue';
@@ -7,11 +8,11 @@ interface ButtonProps {
 const getBackgroundColor = (variant?: 'primary' | 'secondary' | 'danger' | 'blue') => {
   switch (variant) {
     case 'secondary':
-      return '#6c757d';
+      return COLOR_GRAY;
     case 'danger':
       return '#dc3545';
     case 'blue':
-      return '#007bff';
+      return COLOR_PRIMARY;
     default:
       return '#28a745';
   }
@@ -24,7 +25,7 @@ const getHoverColor = (variant?: 'primary' | 'secondary' | 'danger' | 'blue') =>
     case 'danger':
       return '#c82333';
     case 'blue':
-      return '#0056b3';
+      return COLOR_PRIMARY_DARK;
     default:
       return '#218838';
   }

@@ -7,6 +7,7 @@ import { imageUrlAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import type { AspectRatio } from '@/atoms/imageAtoms';
 import { drawImageWithEffects, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/canvas';
 import type { ImagePosition } from '@/utils/canvas';
+import { useSafariRafThrottle } from '@/hooks/useSafariRafThrottle';
 import {
   CANVAS_DISPLAY_SIZE,
   CANVAS_DISPLAY_SIZE_DESKTOP,
@@ -34,9 +35,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
   const imagePositionRef = useRef<ImagePosition | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Safari RAF throttle refs
-  const rafIdRef = useRef<number | null>(null);
-  const pendingRenderRef = useRef(false);
+  const { throttle: safariThrottle } = useSafariRafThrottle(isSafari);
 
   // Scale factor: 800/2000 = 0.4 (Safari only)
   const SCALE_FACTOR = isSafari ? CANVAS_PREVIEW_SIZE / 2000 : 1;
@@ -155,32 +154,13 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
         containerRef.current.style.backgroundColor = newSettings.backgroundColor;
       }
 
-      // Safari: Use RAF throttle for smooth slider performance
-      // Non-Safari: Immediate rendering
-      if (isSafari) {
-        pendingRenderRef.current = true;
-        if (rafIdRef.current === null) {
-          rafIdRef.current = requestAnimationFrame(() => {
-            rafIdRef.current = null;
-            if (pendingRenderRef.current) {
-              pendingRenderRef.current = false;
-              performRender();
-            }
-          });
-        }
-      } else {
-        performRender();
-      }
+      safariThrottle(performRender);
     });
 
     return () => {
       unsubscribe();
-      if (isSafari && rafIdRef.current !== null) {
-        cancelAnimationFrame(rafIdRef.current);
-        rafIdRef.current = null;
-      }
     };
-  }, [store, canvasRef, redrawImage, isSafari]);
+  }, [store, canvasRef, redrawImage, safariThrottle]);
 
   // Track the current image URL to detect changes
   const lastImageUrlRef = useRef<string | null>(null);

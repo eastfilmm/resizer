@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { COLOR_GRAY_TEXT } from '@/constants/theme';
 
 export const Container = styled.div`
   height: 100vh;
@@ -39,5 +40,5 @@ export const Title = styled.h1`
 export const SubTitle = styled.h2`
   font-size: 0.75rem;
   font-weight: normal;
-  color: #666;
+  color: ${COLOR_GRAY_TEXT};
 `;

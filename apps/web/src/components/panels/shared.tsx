@@ -1,6 +1,15 @@
 'use client';
 
 import styled from 'styled-components';
+import {
+  COLOR_PRIMARY,
+  COLOR_PRIMARY_DARK,
+  COLOR_GRAY,
+  COLOR_GRAY_TEXT,
+  COLOR_GRAY_BORDER,
+  COLOR_GRAY_PLACEHOLDER,
+  COLOR_GRAY_BG_DISABLED,
+} from '@/constants/theme';
 
 // Panel Container
 export const PanelContainer = styled.div<{ $direction?: 'column' | 'row' }>`
@@ -32,7 +41,7 @@ export const PanelLabelWrapper = styled.div<{
 // Label text
 export const PanelLabel = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: ${(props) => (props.$isDimmed ? '#ffffff' : '#666')};
+  color: ${(props) => (props.$isDimmed ? '#ffffff' : COLOR_GRAY_TEXT)};
   transition: color 0.2s ease;
 `;
 
@@ -41,7 +50,7 @@ export const ToggleSwitch = styled.div<{ $isActive: boolean }>`
   position: relative;
   width: 48px;
   height: 24px;
-  background-color: ${(props) => (props.$isActive ? '#007bff' : '#6c757d')};
+  background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY)};
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -85,14 +94,14 @@ export const SliderLabelRow = styled.div`
 // Slider Label
 export const SliderLabel = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: ${(props) => (props.$isDimmed ? '#ffffff' : '#666')};
+  color: ${(props) => (props.$isDimmed ? '#ffffff' : COLOR_GRAY_TEXT)};
   transition: color 0.2s ease;
 `;
 
 // Slider Value
 export const SliderValue = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
-  color: ${(props) => (props.$isDimmed ? '#ffffff' : '#666')};
+  color: ${(props) => (props.$isDimmed ? '#ffffff' : COLOR_GRAY_TEXT)};
   transition: color 0.2s ease;
 `;
 
@@ -102,7 +111,7 @@ export const Slider = styled.input`
   height: 4px;
   -webkit-appearance: none;
   appearance: none;
-  background: #ddd;
+  background: ${COLOR_GRAY_BORDER};
   border-radius: 2px;
   outline: none;
 
@@ -115,34 +124,34 @@ export const Slider = styled.input`
     appearance: none;
     width: 20px;
     height: 20px;
-    background: #007bff;
+    background: ${COLOR_PRIMARY};
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.2s ease;
   }
 
   &::-webkit-slider-thumb:hover {
-    background: #0056b3;
+    background: ${COLOR_PRIMARY_DARK};
   }
 
   &:disabled::-webkit-slider-thumb {
-    background: #ffffff;
-    border: 1px solid #ddd;
+    background: white;
+    border: 1px solid ${COLOR_GRAY_BORDER};
     cursor: not-allowed;
   }
 
   &::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    background: #007bff;
+    background: ${COLOR_PRIMARY};
     border-radius: 50%;
     cursor: pointer;
     border: none;
   }
 
   &:disabled::-moz-range-thumb {
-    background: #ffffff;
-    border: 1px solid #ddd;
+    background: white;
+    border: 1px solid ${COLOR_GRAY_BORDER};
     cursor: not-allowed;
   }
 `;
@@ -152,23 +161,23 @@ export const TextInput = styled.input`
   width: 100%;
   padding: 12px;
   font-size: 0.775rem;
-  border: 1px solid #ddd;
+  border: 1px solid ${COLOR_GRAY_BORDER};
   border-radius: 8px;
   outline: none;
   transition: border-color 0.2s ease;
   box-sizing: border-box;
 
   &:focus {
-    border-color: #007bff;
+    border-color: ${COLOR_PRIMARY};
   }
 
   &:disabled {
     opacity: 0.5;
-    background-color: #f5f5f5;
+    background-color: ${COLOR_GRAY_BG_DISABLED};
   }
 
   &::placeholder {
-    color: #999;
+    color: ${COLOR_GRAY_PLACEHOLDER};
   }
 `;
 
