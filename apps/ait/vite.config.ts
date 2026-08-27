@@ -8,6 +8,7 @@ import aitDevtools from "@apps-in-toss/devtools/unplugin";
 export default defineConfig({
   plugins: [aitDevtools.vite(), react()],
   resolve: {
+    dedupe: ['react', 'react-dom'],
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
