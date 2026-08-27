@@ -1,30 +1,43 @@
-
 import { useCallback } from 'react';
 import { useAtomValue } from 'jotai';
+import { saveBase64Data } from '@apps-in-toss/web-framework';
 import { uploadedImagesAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 import { IconButton, ButtonIcon } from '@/components/styled/Button';
 import { renderImageToBlob, renderImageToCanvas } from '@/utils/renderCanvasImage';
+
+// App in Toss 환경에서 기기 갤러리 저장을 지원하는지 확인
+const canSaveToToss = (): boolean => {
+  try {
+    return typeof saveBase64Data?.isSupported === 'function' && saveBase64Data.isSupported();
+  } catch {
+    return false;
+  }
+};
 
 export const ShareButton = () => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);
   const settings = useAtomValue(imageSettingsAtom);
   const { aspectRatio } = useAspectRatio();
 
-  const isWebView = typeof window !== 'undefined' && !!(window as any).ReactNativeWebView;
-  const canShare = uploadedImages.length >= 1 && (isWebView || (typeof navigator !== 'undefined' && !!navigator.share));
+  // 토스: 갤러리 저장 지원 / 브라우저: Web Share API
+  const canShare =
+    uploadedImages.length >= 1 &&
+    (canSaveToToss() || (typeof navigator !== 'undefined' && !!navigator.share));
 
   const handleShare = useCallback(async () => {
     if (uploadedImages.length < 1) return;
 
-    const webView = (window as any).ReactNativeWebView;
-    if (webView) {
+    // App in Toss는 이미지 파일 직접 공유를 지원하지 않으므로 갤러리에 저장
+    // (사용자가 인스타그램에서 저장된 이미지를 업로드하는 흐름)
+    if (canSaveToToss()) {
       const canvas = await renderImageToCanvas(uploadedImages[0].objectUrl, settings, aspectRatio);
-      const dataUrl = canvas.toDataURL('image/png', 1.0);
-      webView.postMessage(JSON.stringify({ type: 'share', data: dataUrl }));
+      const base64 = canvas.toDataURL('image/png', 1.0).split(',')[1];
+      await saveBase64Data({ data: base64, fileName: 'insta-frame.png', mimeType: 'image/png' });
       return;
     }
 
+    // 브라우저 폴백: Web Share API
     const blobs = await Promise.all(uploadedImages.map((img) => renderImageToBlob(img.objectUrl, settings, aspectRatio)));
     const files = blobs.map((blob, i) => new File([blob], `photo-${i + 1}.png`, { type: 'image/png' }));
 
