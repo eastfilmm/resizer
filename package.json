@@ -14,7 +14,8 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "sharp",
-      "unrs-resolver"
+      "unrs-resolver",
+      "protobufjs"
     ]
   }
 }
