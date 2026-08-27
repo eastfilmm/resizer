@@ -17,12 +17,30 @@ importers:
       '@apps-in-toss/web-framework':
         specifier: 3.1.1
         version: 3.1.1(typanion@3.14.0)(typescript@6.0.3)
+      jotai:
+        specifier: ^2.16.1
+        version: 2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.18)(react@19.2.8)
+      jotai-optics:
+        specifier: ^0.4.0
+        version: 0.4.0(jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.18)(react@19.2.8))(optics-ts@2.4.1)
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
+      optics-ts:
+        specifier: ^2.4.1
+        version: 2.4.1
       react:
         specifier: ^19.2.8
         version: 19.2.8
       react-dom:
         specifier: ^19.2.8
         version: 19.2.8(react@19.2.8)
+      stackblur-canvas:
+        specifier: ^2.7.0
+        version: 2.7.0
+      styled-components:
+        specifier: ^6.1.19
+        version: 6.3.12(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
     devDependencies:
       '@apps-in-toss/devtools':
         specifier: ^3.1.1
@@ -36,6 +54,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.4
         version: 19.2.5(@types/react@19.2.18)
+      '@types/styled-components':
+        specifier: ^5.1.34
+        version: 5.1.36
       '@vitejs/plugin-react':
         specifier: ^6.1.0
         version: 6.1.0(babel-plugin-react-compiler@1.0.0)(vite@8.2.2(@types/node@24.13.3)(jiti@2.7.0)(terser@5.46.1)(yaml@2.8.3))
@@ -7158,7 +7179,7 @@ snapshots:
       node-stream-zip: 1.15.0
       ora: 5.4.1
       picocolors: 1.1.1
-      semver: 7.7.4
+      semver: 7.8.5
       wcwidth: 1.0.1
       yaml: 2.8.3
     transitivePeerDependencies:
@@ -7218,7 +7239,7 @@ snapshots:
       ora: 5.4.1
       picocolors: 1.1.1
       prompts: 2.4.2
-      semver: 7.7.4
+      semver: 7.8.5
     optional: true
 
   '@react-native-community/cli-types@20.1.3':
@@ -7242,7 +7263,7 @@ snapshots:
       graceful-fs: 4.2.11
       picocolors: 1.1.1
       prompts: 2.4.2
-      semver: 7.7.4
+      semver: 7.8.5
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -7333,7 +7354,7 @@ snapshots:
       '@babel/plugin-transform-class-properties': 7.28.6(@babel/core@7.29.0)
       '@babel/plugin-transform-classes': 7.28.6(@babel/core@7.29.0)
       '@babel/plugin-transform-destructuring': 7.28.5(@babel/core@7.29.0)
-      '@babel/plugin-transform-flow-strip-types': 7.27.1(@babel/core@7.29.0)
+      '@babel/plugin-transform-flow-strip-types': 7.29.7(@babel/core@7.29.0)
       '@babel/plugin-transform-for-of': 7.27.1(@babel/core@7.29.0)
       '@babel/plugin-transform-modules-commonjs': 7.28.6(@babel/core@7.29.0)
       '@babel/plugin-transform-named-capturing-groups-regex': 7.29.0(@babel/core@7.29.0)
@@ -7375,7 +7396,7 @@ snapshots:
       hermes-parser: 0.32.0
       invariant: 2.2.4
       nullthrows: 1.1.1
-      tinyglobby: 0.2.15
+      tinyglobby: 0.2.17
       yargs: 17.7.2
     optional: true
 
@@ -7447,9 +7468,7 @@ snapshots:
       metro-runtime: 0.83.5
     transitivePeerDependencies:
       - '@babel/core'
-      - bufferutil
       - supports-color
-      - utf-8-validate
     optional: true
 
   '@react-native/normalize-colors@0.83.2': {}
@@ -9738,12 +9757,24 @@ snapshots:
       jotai: 2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.1.0)
       optics-ts: 2.4.1
 
+  jotai-optics@0.4.0(jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.18)(react@19.2.8))(optics-ts@2.4.1):
+    dependencies:
+      jotai: 2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.18)(react@19.2.8)
+      optics-ts: 2.4.1
+
   jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.1.0):
     optionalDependencies:
       '@babel/core': 7.29.0
       '@babel/template': 7.28.6
       '@types/react': 19.2.14
       react: 19.1.0
+
+  jotai@2.19.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.18)(react@19.2.8):
+    optionalDependencies:
+      '@babel/core': 7.29.0
+      '@babel/template': 7.28.6
+      '@types/react': 19.2.18
+      react: 19.2.8
 
   js-tokens@4.0.0: {}
 
@@ -11478,6 +11509,21 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       react-dom: 19.1.0(react@19.1.0)
+
+  styled-components@6.3.12(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      '@emotion/is-prop-valid': 1.4.0
+      '@emotion/unitless': 0.10.0
+      '@types/stylis': 4.2.7
+      css-to-react-native: 3.2.0
+      csstype: 3.2.3
+      postcss: 8.4.49
+      react: 19.2.8
+      shallowequal: 1.1.0
+      stylis: 4.3.6
+      tslib: 2.8.1
+    optionalDependencies:
+      react-dom: 19.2.8(react@19.2.8)
 
   styled-jsx@5.1.6(@babel/core@7.29.0)(react@19.1.0):
     dependencies:
