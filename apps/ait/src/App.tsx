@@ -26,6 +26,7 @@ export default function ClientPage() {
   return (
     <Container>
       <Main>
+        <Title>Insta Frame</Title>
         <CanvasWrapper>
           <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} isDesktop={isDesktop} />
           {hasImages && (
@@ -45,6 +46,15 @@ export default function ClientPage() {
     </Container>
   );
 }
+
+const Title = styled.h1`
+  margin: 12px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #191f28;
+  text-align: center;
+  flex-shrink: 0;
+`;
 
 const CanvasWrapper = styled.div`
   flex-shrink: 0;
