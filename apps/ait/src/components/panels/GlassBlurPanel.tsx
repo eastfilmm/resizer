@@ -32,13 +32,19 @@ export const GlassBlurPanel = () => {
   }, [setGlassBlur]);
 
   const handleIntensityChange = useCallback(
-    (v: number) => setBlurIntensity(v),
-    [setBlurIntensity],
+    (v: number) => {
+      setBlurIntensity(v);
+      setGlassBlur(true); // 꺼진 상태에서 움직이면 자동 ON
+    },
+    [setBlurIntensity, setGlassBlur],
   );
 
   const handleOpacityChange = useCallback(
-    (v: number) => setOverlayOpacity(v / 100),
-    [setOverlayOpacity],
+    (v: number) => {
+      setOverlayOpacity(v / 100);
+      setGlassBlur(true);
+    },
+    [setOverlayOpacity, setGlassBlur],
   );
 
   return (
@@ -51,7 +57,6 @@ export const GlassBlurPanel = () => {
           <FocusReveal.Scope>
             <SliderLabelRow>
               <SliderLabel>Blur</SliderLabel>
-              <SliderValue>{blurIntensity}%</SliderValue>
             </SliderLabelRow>
             <FocusReveal.Trigger>
               <RangeSlider
@@ -59,7 +64,8 @@ export const GlassBlurPanel = () => {
                 max={100}
                 value={blurIntensity}
                 onValueChange={handleIntensityChange}
-                disabled={!glassBlur}
+                inactive={!glassBlur}
+                format={(v) => `${v}%`}
               />
             </FocusReveal.Trigger>
           </FocusReveal.Scope>
@@ -69,7 +75,6 @@ export const GlassBlurPanel = () => {
           <FocusReveal.Scope>
             <SliderLabelRow>
               <SliderLabel>Tint</SliderLabel>
-              <SliderValue>{Math.round(overlayOpacity * 100)}%</SliderValue>
             </SliderLabelRow>
             <FocusReveal.Trigger>
               <RangeSlider
@@ -77,7 +82,8 @@ export const GlassBlurPanel = () => {
                 max={100}
                 value={Math.round(overlayOpacity * 100)}
                 onValueChange={handleOpacityChange}
-                disabled={!glassBlur}
+                inactive={!glassBlur}
+                format={(v) => `${v}%`}
               />
             </FocusReveal.Trigger>
           </FocusReveal.Scope>

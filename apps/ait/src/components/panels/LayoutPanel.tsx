@@ -12,6 +12,7 @@ import {
   PanelLabelWrapper,
   SliderSection,
   SliderLabelRow,
+  SliderLabel,
   SliderValue,
   TitleAndInputWrapper,
 } from './shared';
@@ -118,8 +119,7 @@ export const LayoutPanel = memo(() => {
       <SliderSection>
         <FocusReveal.Scope>
           <SliderLabelRow>
-            <PanelLabel>Padding</PanelLabel>
-            <SliderValue>{padding}px</SliderValue>
+            <SliderLabel>Padding</SliderLabel>
           </SliderLabelRow>
           <FocusReveal.Trigger>
             <RangeSlider
@@ -127,6 +127,7 @@ export const LayoutPanel = memo(() => {
               max={200}
               value={padding}
               onValueChange={handlePaddingChange}
+              format={(v) => `${v}px`}
             />
           </FocusReveal.Trigger>
         </FocusReveal.Scope>

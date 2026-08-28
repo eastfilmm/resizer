@@ -109,12 +109,6 @@ const RootBox = styled.div`
     background: transparent !important;
     box-shadow: none !important;
   }
-
-  /* 활성 트리거가 속한 Scope 내부는 통째로 표시 유지 (값·라벨 등 함께 보이게) */
-  &[data-active] [data-focus-scope]:has([data-focus-active-trigger]) * {
-    opacity: 1;
-    pointer-events: auto;
-  }
 `;
 
 interface TriggerProps {
@@ -127,6 +121,9 @@ const Trigger = ({ children, className }: TriggerProps) => {
   const [pressed, setPressed] = useState(false);
   const endRef = useRef<(() => void) | null>(null);
 
+  // 단순 탭/클릭과 슬라이딩을 구분: 일정 거리 이상 이동해야 활성화
+  const DRAG_THRESHOLD = 4; // px
+
   const handlePointerDown = useCallback(
     (e: ReactPointerEvent) => {
       // 비활성(disabled) 컨트롤은 트리거하지 않음 (기능 off 상태)
@@ -134,15 +131,29 @@ const Trigger = ({ children, className }: TriggerProps) => {
       const target = e.target as HTMLElement | null;
       if (target?.closest('[data-disabled], :disabled')) return;
 
-      setPressed(true);
-      activate();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      let activated = false;
+
+      const onMove = (ev: PointerEvent) => {
+        if (activated) return;
+        if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > DRAG_THRESHOLD) {
+          activated = true;
+          setPressed(true);
+          activate();
+        }
+      };
       const end = () => {
-        setPressed(false);
-        deactivate();
+        if (activated) {
+          setPressed(false);
+          deactivate();
+        }
+        window.removeEventListener('pointermove', onMove);
         window.removeEventListener('pointerup', end);
         window.removeEventListener('pointercancel', end);
         endRef.current = null;
       };
+      window.addEventListener('pointermove', onMove);
       window.addEventListener('pointerup', end);
       window.addEventListener('pointercancel', end);
       endRef.current = end;

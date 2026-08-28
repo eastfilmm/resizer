@@ -49,7 +49,7 @@ export const ToggleSwitch = styled.div<{ $isActive: boolean }>`
   position: relative;
   width: 48px;
   height: 24px;
-  background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY)};
+  background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_BORDER)};
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -95,6 +95,8 @@ export const SliderLabel = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
   color: ${(props) => (props.$isDimmed ? '#ffffff' : COLOR_GRAY_TEXT)};
   transition: color 0.2s ease;
+  min-width: 52px;
+  flex-shrink: 0;
 `;
 
 // Slider Value

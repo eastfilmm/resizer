@@ -32,13 +32,19 @@ export const ShadowPanel = () => {
   }, [setShadowEnabled]);
 
   const handleIntensityChange = useCallback(
-    (v: number) => setShadowIntensity(v),
-    [setShadowIntensity],
+    (v: number) => {
+      setShadowIntensity(v);
+      setShadowEnabled(true); // 꺼진 상태에서 움직이면 자동 ON
+    },
+    [setShadowIntensity, setShadowEnabled],
   );
 
   const handleOffsetChange = useCallback(
-    (v: number) => setShadowOffset(v),
-    [setShadowOffset],
+    (v: number) => {
+      setShadowOffset(v);
+      setShadowEnabled(true);
+    },
+    [setShadowOffset, setShadowEnabled],
   );
 
   return (
@@ -51,7 +57,6 @@ export const ShadowPanel = () => {
         <FocusReveal.Scope>
           <SliderLabelRow>
             <SliderLabel>Blur</SliderLabel>
-            <SliderValue>{shadowIntensity}px</SliderValue>
           </SliderLabelRow>
           <FocusReveal.Trigger>
             <RangeSlider
@@ -59,7 +64,8 @@ export const ShadowPanel = () => {
               max={100}
               value={shadowIntensity}
               onValueChange={handleIntensityChange}
-              disabled={!shadowEnabled}
+              inactive={!shadowEnabled}
+              format={(v) => `${v}px`}
             />
           </FocusReveal.Trigger>
         </FocusReveal.Scope>
@@ -69,7 +75,6 @@ export const ShadowPanel = () => {
         <FocusReveal.Scope>
           <SliderLabelRow>
             <SliderLabel>Offset</SliderLabel>
-            <SliderValue>{shadowOffset}px</SliderValue>
           </SliderLabelRow>
           <FocusReveal.Trigger>
             <RangeSlider
@@ -77,7 +82,8 @@ export const ShadowPanel = () => {
               max={50}
               value={shadowOffset}
               onValueChange={handleOffsetChange}
-              disabled={!shadowEnabled}
+              inactive={!shadowEnabled}
+              format={(v) => `${v}px`}
             />
           </FocusReveal.Trigger>
         </FocusReveal.Scope>
