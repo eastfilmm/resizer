@@ -102,6 +102,9 @@ export const SliderValue = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
   color: ${(props) => (props.$isDimmed ? '#ffffff' : COLOR_GRAY_TEXT)};
   transition: color 0.2s ease;
+  min-width: 40px;
+  text-align: right;
+  flex-shrink: 0;
 `;
 
 // Slider Input

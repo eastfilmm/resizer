@@ -15,8 +15,9 @@ import {
   SliderLabelRow,
   SliderLabel,
   SliderValue,
-  Slider,
 } from './shared';
+import { FocusReveal } from '@/components/FocusReveal';
+import { RangeSlider } from '@/components/RangeSlider';
 
 export const ShadowPanel = () => {
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
@@ -31,16 +32,12 @@ export const ShadowPanel = () => {
   }, [setShadowEnabled]);
 
   const handleIntensityChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setShadowIntensity(Number(e.target.value));
-    },
+    (v: number) => setShadowIntensity(v),
     [setShadowIntensity],
   );
 
   const handleOffsetChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setShadowOffset(Number(e.target.value));
-    },
+    (v: number) => setShadowOffset(v),
     [setShadowOffset],
   );
 
@@ -51,33 +48,39 @@ export const ShadowPanel = () => {
         <ToggleSwitch $isActive={shadowEnabled} onClick={toggleShadow} />
       </PanelRow>
       <SliderSection>
-        <SliderLabelRow>
-          <SliderLabel>Blur</SliderLabel>
-          <SliderValue>{shadowIntensity}px</SliderValue>
-        </SliderLabelRow>
-        <Slider
-          type="range"
-          min="1"
-          max="100"
-          value={shadowIntensity}
-          onChange={handleIntensityChange}
-          disabled={!shadowEnabled}
-        />
+        <FocusReveal.Scope>
+          <SliderLabelRow>
+            <SliderLabel>Blur</SliderLabel>
+            <SliderValue>{shadowIntensity}px</SliderValue>
+          </SliderLabelRow>
+          <FocusReveal.Trigger>
+            <RangeSlider
+              min={1}
+              max={100}
+              value={shadowIntensity}
+              onValueChange={handleIntensityChange}
+              disabled={!shadowEnabled}
+            />
+          </FocusReveal.Trigger>
+        </FocusReveal.Scope>
       </SliderSection>
 
       <SliderSection>
-        <SliderLabelRow>
-          <SliderLabel>Offset</SliderLabel>
-          <SliderValue>{shadowOffset}px</SliderValue>
-        </SliderLabelRow>
-        <Slider
-          type="range"
-          min="1"
-          max="50"
-          value={shadowOffset}
-          onChange={handleOffsetChange}
-          disabled={!shadowEnabled}
-        />
+        <FocusReveal.Scope>
+          <SliderLabelRow>
+            <SliderLabel>Offset</SliderLabel>
+            <SliderValue>{shadowOffset}px</SliderValue>
+          </SliderLabelRow>
+          <FocusReveal.Trigger>
+            <RangeSlider
+              min={1}
+              max={50}
+              value={shadowOffset}
+              onValueChange={handleOffsetChange}
+              disabled={!shadowEnabled}
+            />
+          </FocusReveal.Trigger>
+        </FocusReveal.Scope>
       </SliderSection>
     </PanelContainer>
   );

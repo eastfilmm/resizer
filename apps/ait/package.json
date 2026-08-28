@@ -11,17 +11,19 @@
     "deploy": "ait deploy"
   },
   "dependencies": {
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
     "@apps-in-toss/web-framework": "3.1.1",
+    "@base-ui-components/react": "1.0.0-rc.0",
     "jotai": "^2.16.1",
     "jotai-optics": "^0.4.0",
-    "optics-ts": "^2.4.1",
-    "styled-components": "^6.1.19",
     "jszip": "^3.10.1",
-    "stackblur-canvas": "^2.7.0"
+    "optics-ts": "^2.4.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "stackblur-canvas": "^2.7.0",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
+    "@apps-in-toss/devtools": "^3.1.1",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
@@ -29,7 +31,6 @@
     "@vitejs/plugin-react": "^6.1.0",
     "oxlint": "^1.79.0",
     "typescript": "~6.0.2",
-    "vite": "^8.2.2",
-    "@apps-in-toss/devtools": "^3.1.1"
+    "vite": "^8.2.2"
   }
 }

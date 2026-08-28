@@ -13,9 +13,10 @@ import {
   SliderSection,
   SliderLabelRow,
   SliderValue,
-  Slider,
   TitleAndInputWrapper,
 } from './shared';
+import { FocusReveal } from '@/components/FocusReveal';
+import { RangeSlider } from '@/components/RangeSlider';
 
 const AspectRatioOptions = styled.div`
   display: flex;
@@ -77,9 +78,7 @@ export const LayoutPanel = memo(() => {
   );
 
   const handlePaddingChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPadding(Number(e.target.value));
-    },
+    (v: number) => setPadding(v),
     [setPadding],
   );
 
@@ -117,17 +116,20 @@ export const LayoutPanel = memo(() => {
 
       {/* Padding Section */}
       <SliderSection>
-        <SliderLabelRow>
-          <PanelLabel>Padding</PanelLabel>
-          <SliderValue style={{ width: '36px' }}>{padding}px</SliderValue>
-        </SliderLabelRow>
-        <Slider
-          type="range"
-          min="0"
-          max="200"
-          value={padding}
-          onChange={handlePaddingChange}
-        />
+        <FocusReveal.Scope>
+          <SliderLabelRow>
+            <PanelLabel>Padding</PanelLabel>
+            <SliderValue>{padding}px</SliderValue>
+          </SliderLabelRow>
+          <FocusReveal.Trigger>
+            <RangeSlider
+              min={0}
+              max={200}
+              value={padding}
+              onValueChange={handlePaddingChange}
+            />
+          </FocusReveal.Trigger>
+        </FocusReveal.Scope>
       </SliderSection>
     </PanelContainer>
   );

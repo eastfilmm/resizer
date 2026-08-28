@@ -29,6 +29,7 @@ import {
   ButtonLabel,
   NavIcon,
 } from './NavigationBar.styles';
+import { FocusReveal } from '@/components/FocusReveal';
 
 function isPanelAllowedInFrameMode(
   panelId: string,
@@ -194,11 +195,13 @@ export const NavigationBar = () => {
 
   return (
     <Container ref={containerRef}>
-      <PanelContainer $height={panelHeight}>
-        <PanelContentWrapper $isVisible={isContentVisible}>
-          <PanelContent activePanel={displayedPanel} />
-        </PanelContentWrapper>
-      </PanelContainer>
+      <FocusReveal.Root>
+        <PanelContainer $height={panelHeight}>
+          <PanelContentWrapper $isVisible={isContentVisible}>
+            <PanelContent activePanel={displayedPanel} />
+          </PanelContentWrapper>
+        </PanelContainer>
+      </FocusReveal.Root>
 
       <NavContainer>
         <SliderBackground $activeIndex={activeIndex} />
