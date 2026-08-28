@@ -42,11 +42,13 @@ export const RangeSlider = ({
       max={max}
       step={step}
       disabled={disabled}
+      thumbAlignment="edge"
     >
       <ValueBadge>{format(value)}</ValueBadge>
       <SliderControl>
         <SliderTrack>
-          <SliderIndicator />
+          {/* 최솟값에선 edge 정렬로 남는 파란 조각을 없애기 위해 미렌더 */}
+          {value > min && <SliderIndicator />}
           <SliderThumb />
         </SliderTrack>
       </SliderControl>
