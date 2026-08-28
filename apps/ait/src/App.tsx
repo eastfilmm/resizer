@@ -48,8 +48,8 @@ export default function ClientPage() {
 }
 
 const Title = styled.h1`
-  margin: 12px 0 8px;
-  font-size: 20px;
+  margin: 6px 0 2px;
+  font-size: 16px;
   font-weight: 700;
   color: #191f28;
   text-align: center;
