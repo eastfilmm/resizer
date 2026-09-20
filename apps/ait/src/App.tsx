@@ -2,14 +2,18 @@
 import { Container, Main, useIsDesktop } from '@resizer/ui';
 import { useRef } from 'react';
 import { useAtomValue } from 'jotai';
-import { imageUrlAtom } from '@/atoms/imageAtoms';
 import styled from 'styled-components';
-import ImageCanvas from '@/components/ImageCanvas';
-import { ResetButton } from '@/components/ResetButton';
-import { DownloadButton } from '@/components/DownloadButton';
-import { ShareButton } from '@/components/ShareButton';
-import { ThumbnailStrip } from '@/components/ThumbnailStrip';
-import { NavigationBar } from '@/components/NavigationBar';
+import {
+  imageUrlAtom,
+  ImageCanvas,
+  ResetButton,
+  DownloadButton,
+  ShareButton,
+  ThumbnailStrip,
+  NavigationBar,
+  PlatformProvider,
+} from '@resizer/editor';
+import { aitPlatform } from '@/platform';
 const NAV_HEIGHT = 200;
 
 export default function ClientPage() {
@@ -22,7 +26,8 @@ export default function ClientPage() {
   const hasImages = imageUrl !== null;
 
   return (
-    <Container>
+    <PlatformProvider value={aitPlatform}>
+      <Container>
       <Main>
         <Title>Insta Frame</Title>
         <CanvasWrapper>
@@ -40,8 +45,9 @@ export default function ClientPage() {
         <NavSpacer />
       </Main>
 
-      <NavigationBar />
-    </Container>
+        <NavigationBar />
+      </Container>
+    </PlatformProvider>
   );
 }
 
