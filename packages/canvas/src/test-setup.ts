@@ -82,13 +82,12 @@ class MockImage {
 
   constructor() {
     // Auto-trigger onload after src is set (sync in test environment)
-    const self = this;
     Object.defineProperty(this, 'src', {
-      get() { return self._src; },
-      set(value: string) {
-        self._src = value;
-        if (value && self.onload) {
-          setTimeout(() => self.onload?.(), 0);
+      get: () => this._src,
+      set: (value: string) => {
+        this._src = value;
+        if (value && this.onload) {
+          setTimeout(() => this.onload?.(), 0);
         }
       },
       configurable: true,

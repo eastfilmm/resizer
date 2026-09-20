@@ -35,9 +35,10 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
   const settingsRef = useRef(store.get(imageSettingsAtom));
   const imageRef = useRef<DrawableImage | null>(null);
   const loadedUrlRef = useRef<string | null>(null);
-  const imageUrlRef = useRef<string | null>(null);
-  // 로드가 끝났을 때 선택이 이미 바뀌었는지 판별하기 위해 최신 값을 유지한다
-  imageUrlRef.current = imageUrl;
+  // 로드가 끝났을 때 더 최신 요청이 시작됐는지 판별하는 토큰.
+  // 최신 URL을 렌더 중에 ref로 복사하던 방식은 캐시 적중 시 .then()이
+  // effect보다 먼저 실행돼 어긋날 수 있었다. 요청 시작 시점에 번호를 매긴다.
+  const loadRequestIdRef = useRef(0);
   const imagePositionRef = useRef<ImagePosition | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -119,9 +120,10 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
     }
 
     // 축소·디코드된 소스를 공유 캐시에서 받는다(같은 URL은 한 번만 디코드된다)
+    const requestId = ++loadRequestIdRef.current;
     loadEditableImage(imageUrl).then((image) => {
-      // 로드 중에 선택이 바뀌었으면 버린다
-      if (imageUrlRef.current !== imageUrl) return;
+      // 로드 중에 더 최신 요청이 시작됐으면 버린다
+      if (requestId !== loadRequestIdRef.current) return;
       imageRef.current = image;
       loadedUrlRef.current = imageUrl;
       redrawImage(ctx, image);

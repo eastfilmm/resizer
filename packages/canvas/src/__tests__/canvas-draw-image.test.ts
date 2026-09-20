@@ -187,8 +187,9 @@ describe('drawImageWithEffects', () => {
 
       const lastFillRectIndex = ctx.calls.lastIndexOf(fillRectCalls[fillRectCalls.length - 1]);
       const drawImageIndex = ctx.calls.indexOf(drawImageCalls[0]);
-      // The shadow fillRect should be before the drawImage
+      // 그림자 fillRect가 drawImage보다 먼저여야 한다
       // (bg fillRect → save → shadow fillRect → restore → drawImage)
+      expect(lastFillRectIndex).toBeLessThan(drawImageIndex);
     });
   });
 

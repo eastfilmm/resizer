@@ -10,18 +10,34 @@
 
 pnpm 워크스페이스 기반 모노레포입니다.
 
+**앱은 셸이고 로직은 패키지에 있습니다.** `apps/web/src`는 9개, `apps/ait/src`는
+3개 파일뿐이며 화면은 `@resizer/editor`가 조립합니다.
+
 ```
 resizer/
 ├── apps/
-│   ├── web/       # Next.js 웹 앱 (주 개발 대상)
-│   ├── ait/       # Vite SPA — App in Toss 미니앱
+│   ├── web/       # Next.js 셸 (App Router, SEO, SSR 레지스트리)
+│   ├── ait/       # Vite SPA 셸 — App in Toss 미니앱
 │   └── mobile/    # Expo React Native 앱 (WebView 래퍼)
 ├── packages/
-│   └── canvas/    # @resizer/canvas — web·ait 공용 캔버스 렌더링 엔진
-├── package.json   # 모노레포 루트
+│   ├── canvas/    # @resizer/canvas — 캔버스 렌더링 엔진 (순수 TS, React 없음)
+│   ├── editor/    # @resizer/editor — 에디터 화면 전체 (atoms·패널·캔버스·버튼)
+│   └── ui/        # @resizer/ui — 디자인 시스템 (Button/RangeSlider/theme/motion/훅)
+├── eslint.config.mjs   # 워크스페이스 전체를 덮는 단일 flat config
+├── package.json        # 모노레포 루트
 ├── pnpm-workspace.yaml
-└── vercel.json    # Vercel 배포 설정
+└── vercel.json         # Vercel 배포 설정
 ```
+
+의존 방향은 한 방향입니다.
+
+```
+apps/*  →  editor  →  ui
+                   →  canvas
+```
+
+`ui`와 `canvas`는 서로 의존하지 않는 잎 노드입니다. 역방향 참조(패키지가 앱을,
+또는 `ui`/`canvas`가 `editor`를 참조)를 만들지 마세요.
 
 ## 명령어
 
@@ -31,9 +47,12 @@ pnpm build:web    # 웹 빌드
 pnpm dev:ait      # App in Toss 개발 서버
 pnpm build:ait    # App in Toss 빌드 (.ait 번들)
 pnpm test         # 전체 워크스페이스 테스트 (pre-commit에서 실행)
-pnpm test:web     # 웹 앱 테스트만
-pnpm lint:web     # ESLint (eslint-config-next flat config)
+pnpm typecheck    # 전체 워크스페이스 타입체크
+pnpm lint         # 전체 워크스페이스 ESLint (pre-commit에서 실행)
 ```
+
+테스트는 패키지에 있습니다 — `packages/canvas`(렌더러), `packages/editor`(컴포넌트·atom).
+앱에는 테스트가 없으므로 앱 단위로 테스트를 돌리는 명령은 없습니다.
 
 모바일:
 ```bash
@@ -41,30 +60,36 @@ cd apps/mobile
 pnpm start        # Expo 개발 서버
 ```
 
-## 핵심 아키텍처 (apps/web)
+## 핵심 아키텍처
 
-- **프레임워크**: Next.js 16 (App Router, Turbopack)
-- **상태관리**: Jotai — `imageSettingsAtom` 중심, `focusAtom`으로 개별 구독
-- **스타일링**: styled-components
-- **캔버스 엔진**: `@resizer/canvas` (`packages/canvas/`) — web·ait 공용, dimensions/frames/effects/drawImage
-- **테스트**: Vitest + Husky pre-commit hook
+- **프레임워크**: web은 Next.js 16 (App Router, Turbopack), ait는 Vite SPA
+- **상태관리**: Jotai — `imageSettingsAtom` 중심, `focusAtom`으로 개별 구독 (`@resizer/editor`)
+- **스타일링**: styled-components + `@resizer/ui`의 theme/motion 토큰
+- **캔버스 엔진**: `@resizer/canvas` — dimensions/frames/effects/drawImage
+- **플랫폼 주입**: 저장·공유처럼 환경마다 다른 동작은 `PlatformProvider`로 앱이 주입
+  (web은 `ReactNativeWebView.postMessage`, ait는 App in Toss SDK)
+- **테스트**: Vitest + Husky pre-commit hook (lint + test)
 
 ## 코드 규칙
 
 - 컴포넌트는 화살표 함수: `const Component = () => { ... }`
 - 새 설정은 `ImageSettings` 인터페이스에 추가하고 `focusAtom`으로 파생
 - 개별 atom을 따로 만들지 말 것
-- 캔버스 로직 수정 시 `packages/canvas/src/index.ts` export 업데이트 필수
-- `@resizer/canvas`에 환경 분기(브라우저 판정, 웹뷰 감지)를 넣지 말 것 — 앱이 판단해 인자로 넘긴다
-- 캔버스를 고치면 web과 ait **양쪽**에 반영된다는 점을 전제로 변경할 것
-- 복잡한 로직은 `src/hooks/`로 분리
+- 패키지 수정 시 해당 `src/index.ts` export 업데이트 필수
+- 패키지에 환경 분기(브라우저 이름 판정, 웹뷰 감지)를 넣지 말 것 — 능력을 직접 감지하거나
+  앱이 판단해 주입한다
+- 패키지를 고치면 web과 ait **양쪽**에 반영된다는 점을 전제로 변경할 것
+- 앱에 UI 로직을 새로 쌓지 말 것 — 공용이면 `@resizer/ui`, 에디터 기능이면 `@resizer/editor`
+- 복잡한 로직은 `hooks/`로 분리
 
-## Safari 최적화
+## 렌더링 성능
 
 - 프리뷰는 **모든 브라우저**에서 축소 해상도로 렌더 (모바일 800px / 데스크톱 1200px)
   - `getPreviewScaleFactor(isDesktop)` → 모바일 0.4, 데스크톱 0.6
-  - `isSafari`는 이제 블러 구현 선택에만 사용 — 렌더러에는 `useStackBlur` 옵션으로 전달
-- StackBlur 사용 (CSS 필터 대신)
+- 블러는 네이티브 `ctx.filter`를 쓰고, `supportsCanvasFilter()`로 능력을 감지한다
+  (결과 1회 캐시). 미지원 환경에서만 StackBlur(순수 JS)로 폴백한다.
+  브라우저 이름으로 분기하지 말 것 — 그 방식이 ait에서 느린 경로를 강제한 적이 있다
+- 업로드 이미지는 한 번만 디코드·축소해 공유 (`loadEditableImage`)
 - 설정 변경은 `useRafThrottle`로 프레임당 1회만 다시 그림 (전 브라우저 공통)
 - Glass Blur의 임시 캔버스는 모듈 스코프에서 재사용 (프레임당 재할당 없음)
 - 다운로드는 항상 2000px 풀 해상도 렌더링

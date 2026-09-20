@@ -65,10 +65,14 @@ const Root = ({ children, enabled = true, dimOpacity = 0, transitionMs = 180, cl
   }, [enabled]);
   const deactivate = useCallback(() => setActive(false), []);
 
-  // enabled가 꺼지면 활성 상태를 즉시 해제
-  useEffect(() => {
+  // enabled가 꺼지면 활성 상태를 해제한다.
+  // effect에서 setState를 부르면 한 프레임 늦게 반영되며 연쇄 렌더가 생기므로,
+  // prop이 바뀐 렌더에서 직접 조정한다(usePanelTransition과 같은 패턴).
+  const [prevEnabled, setPrevEnabled] = useState(enabled);
+  if (prevEnabled !== enabled) {
+    setPrevEnabled(enabled);
     if (!enabled) setActive(false);
-  }, [enabled]);
+  }
 
   const styleVars = {
     '--focus-dim-opacity': String(dimOpacity),

@@ -10,8 +10,6 @@ export function drawPolaroidFrame(
   canvasPadding: number = 0,
   dateText: string = ''
 ): ImagePosition {
-  const isLandscape = img.width >= img.height;
-
   const topPaddingRatio = 1;
   const sidePaddingRatio = 1;
   const bottomPaddingRatio = 3;
@@ -29,9 +27,6 @@ export function drawPolaroidFrame(
   const maxFrameWidth = canvasWidth - canvasPadding * 2;
   const maxFrameHeight = canvasHeight - canvasPadding * 2;
 
-  let frameWidth: number;
-  let frameHeight: number;
-
   const availableImageWidth = maxFrameWidth - totalHorizontalPaddingPx;
   const availableImageHeight = maxFrameHeight - totalVerticalPaddingPx;
 
@@ -46,8 +41,8 @@ export function drawPolaroidFrame(
     imageAreaWidth = imageAreaHeight * imageAspectRatio;
   }
 
-  frameWidth = imageAreaWidth + totalHorizontalPaddingPx;
-  frameHeight = imageAreaHeight + totalVerticalPaddingPx;
+  const frameWidth = imageAreaWidth + totalHorizontalPaddingPx;
+  const frameHeight = imageAreaHeight + totalVerticalPaddingPx;
 
   const frameX = (canvasWidth - frameWidth) / 2;
   const frameY = (canvasHeight - frameHeight) / 2;
@@ -85,7 +80,6 @@ export function drawPolaroidFrame(
 
   const topMargin = topPaddingRatio * paddingUnit;
   const sideMargin = sidePaddingRatio * paddingUnit;
-  const bottomMargin = bottomPaddingRatio * paddingUnit;
 
   const imageAreaX = frameX + sideMargin;
   const imageAreaY = frameY + topMargin;

@@ -18,9 +18,6 @@ import {
 } from './thumbnail-strip/ThumbnailStrip.styles';
 import { ThumbnailItem } from './thumbnail-strip/ThumbnailItem';
 
-interface ThumbnailStripProps {
-}
-
 export const ThumbnailStrip = () => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);
   const [selectedImageId, setSelectedImageId] = useAtom(selectedImageIdAtom);
