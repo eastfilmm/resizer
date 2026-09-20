@@ -27,7 +27,7 @@ export const DownloadButton = () => {
   const handleDownload = useCallback(async () => {
     if (uploadedImages.length === 0) return;
 
-    const webView = (window as any).ReactNativeWebView;
+    const webView = window.ReactNativeWebView;
 
     if (webView) {
       const dataUrls: string[] = [];

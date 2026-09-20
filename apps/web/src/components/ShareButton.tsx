@@ -12,13 +12,13 @@ export const ShareButton = () => {
   const settings = useAtomValue(imageSettingsAtom);
   const { aspectRatio } = useAspectRatio();
 
-  const isWebView = typeof window !== 'undefined' && !!(window as any).ReactNativeWebView;
+  const isWebView = typeof window !== 'undefined' && !!window.ReactNativeWebView;
   const canShare = uploadedImages.length >= 1 && (isWebView || (typeof navigator !== 'undefined' && !!navigator.share));
 
   const handleShare = useCallback(async () => {
     if (uploadedImages.length < 1) return;
 
-    const webView = (window as any).ReactNativeWebView;
+    const webView = window.ReactNativeWebView;
     if (webView) {
       const canvas = await renderImageToCanvas(uploadedImages[0].objectUrl, settings, aspectRatio);
       const dataUrl = canvas.toDataURL('image/png', 1.0);

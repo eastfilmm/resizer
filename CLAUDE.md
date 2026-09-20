@@ -32,6 +32,7 @@ pnpm dev:ait      # App in Toss 개발 서버
 pnpm build:ait    # App in Toss 빌드 (.ait 번들)
 pnpm test         # 전체 워크스페이스 테스트 (pre-commit에서 실행)
 pnpm test:web     # 웹 앱 테스트만
+pnpm lint:web     # ESLint (eslint-config-next flat config)
 ```
 
 모바일:

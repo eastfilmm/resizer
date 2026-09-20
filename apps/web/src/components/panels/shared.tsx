@@ -3,7 +3,6 @@
 import styled from 'styled-components';
 import {
   COLOR_PRIMARY,
-  COLOR_PRIMARY_DARK,
   COLOR_GRAY_TEXT,
   COLOR_GRAY_BORDER,
   COLOR_GRAY_PLACEHOLDER,

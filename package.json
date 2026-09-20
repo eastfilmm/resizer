@@ -9,7 +9,8 @@
     "prepare": "husky",
     "test": "pnpm -r test",
     "dev:ait": "pnpm --filter ait dev",
-    "build:ait": "pnpm --filter ait build"
+    "build:ait": "pnpm --filter ait build",
+    "lint:web": "pnpm --filter web lint"
   },
   "devDependencies": {
     "husky": "^9.1.7"
