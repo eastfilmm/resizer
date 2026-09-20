@@ -2,6 +2,7 @@
 // 도메인이 필요한 패널·NavigationBar 등은 앱 쪽에 남는다.
 
 export * from './theme';
+export * from './motion';
 
 // Base UI 래퍼
 export { RangeSlider } from './RangeSlider';

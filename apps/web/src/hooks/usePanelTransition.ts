@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { PANEL_FADE_MS, PANEL_FADE_IN_DELAY_MS } from '@resizer/ui';
 import type { NavPanelType } from '@/atoms/imageAtoms';
 
 /** 패널 전환 중 예약해 둔 다음 단계 */
@@ -7,9 +8,6 @@ type PendingTransition =
     | { kind: 'open' }
     | { kind: 'switch'; to: NavPanelType }
     | null;
-
-const FADE_OUT_MS = 150;
-const FADE_IN_DELAY_MS = 50;
 
 /**
  * 패널을 페이드아웃 → 높이 전환 → 페이드인 순서로 바꾼다.
@@ -53,15 +51,15 @@ export function usePanelTransition(activePanel: NavPanelType) {
 
         let timer: ReturnType<typeof setTimeout>;
         if (pending.kind === 'close') {
-            timer = setTimeout(() => setDisplayedPanel(null), FADE_OUT_MS);
+            timer = setTimeout(() => setDisplayedPanel(null), PANEL_FADE_MS);
         } else if (pending.kind === 'open') {
-            timer = setTimeout(() => setIsContentVisible(true), FADE_IN_DELAY_MS);
+            timer = setTimeout(() => setIsContentVisible(true), PANEL_FADE_IN_DELAY_MS);
         } else {
             const next = pending.to;
             timer = setTimeout(() => {
                 setDisplayedPanel(next);
                 setIsContentVisible(true);
-            }, FADE_OUT_MS);
+            }, PANEL_FADE_MS);
         }
 
         return () => clearTimeout(timer);

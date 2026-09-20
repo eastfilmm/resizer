@@ -1,5 +1,12 @@
 
-import { COLOR_PRIMARY, COLOR_GRAY_TEXT } from '@resizer/ui';
+import {
+  COLOR_PRIMARY,
+  COLOR_GRAY_TEXT,
+  PANEL_HEIGHT_MS,
+  PANEL_FADE_MS,
+  NAV_INDICATOR_MS,
+  PANEL_EASING,
+} from '@resizer/ui';
 import styled from 'styled-components';
 export const Container = styled.div`
   position: fixed;
@@ -13,8 +20,7 @@ export const PanelContainer = styled.div<{ $height: number }>`
   background: #ffffff;
   overflow: hidden;
   height: ${props => props.$height}px;
-  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: height;
+  transition: height ${PANEL_HEIGHT_MS}ms ${PANEL_EASING};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -28,7 +34,7 @@ export const PanelContentWrapper = styled.div<{ $isVisible: boolean }>`
   justify-content: center;
   align-items: center;
   opacity: ${props => props.$isVisible ? 1 : 0};
-  transition: opacity 0.15s ease;
+  transition: opacity ${PANEL_FADE_MS}ms ease;
   will-change: opacity;
   pointer-events: ${props => props.$isVisible ? 'auto' : 'none'};
 `;
@@ -48,8 +54,9 @@ export const SliderBackground = styled.div<{ $activeIndex: number }>`
   bottom: 0;
   width: 20%;
   background-color: #ffffff;
-  transition: left 0.3s ease, opacity 0.3s ease;
-  left: ${props => props.$activeIndex >= 0 ? `${props.$activeIndex * 20}%` : '0'};
+  left: 0;
+  transition: transform ${NAV_INDICATOR_MS}ms ease, opacity ${NAV_INDICATOR_MS}ms ease;
+  transform: translateX(${props => (props.$activeIndex >= 0 ? props.$activeIndex : 0) * 100}%);
   opacity: ${props => props.$activeIndex >= 0 ? 1 : 0};
   pointer-events: none;
 `;
