@@ -1,7 +1,17 @@
 'use client';
 
-import { useClickOutside, FocusReveal, useClickClearedHover } from '@resizer/ui';
+import {
+  useClickOutside,
+  FocusReveal,
+  useClickClearedHover,
+  LayoutIcon,
+  PolaroidIcon,
+  BackgroundIcon,
+  GlassBlurIcon,
+  ShadowIcon,
+} from '@resizer/ui';
 import { memo, useCallback, useMemo, useRef } from 'react';
+import type { ComponentType, SVGProps } from 'react';
 import { LayoutPanel } from './panels/LayoutPanel';
 import { FramePanel } from './panels/FramePanel';
 import { BackgroundPanel } from './panels/BackgroundPanel';
@@ -46,15 +56,15 @@ function isPanelAllowedInFrameMode(
 type NavItem = {
   id: Exclude<NavPanelType, null>;
   label: string;
-  icon: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'layout', label: 'Layout', icon: '/layout.svg' },
-  { id: 'frame', label: 'Frame', icon: '/polaroid.svg' },
-  { id: 'background', label: 'Background', icon: '/background.svg' },
-  { id: 'glassblur', label: 'Glass Blur', icon: '/glassBlur.svg' },
-  { id: 'shadow', label: 'Shadow', icon: '/shadow.svg' },
+  { id: 'layout', label: 'Layout', icon: LayoutIcon },
+  { id: 'frame', label: 'Frame', icon: PolaroidIcon },
+  { id: 'background', label: 'Background', icon: BackgroundIcon },
+  { id: 'glassblur', label: 'Glass Blur', icon: GlassBlurIcon },
+  { id: 'shadow', label: 'Shadow', icon: ShadowIcon },
 ];
 
 interface NavButtonProps {
@@ -98,8 +108,9 @@ const NavButton = memo(
         disabled={!isClickable}
       >
         <NavIcon
-          src={item.icon}
-          alt={item.label}
+          as={item.icon}
+          role="img"
+          aria-label={item.label}
           $isActive={isActive}
           $isDimmed={isDimmed}
         />

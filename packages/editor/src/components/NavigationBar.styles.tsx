@@ -128,7 +128,7 @@ export const ButtonLabel = styled.span<{ $isActive: boolean; $isDimmed: boolean 
   transition: color 0.3s ease;
 `;
 
-export const NavIcon = styled.img<{ $isActive: boolean; $isDimmed: boolean }>`
+export const NavIcon = styled.svg<{ $isActive: boolean; $isDimmed: boolean }>`
   width: 24px;
   height: 24px;
   transition: filter 0.3s ease, opacity 0.3s ease;

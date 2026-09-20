@@ -1,6 +1,6 @@
 'use client';
 
-import { IconButton, ButtonIcon } from '@resizer/ui';
+import { IconButton, ButtonIcon, RefreshIcon } from '@resizer/ui';
 import type { RefObject } from 'react';
 import { useAtomValue } from 'jotai';
 import { canResetAtom } from '../atoms/imageAtoms';
@@ -20,7 +20,7 @@ export const ResetButton = ({ canvasRef }: ResetButtonProps) => {
       onClick={resetState}
       style={{ opacity: 0.9 }}
     >
-      <ButtonIcon src="/refresh_icon.svg" alt="Reset" />
+      <ButtonIcon as={RefreshIcon} role="img" aria-label="Reset" />
     </IconButton>
   );
 };

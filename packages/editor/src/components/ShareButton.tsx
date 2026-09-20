@@ -1,6 +1,6 @@
 'use client';
 
-import { IconButton, ButtonIcon } from '@resizer/ui';
+import { IconButton, ButtonIcon, InstagramIcon } from '@resizer/ui';
 import { useCallback } from 'react';
 import { useAtomValue } from 'jotai';
 import { uploadedImagesAtom, imageSettingsAtom } from '../atoms/imageAtoms';
@@ -50,7 +50,7 @@ export const ShareButton = () => {
         background: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
       }}
     >
-      <ButtonIcon src="/instagram.svg" alt="Share to Instagram" />
+      <ButtonIcon as={InstagramIcon} role="img" aria-label="Share to Instagram" />
     </IconButton>
   );
 };

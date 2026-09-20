@@ -1,6 +1,6 @@
 'use client';
 
-import { IconButton, ButtonIcon } from '@resizer/ui';
+import { IconButton, ButtonIcon, DownloadIcon } from '@resizer/ui';
 import { useCallback } from 'react';
 import { useAtomValue } from 'jotai';
 import { uploadedImagesAtom, imageSettingsAtom } from '../atoms/imageAtoms';
@@ -69,7 +69,7 @@ export const DownloadButton = () => {
 
   return (
     <IconButton $variant="blue" disabled={uploadedImages.length === 0} onClick={handleDownload} style={{ opacity: 0.9 }}>
-      <ButtonIcon src="/download.svg" alt="Download" />
+      <ButtonIcon as={DownloadIcon} role="img" aria-label="Download" />
     </IconButton>
   );
 };

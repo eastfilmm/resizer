@@ -13,6 +13,7 @@ export { FocusReveal } from './FocusReveal';
 // styled 원자
 export * from './primitives';
 export * from './Button';
+export * from './icons';
 export * from './Layout';
 
 // 범용 훅

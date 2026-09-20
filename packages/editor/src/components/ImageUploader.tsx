@@ -1,6 +1,6 @@
 'use client';
 
-import { IconButton, ButtonIcon } from '@resizer/ui';
+import { IconButton, ButtonIcon, UploadIcon } from '@resizer/ui';
 import styled from 'styled-components';
 import type { RefObject } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -52,7 +52,7 @@ export const ImageUploader = ({ fileInputRef }: ImageUploaderProps) => {
       />
       
       <IconButton $variant="blue" onClick={() => fileInputRef.current?.click()}>
-        <ButtonIcon src="/upload.svg" alt="Upload" />
+        <ButtonIcon as={UploadIcon} role="img" aria-label="Upload" />
       </IconButton>
     </>
   );

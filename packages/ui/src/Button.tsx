@@ -68,7 +68,8 @@ export const IconButton = styled(BaseButton)`
   justify-content: center;
 `;
 
-export const ButtonIcon = styled.img`
+/** 아이콘 컴포넌트를 `as`로 받는다: <ButtonIcon as={DownloadIcon} /> */
+export const ButtonIcon = styled.svg`
   width: 20px;
   height: 20px;
   filter: brightness(0) invert(1);
