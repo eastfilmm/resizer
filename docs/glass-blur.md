@@ -30,9 +30,9 @@
 
 ## 관련 파일 목록
 
-- `src/atoms/imageAtoms.ts`: 관련 3종 Atom 정의.
+- `packages/editor/src/atoms/imageAtoms.ts`: 관련 3종 Atom 정의.
 - `packages/canvas/src/effects.ts`: 핵심 렌더링 및 Edge Clamp 로직.
-- `src/components/panels/GlassBlurPanel.tsx`: 토글 및 슬라이더 UI.
+- `packages/editor/src/components/panels/GlassBlurPanel.tsx`: 토글 및 슬라이더 UI.
 - `packages/canvas/src/__tests__/canvas-effects.test.ts`: 블러 배경 생성 및 Tint 적용 테스트.
 
 ## UI 위치

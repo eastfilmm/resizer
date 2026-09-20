@@ -27,8 +27,8 @@
 
 ## 관련 파일 목록
 
-- `src/atoms/imageAtoms.ts`: `paddingAtom` 선언.
-- `src/components/panels/LayoutPanel.tsx`: 패딩 조절 슬라이더 UI 포함.
+- `packages/editor/src/atoms/imageAtoms.ts`: `paddingAtom` 선언.
+- `packages/editor/src/components/panels/LayoutPanel.tsx`: 패딩 조절 슬라이더 UI 포함.
 - `packages/canvas/src/dimensions.ts`: 패딩 기반 좌표 계산 로직.
 - `packages/canvas/src/__tests__/canvas-dimensions.test.ts`: 패딩 적용 시 크기 계산 테스트.
 

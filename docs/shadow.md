@@ -26,9 +26,9 @@
 
 ## 관련 파일 목록
 
-- `src/atoms/imageAtoms.ts`: 그림자 관련 Atom들.
+- `packages/editor/src/atoms/imageAtoms.ts`: 그림자 관련 Atom들.
 - `packages/canvas/src/effects.ts`: 그림자 렌더링 헬퍼.
-- `src/components/panels/ShadowPanel.tsx`: 토글 및 인디케이터 UI.
+- `packages/editor/src/components/panels/ShadowPanel.tsx`: 토글 및 인디케이터 UI.
 - `packages/canvas/src/__tests__/canvas-effects.test.ts`: 그림자 위치 오프셋 및 렌더링 테스트.
 
 ## UI 위치

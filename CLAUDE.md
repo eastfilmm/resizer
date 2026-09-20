@@ -75,7 +75,7 @@ pnpm start        # Expo 개발 서버
 - 컴포넌트는 화살표 함수: `const Component = () => { ... }`
 - 새 설정은 `ImageSettings` 인터페이스에 추가하고 `focusAtom`으로 파생
 - 개별 atom을 따로 만들지 말 것
-- 패키지 수정 시 해당 `src/index.ts` export 업데이트 필수
+- 패키지 수정 시 그 패키지의 `src/index.ts` export 업데이트 필수
 - 패키지에 환경 분기(브라우저 이름 판정, 웹뷰 감지)를 넣지 말 것 — 능력을 직접 감지하거나
   앱이 판단해 주입한다
 - 패키지를 고치면 web과 ait **양쪽**에 반영된다는 점을 전제로 변경할 것
@@ -107,8 +107,11 @@ pnpm start        # Expo 개발 서버
 
 ## 상세 문서
 
-- `apps/web/AGENTS.md` — AI 에이전트 개발 가이드
-- `apps/web/docs/project-structure.md` — 디렉토리 구조 상세
-- `apps/web/docs/workflow.md` — 4단계 서브에이전트 워크플로우
-- `apps/web/docs/native-bridge.md` — 네이티브 브릿지 명세
-- `apps/web/docs/frame.md`, `canvas-padding.md`, `glass-blur.md`, `shadow.md` — 기능별 명세
+- `AGENTS.md` — AI 에이전트 기술 가이드 (여기부터 읽으면 됩니다)
+- `docs/project-structure.md` — 디렉토리 구조 상세
+- `docs/workflow.md` — 4단계 서브에이전트 워크플로우
+- `docs/native-bridge.md` — 네이티브 브릿지 명세
+- `docs/frame.md`, `canvas-padding.md`, `glass-blur.md`, `shadow.md` — 기능별 명세
+
+문서는 워크스페이스 전체를 다루므로 루트에 둡니다. 과거 `apps/web/` 아래에 있던
+탓에 패키지로 코드가 옮겨간 뒤 그대로 낡았습니다.

@@ -50,7 +50,7 @@
 **최적화 가이드**:
 - ✅ `imageSettingsAtom` 객체 전체를 구독하지 말고, `useAtom(derivedAtom)` 패턴을 사용하세요.
 - ✅ 캔버스 엔진 수정 시 `packages/canvas/src/index.ts`에 Export를 잊지 마세요.
-- ✅ 컴포넌트 로직이 복잡해지면 `src/hooks/`로 분리하세요.
+- ✅ 컴포넌트 로직이 복잡해지면 `packages/editor/src/hooks/`로 분리하세요.
 
 **사용 예시**:
 ```
@@ -67,7 +67,7 @@
 
 **작업 내용**:
 1. **테스트 필수 수행**: 
-   - `src/__tests__/utils/`에 신규 기능에 대한 단위 테스트를 추가하거나 기존 테스트를 업데이트하세요.
+   - `packages/canvas/src/__tests__/`에 신규 기능에 대한 단위 테스트를 추가하거나 기존 테스트를 업데이트하세요.
    - `pnpm test`를 실행하여 모든 테스트가 통과하는지 확인하세요.
 2. 다음 항목 체크 및 최적화:
    - **성능**: 불필요한 리렌더링 방지 (Jotai Optics 활용 여부)
@@ -113,8 +113,8 @@ ESLint 체크하고, Safari 최적화도 확인해줘.
 
 ## 관련 파일
 
-- `src/atoms/imageAtoms.ts` - borderEnabledAtom, borderWidthAtom
-- `src/components/panels/BorderPanel.tsx` - UI 컴포넌트
+- `packages/editor/src/atoms/imageAtoms.ts` - borderEnabledAtom, borderWidthAtom
+- `packages/editor/src/components/panels/BorderPanel.tsx` - UI 컴포넌트
 - ...
 ```
 

@@ -85,8 +85,8 @@ webView.postMessage(JSON.stringify({
 | 파일 | 역할 |
 |------|------|
 | `apps/mobile/App.tsx` | 네이티브 메시지 수신 및 처리 |
-| `apps/web/src/components/DownloadButton.tsx` | 다운로드 메시지 발신 |
-| `apps/web/src/components/ShareButton.tsx` | 공유 메시지 발신 |
+| `packages/editor/src/components/DownloadButton.tsx` | 다운로드 메시지 발신 |
+| `packages/editor/src/components/ShareButton.tsx` | 공유 메시지 발신 |
 | `apps/mobile/app.json` | 네이티브 권한 설정 |
 
 ## 주의사항

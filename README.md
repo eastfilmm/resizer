@@ -61,40 +61,38 @@ pnpm test:web     # Vitest 테스트 실행
 
 ```
 resizer/
-├── apps/
-│   ├── web/                    # Next.js 웹 앱
-│   │   ├── src/
-│   │   │   ├── app/            # App Router (layout, page, SEO)
-│   │   │   ├── atoms/          # Jotai 상태관리 (imageSettingsAtom)
-│   │   │   ├── components/     # React 컴포넌트
-│   │   │   │   ├── panels/     # 설정 패널 (Layout, Frame, Background, Blur, Shadow)
-│   │   │   │   ├── styled/     # 디자인 시스템 컴포넌트
-│   │   │   │   └── thumbnail-strip/  # 멀티 이미지 썸네일
-│   │   │   ├── hooks/          # 커스텀 훅
-│   │   │   ├── utils/canvas/   # 모듈화된 캔버스 렌더링 엔진
-│   │   │   ├── constants/      # 앱 상수
-│   │   │   └── __tests__/      # Vitest 테스트 (88+ 케이스)
-│   │   └── docs/               # 기능별 명세서
-│   └── mobile/                 # Expo React Native 앱
-│       └── App.tsx             # WebView + 네이티브 브릿지
+├── apps/                       # 셸 — 화면은 packages/editor가 조립한다
+│   ├── web/                    # Next.js (App Router, SEO, SSR 레지스트리)
+│   ├── ait/                    # Vite SPA (App in Toss 미니앱)
+│   └── mobile/                 # Expo WebView 래퍼 + 네이티브 브릿지
+├── packages/
+│   ├── canvas/                 # @resizer/canvas — 렌더링 엔진 (순수 TS)
+│   ├── editor/                 # @resizer/editor — atoms, 패널, 캔버스, 버튼
+│   └── ui/                     # @resizer/ui — Button, RangeSlider, theme, 훅
+├── docs/                       # 기술 문서
+├── AGENTS.md                   # AI 에이전트 기술 가이드
 ├── CLAUDE.md                   # Claude Code 지침
+├── eslint.config.mjs           # 워크스페이스 전체 린트 설정
 ├── vercel.json                 # Vercel 배포 설정
 └── pnpm-workspace.yaml         # 워크스페이스 설정
 ```
+
+의존 방향은 한 방향입니다: `apps/* → editor → { ui, canvas }`.
+
 
 ## 문서
 
 | 문서 | 내용 |
 |------|------|
 | [CLAUDE.md](./CLAUDE.md) | Claude Code 개발 지침 |
-| [AGENTS.md](./apps/web/AGENTS.md) | AI 에이전트 기술 가이드 |
-| [프로젝트 구조](./apps/web/docs/project-structure.md) | 디렉토리 구조 상세 |
-| [워크플로우](./apps/web/docs/workflow.md) | 4단계 서브에이전트 워크플로우 |
-| [네이티브 브릿지](./apps/web/docs/native-bridge.md) | Web ↔ Mobile 브릿지 명세 |
-| [Frame](./apps/web/docs/frame.md) | 프레임 기능 명세 |
-| [Canvas Padding](./apps/web/docs/canvas-padding.md) | 패딩 기능 명세 |
-| [Glass Blur](./apps/web/docs/glass-blur.md) | Glass Blur 기능 명세 |
-| [Shadow](./apps/web/docs/shadow.md) | Shadow 기능 명세 |
+| [AGENTS.md](./AGENTS.md) | AI 에이전트 기술 가이드 |
+| [프로젝트 구조](./docs/project-structure.md) | 디렉토리 구조 상세 |
+| [워크플로우](./docs/workflow.md) | 4단계 서브에이전트 워크플로우 |
+| [네이티브 브릿지](./docs/native-bridge.md) | Web ↔ Mobile 브릿지 명세 |
+| [Frame](./docs/frame.md) | 프레임 기능 명세 |
+| [Canvas Padding](./docs/canvas-padding.md) | 패딩 기능 명세 |
+| [Glass Blur](./docs/glass-blur.md) | Glass Blur 기능 명세 |
+| [Shadow](./docs/shadow.md) | Shadow 기능 명세 |
 
 ## 라이선스
 

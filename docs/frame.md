@@ -32,9 +32,9 @@
 
 ## 관련 파일 목록
 
-- `src/atoms/imageAtoms.ts`: `FrameType` 타입 정의 및 `frameTypeAtom` 선언.
+- `packages/editor/src/atoms/imageAtoms.ts`: `FrameType` 타입 정의 및 `frameTypeAtom` 선언.
 - `packages/canvas/src/frames.ts`: 실제 Canvas API 기반 프레임 렌더링 로직.
-- `src/components/panels/FramePanel.tsx`: 프레임 선택 및 데이터 입력을 위한 UI 패널.
+- `packages/editor/src/components/panels/FramePanel.tsx`: 프레임 선택 및 데이터 입력을 위한 UI 패널.
 - `packages/canvas/src/drawImage.ts`: 프레임 로직 오케스트레이션.
 - `packages/canvas/src/__tests__/canvas-frames.test.ts`: 프레임 렌더링 정확도 테스트.
 
