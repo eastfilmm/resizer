@@ -15,9 +15,9 @@ import {
   SliderSection,
   SliderLabelRow,
   SliderLabel,
-  SliderValue,
-  Slider,
 } from './shared';
+import { FocusReveal } from '@/components/FocusReveal';
+import { RangeSlider } from '@/components/RangeSlider';
 
 export const GlassBlurPanel = () => {
   const glassBlur = useAtomValue(glassBlurAtom);
@@ -32,17 +32,19 @@ export const GlassBlurPanel = () => {
   }, [setGlassBlur]);
 
   const handleIntensityChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setBlurIntensity(Number(e.target.value));
+    (v: number) => {
+      setBlurIntensity(v);
+      setGlassBlur(true); // 꺼진 상태에서 움직이면 자동 ON
     },
-    [setBlurIntensity],
+    [setBlurIntensity, setGlassBlur],
   );
 
   const handleOpacityChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setOverlayOpacity(Number(e.target.value) / 100);
+    (v: number) => {
+      setOverlayOpacity(v / 100);
+      setGlassBlur(true);
     },
-    [setOverlayOpacity],
+    [setOverlayOpacity, setGlassBlur],
   );
 
   return (
@@ -52,33 +54,39 @@ export const GlassBlurPanel = () => {
         <ToggleSwitch $isActive={glassBlur} onClick={toggleGlassBlur} />
       </PanelRow>
       <SliderSection>
-        <SliderLabelRow>
-          <SliderLabel>Blur</SliderLabel>
-          <SliderValue>{blurIntensity}%</SliderValue>
-        </SliderLabelRow>
-        <Slider
-          type="range"
-          min="1"
-          max="100"
-          value={blurIntensity}
-          onChange={handleIntensityChange}
-          disabled={!glassBlur}
-        />
+        <FocusReveal.Scope>
+          <SliderLabelRow>
+            <SliderLabel>Blur</SliderLabel>
+          </SliderLabelRow>
+          <FocusReveal.Trigger>
+            <RangeSlider
+              min={1}
+              max={100}
+              value={blurIntensity}
+              onValueChange={handleIntensityChange}
+              inactive={!glassBlur}
+              format={(v) => `${v}%`}
+            />
+          </FocusReveal.Trigger>
+        </FocusReveal.Scope>
       </SliderSection>
 
       <SliderSection>
-        <SliderLabelRow>
-          <SliderLabel>Tint</SliderLabel>
-          <SliderValue>{Math.round(overlayOpacity * 100)}%</SliderValue>
-        </SliderLabelRow>
-        <Slider
-          type="range"
-          min="0"
-          max="100"
-          value={Math.round(overlayOpacity * 100)}
-          onChange={handleOpacityChange}
-          disabled={!glassBlur}
-        />
+        <FocusReveal.Scope>
+          <SliderLabelRow>
+            <SliderLabel>Tint</SliderLabel>
+          </SliderLabelRow>
+          <FocusReveal.Trigger>
+            <RangeSlider
+              min={0}
+              max={100}
+              value={Math.round(overlayOpacity * 100)}
+              onValueChange={handleOpacityChange}
+              inactive={!glassBlur}
+              format={(v) => `${v}%`}
+            />
+          </FocusReveal.Trigger>
+        </FocusReveal.Scope>
       </SliderSection>
     </PanelContainer>
   );

@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import {
   COLOR_PRIMARY,
   COLOR_PRIMARY_DARK,
-  COLOR_GRAY,
   COLOR_GRAY_TEXT,
   COLOR_GRAY_BORDER,
   COLOR_GRAY_PLACEHOLDER,
@@ -50,7 +49,7 @@ export const ToggleSwitch = styled.div<{ $isActive: boolean }>`
   position: relative;
   width: 48px;
   height: 24px;
-  background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY)};
+  background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_BORDER)};
   border-radius: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -96,6 +95,8 @@ export const SliderLabel = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
   color: ${(props) => (props.$isDimmed ? '#ffffff' : COLOR_GRAY_TEXT)};
   transition: color 0.2s ease;
+  min-width: 52px;
+  flex-shrink: 0;
 `;
 
 // Slider Value
@@ -103,57 +104,9 @@ export const SliderValue = styled.span<{ $isDimmed?: boolean }>`
   font-size: 0.875rem;
   color: ${(props) => (props.$isDimmed ? '#ffffff' : COLOR_GRAY_TEXT)};
   transition: color 0.2s ease;
-`;
-
-// Slider Input
-export const Slider = styled.input`
-  width: 100%;
-  height: 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: ${COLOR_GRAY_BORDER};
-  border-radius: 2px;
-  outline: none;
-
-  &:disabled {
-    opacity: 0.5;
-  }
-
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: ${COLOR_PRIMARY};
-    border-radius: 50%;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-
-  &::-webkit-slider-thumb:hover {
-    background: ${COLOR_PRIMARY_DARK};
-  }
-
-  &:disabled::-webkit-slider-thumb {
-    background: white;
-    border: 1px solid ${COLOR_GRAY_BORDER};
-    cursor: not-allowed;
-  }
-
-  &::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: ${COLOR_PRIMARY};
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-  }
-
-  &:disabled::-moz-range-thumb {
-    background: white;
-    border: 1px solid ${COLOR_GRAY_BORDER};
-    cursor: not-allowed;
-  }
+  min-width: 40px;
+  text-align: right;
+  flex-shrink: 0;
 `;
 
 // Text Input
