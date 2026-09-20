@@ -38,7 +38,7 @@ resizer/
 ├── vercel.json             # Vercel 배포 (web만)
 ├── .prettierrc             # 80자, 2스페이스, 세미콜론
 ├── .npmrc                  # node-linker=hoisted
-└── .husky/pre-commit       # pnpm lint && pnpm -r test
+└── .husky/pre-commit       # lint + typecheck + test
 ```
 
 ---

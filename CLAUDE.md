@@ -46,9 +46,9 @@ pnpm dev:web      # 웹 개발 서버
 pnpm build:web    # 웹 빌드
 pnpm dev:ait      # App in Toss 개발 서버
 pnpm build:ait    # App in Toss 빌드 (.ait 번들)
-pnpm test         # 전체 워크스페이스 테스트 (pre-commit에서 실행)
-pnpm typecheck    # 전체 워크스페이스 타입체크
-pnpm lint         # 전체 워크스페이스 ESLint (pre-commit에서 실행)
+pnpm test         # 전체 워크스페이스 테스트 (pre-commit)
+pnpm typecheck    # 전체 워크스페이스 타입체크 (pre-commit)
+pnpm lint         # 전체 워크스페이스 ESLint (pre-commit)
 ```
 
 테스트는 패키지에 있습니다 — `packages/canvas`(렌더러), `packages/editor`(컴포넌트·atom).
@@ -68,7 +68,7 @@ pnpm start        # Expo 개발 서버
 - **캔버스 엔진**: `@resizer/canvas` — dimensions/frames/effects/drawImage
 - **플랫폼 주입**: 저장·공유처럼 환경마다 다른 동작은 `PlatformProvider`로 앱이 주입
   (web은 `ReactNativeWebView.postMessage`, ait는 App in Toss SDK)
-- **테스트**: Vitest + Husky pre-commit hook (lint + test)
+- **테스트**: Vitest + Husky pre-commit hook (lint + typecheck + test)
 
 ## 코드 규칙
 

@@ -46,7 +46,7 @@ Next는 `transpilePackages`로 Vite는 워크스페이스 링크로 소비합니
 - **언어**: TypeScript 5.x (strict)
 - **UI**: React 19.x + styled-components 6.x, Base UI
 - **상태**: Jotai — `imageSettingsAtom` + `jotai-optics`의 `focusAtom`
-- **테스트/린트**: Vitest, ESLint(루트 flat config), Husky pre-commit
+- **테스트/린트**: Vitest, ESLint(루트 flat config), tsc, Husky pre-commit
 
 ---
 
@@ -141,8 +141,9 @@ pnpm lint         # 전체 워크스페이스 ESLint
 
 ### 품질 기준
 
-- **pre-commit이 `pnpm lint`와 `pnpm test`를 돌립니다.** 우회하지 마세요.
-  실패하면 코드를 고칩니다.
+- **pre-commit이 `pnpm lint`, `pnpm typecheck`, `pnpm test`를 돌립니다.** 우회하지
+  마세요. 실패하면 코드를 고칩니다. 타입 오류가 린트·테스트를 통과해 넘어간 전례가
+  있어 셋을 모두 돌립니다.
 - 린트 설정은 루트 `eslint.config.mjs` 하나입니다. `apps/web`만 Next 프리셋을
   받고 나머지는 TypeScript + React Hooks 규칙을 받습니다. 패키지별로 설정을
   따로 만들면 범위가 다시 갈라집니다.
