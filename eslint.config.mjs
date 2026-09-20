@@ -71,7 +71,8 @@ export default [
   })),
   {
     ...reactHooks.configs.flat["recommended-latest"],
-    files: ["packages/**/*.tsx", "apps/ait/**/*.tsx"],
+    // 훅은 .ts 파일에도 있다. .tsx만 걸면 hooks/ 디렉토리가 통째로 빠진다.
+    files: ["packages/**/*.{ts,tsx}", "apps/ait/**/*.{ts,tsx}"],
   },
 
   {

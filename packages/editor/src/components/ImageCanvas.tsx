@@ -1,6 +1,6 @@
 'use client';
 
-import { useRafThrottle } from '@resizer/ui';
+import { useRafThrottle, DESKTOP_MEDIA_QUERY } from '@resizer/ui';
 import styled from 'styled-components';
 import { useEffect, useCallback, useRef } from 'react';
 import type { RefObject } from 'react';
@@ -253,7 +253,7 @@ const CanvasContainer = styled.div<{
   transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   ${props => props.$aspectRatio === '1:1' ? 'will-change: transform;' : ''}
 
-  @media (min-width: 768px) {
+  @media ${DESKTOP_MEDIA_QUERY} {
     width: ${props => props.$aspectRatio === '4:5'
       ? `${CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP}px`
       : props.$aspectRatio === '9:16'

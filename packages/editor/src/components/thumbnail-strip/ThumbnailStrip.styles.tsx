@@ -1,4 +1,4 @@
-import { COLOR_PRIMARY, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER } from '@resizer/ui';
+import { COLOR_PRIMARY, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER, DESKTOP_MEDIA_QUERY } from '@resizer/ui';
 import styled from 'styled-components';
 import { THUMBNAIL_SLOT_SIZE } from './constants';
 export const Container = styled.div`
@@ -8,7 +8,7 @@ export const Container = styled.div`
   flex-direction: column;
   gap: 8px;
 
-  @media (min-width: 768px) {
+  @media ${DESKTOP_MEDIA_QUERY} {
     max-width: 600px;
   }
 `;

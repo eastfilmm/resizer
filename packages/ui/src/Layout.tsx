@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { COLOR_GRAY_TEXT } from './theme';
+import { COLOR_GRAY_TEXT, DESKTOP_MEDIA_QUERY } from './theme';
 
 export const Container = styled.div`
   height: 100vh;
@@ -10,7 +10,7 @@ export const Container = styled.div`
   flex-direction: column;
   background-color: #ffffff;
 
-  @media (min-width: 768px) {
+  @media ${DESKTOP_MEDIA_QUERY} {
     max-width: 700px;
     margin: 0 auto;
   }
