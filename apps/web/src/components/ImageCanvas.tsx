@@ -12,7 +12,7 @@ import {
   getPreviewScaleFactor,
 } from '@/utils/canvas';
 import type { ImagePosition } from '@/utils/canvas';
-import { useSafariRafThrottle } from '@/hooks/useSafariRafThrottle';
+import { useRafThrottle } from '@/hooks/useRafThrottle';
 import {
   CANVAS_DISPLAY_SIZE,
   CANVAS_DISPLAY_SIZE_DESKTOP,
@@ -39,7 +39,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
   const imagePositionRef = useRef<ImagePosition | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const { throttle: safariThrottle } = useSafariRafThrottle(isSafari);
+  const { throttle } = useRafThrottle();
 
   // 프리뷰는 브라우저와 무관하게 축소 해상도로 렌더한다 (모바일 0.4, 데스크톱 0.6).
   // 다운로드는 renderCanvasImage에서 항상 2000px 풀 해상도로 별도 렌더한다.
@@ -149,7 +149,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
     }
   }, [canvasRef, aspectRatio, isDesktop]);
 
-  // Handle effect changes imperatively with conditional RAF throttle for Safari
+  // 설정 변경은 rAF로 스로틀해 프레임당 최대 한 번만 다시 그린다
   useEffect(() => {
     const performRender = () => {
       if (canvasRef.current) {
@@ -170,13 +170,13 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
         containerRef.current.style.backgroundColor = newSettings.backgroundColor;
       }
 
-      safariThrottle(performRender);
+      throttle(performRender);
     });
 
     return () => {
       unsubscribe();
     };
-  }, [store, canvasRef, redrawImage, safariThrottle]);
+  }, [store, canvasRef, redrawImage, throttle]);
 
   // Track the current image URL to detect changes
   const lastImageUrlRef = useRef<string | null>(null);

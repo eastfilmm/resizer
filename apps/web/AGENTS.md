@@ -46,9 +46,10 @@ The rendering logic is split into focused modules:
 - The preview renders at a reduced resolution in **every** browser: 800px height on mobile,
   1200px on desktop. `getPreviewScaleFactor(isDesktop)` (0.4 / 0.6) converts the 2000px-based
   settings (padding, blur, shadow) into preview space.
-- `isSafari` now only selects the blur implementation and the RAF throttle — not the resolution.
+- `isSafari` now only selects the blur implementation — not the resolution, not the throttle.
 - Stackblur is used instead of CSS filters for Safari.
-- Transitions are throttled using RAF in `ImageCanvas.tsx`.
+- Setting changes are RAF-throttled in every browser via `useRafThrottle` (one redraw per frame).
+- Glass blur reuses module-scoped scratch canvases instead of allocating per frame.
 - **Download** always triggers a full-resolution (2000px height) render.
 
 ---

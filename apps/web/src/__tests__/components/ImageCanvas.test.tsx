@@ -215,6 +215,41 @@ describe('ImageCanvas 재드로우 배선', () => {
     expect(lastDrawOptions().padding).toBe(80 * 0.4);
   });
 
+  // 슬라이더 드래그는 포인터 이벤트를 초당 60~120회 쏟아낸다.
+  // 스로틀이 없으면 이벤트마다 캔버스를 통째로 다시 그리게 된다.
+  it('한 프레임 안에 설정이 여러 번 바뀌어도 한 번만 그린다', async () => {
+    const { store } = await setup();
+    const before = drawSpy.mock.calls.length;
+
+    await act(async () => {
+      for (let i = 1; i <= 10; i += 1) {
+        store.set(imageSettingsAtom, (prev) => ({ ...prev, padding: i * 10 }));
+      }
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    });
+
+    expect(drawSpy.mock.calls.length - before).toBe(1);
+    // 버려진 중간값이 아니라 마지막 값으로 그려져야 한다.
+    expect(lastDrawOptions().padding).toBe(100 * 0.4);
+  });
+
+  it('프레임이 지나면 다시 그릴 수 있다', async () => {
+    const { store } = await setup();
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
+    const before = drawSpy.mock.calls.length;
+    await act(async () => {
+      store.set(imageSettingsAtom, (prev) => ({ ...prev, padding: 10 }));
+      await nextFrame();
+    });
+    await act(async () => {
+      store.set(imageSettingsAtom, (prev) => ({ ...prev, padding: 20 }));
+      await nextFrame();
+    });
+
+    expect(drawSpy.mock.calls.length - before).toBe(2);
+  });
+
   // useIsDesktop은 마운트 후에 false -> true로 뒤집힌다. 그때 캔버스가 재생성되고
   // 다시 그려지지 않으면 데스크톱에서 빈 캔버스가 남는다.
   it('isDesktop이 뒤집히면 캔버스를 다시 만들고 다시 그린다', async () => {

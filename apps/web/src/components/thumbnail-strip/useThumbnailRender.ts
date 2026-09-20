@@ -9,7 +9,7 @@ import {
   getThumbnailCanvasSize,
 } from '@/utils/canvas';
 import { THUMBNAIL_INNER_SIZE, THUMBNAIL_RENDER_SCALE } from './constants';
-import { useSafariRafThrottle } from '@/hooks/useSafariRafThrottle';
+import { useRafThrottle } from '@/hooks/useRafThrottle';
 
 interface UseThumbnailRenderOptions {
   objectUrl: string;
@@ -27,7 +27,7 @@ export const useThumbnailRender = ({
   const imageRef = useRef<HTMLImageElement | null>(null);
   const settingsRef = useRef(store.get(imageSettingsAtom));
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { throttle: safariThrottle } = useSafariRafThrottle(isSafari);
+  const { throttle } = useRafThrottle();
 
   const renderThumbnail = useCallback(() => {
     if (!canvasRef.current || !imageRef.current) return;
@@ -91,7 +91,7 @@ export const useThumbnailRender = ({
     const DEBOUNCE_MS = 300;
 
     const performRender = () => {
-      safariThrottle(renderThumbnail);
+      throttle(renderThumbnail);
     };
 
     const unsubscribe = store.sub(imageSettingsAtom, () => {
@@ -114,7 +114,7 @@ export const useThumbnailRender = ({
         debounceTimerRef.current = null;
       }
     };
-  }, [safariThrottle, renderThumbnail, store]);
+  }, [throttle, renderThumbnail, store]);
 
   useEffect(() => {
     renderThumbnail();
