@@ -22,11 +22,10 @@ import { useAspectRatio } from '../hooks/useAspectRatio';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  isSafari?: boolean;
   isDesktop?: boolean;
 }
 
-export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = false }: ImageCanvasProps) {
+export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanvasProps) {
   const store = useStore();
   const imageUrl = useAtomValue(imageUrlAtom);
   const { aspectRatio } = useAspectRatio();
@@ -71,7 +70,6 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
           shadowOffset: settings.shadowOffset * SCALE_FACTOR,
           frameType: settings.frameType,
           scaleFactor: SCALE_FACTOR,
-          useStackBlur: isSafari,
           polaroidDate: settings.polaroidDate,
         });
       } else {
@@ -80,7 +78,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     },
-    [isSafari, isDesktop, SCALE_FACTOR]
+    [isDesktop, SCALE_FACTOR]
   );
 
   const drawImageOnCanvas = useCallback(() => {

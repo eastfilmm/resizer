@@ -33,7 +33,6 @@ export interface DrawImageOptions {
    * 블러를 JS(StackBlur)로 계산할지 여부. 기본값은 네이티브 `ctx.filter`다.
    * 어떤 환경이 어느 쪽인지는 렌더러가 아니라 호출하는 앱이 판단한다.
    */
-  useStackBlur?: boolean;
   scaleFactor?: number;
   polaroidDate?: string;
 }

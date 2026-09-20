@@ -28,6 +28,38 @@ function getScratchCanvas(key: 'temp' | 'blur', width: number, height: number): 
   return canvas;
 }
 
+/**
+ * 캔버스 2D의 `ctx.filter` 지원 여부.
+ *
+ * 예전에는 호출부가 "사파리인가"를 넘겨줬다. Safari가 ctx.filter를 지원하지
+ * 않아 블러가 조용히 무시됐기 때문인데, Safari 17(2023-09)부터는 지원한다.
+ * 브라우저 이름으로 추측하면 ait처럼 "최적화"라 믿고 느린 JS 블러를 강제하는
+ * 일이 생기므로, 능력을 직접 확인한다. StackBlur는 순수 JS라 네이티브
+ * ctx.filter보다 훨씬 느리니 폴백으로만 쓴다.
+ */
+let canvasFilterSupported: boolean | null = null;
+
+export function supportsCanvasFilter(): boolean {
+  if (canvasFilterSupported !== null) return canvasFilterSupported;
+  if (typeof document === 'undefined') return false;
+
+  const probe = document.createElement('canvas').getContext('2d');
+  if (!probe) {
+    canvasFilterSupported = false;
+    return false;
+  }
+
+  probe.filter = 'blur(1px)';
+  // 미지원 브라우저는 대입을 무시해 'none'으로 남는다.
+  canvasFilterSupported = probe.filter !== 'none' && probe.filter !== '';
+  return canvasFilterSupported;
+}
+
+/** 테스트용: 감지 결과 캐시를 비운다. */
+export function resetCanvasFilterSupportCache(): void {
+  canvasFilterSupported = null;
+}
+
 export function drawGlassBlurBackground(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -35,8 +67,7 @@ export function drawGlassBlurBackground(
   canvasHeight: number,
   intensity: number,
   overlayColor: string,
-  opacity: number,
-  useStackBlur: boolean = false
+  opacity: number
 ): void {
   // Crop source image to match canvas aspect ratio (center crop, no distortion)
   const canvasRatio = canvasWidth / canvasHeight;
@@ -96,7 +127,8 @@ export function drawGlassBlurBackground(
     expandedHeight
   );
 
-  if (useStackBlur) {
+  if (!supportsCanvasFilter()) {
+    // 폴백: 메인 스레드 JS 블러
     canvasRGB(tempCanvas, 0, 0, expandedWidth, expandedHeight, Math.round(intensity));
     ctx.drawImage(tempCanvas, margin, margin, canvasWidth, canvasHeight, 0, 0, canvasWidth, canvasHeight);
   } else {

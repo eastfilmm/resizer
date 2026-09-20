@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Main, useIsSafari, useIsDesktop } from '@resizer/ui';
+import { Container, Main, useIsDesktop } from '@resizer/ui';
 import { useRef } from 'react';
 import { useAtomValue } from 'jotai';
 import styled from 'styled-components';
@@ -19,7 +19,6 @@ const NAV_HEIGHT = 200;
 
 export default function ClientPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isSafari = useIsSafari();
   const isDesktop = useIsDesktop();
   const imageUrl = useAtomValue(imageUrlAtom);
   const hasImages = imageUrl !== null;
@@ -29,7 +28,7 @@ export default function ClientPage() {
       <Container>
       <Main>
         <CanvasWrapper>
-          <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} isDesktop={isDesktop} />
+          <ImageCanvas canvasRef={canvasRef} isDesktop={isDesktop} />
           {hasImages && (
             <FloatingButtons>
               <ResetButton canvasRef={canvasRef} />
@@ -38,7 +37,7 @@ export default function ClientPage() {
             </FloatingButtons>
           )}
         </CanvasWrapper>
-        <ThumbnailStrip isSafari={isSafari} />
+        <ThumbnailStrip />
 
         <NavSpacer />
       </Main>

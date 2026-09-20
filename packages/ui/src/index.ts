@@ -19,5 +19,4 @@ export * from './Layout';
 export { useClickClearedHover } from './hooks/useClickClearedHover';
 export { useClickOutside } from './hooks/useClickOutside';
 export { useIsDesktop } from './hooks/useIsDesktop';
-export { useIsSafari } from './hooks/useIsSafari';
 export { useRafThrottle } from './hooks/useRafThrottle';

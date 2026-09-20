@@ -32,7 +32,6 @@ const drawSpy = vi.mocked(drawImageWithEffects);
 const OBJECT_URL = 'blob:test-image';
 
 type RenderOptions = {
-  isSafari?: boolean;
   isDesktop?: boolean;
   aspectRatio?: AspectRatio;
   settings?: Partial<ImageSettings>;
@@ -40,7 +39,6 @@ type RenderOptions = {
 };
 
 const setup = async ({
-  isSafari = false,
   isDesktop = false,
   aspectRatio = '1:1',
   settings,
@@ -64,7 +62,7 @@ const setup = async ({
 
   const view = render(
     <Provider store={store}>
-      <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} isDesktop={isDesktop} />
+      <ImageCanvas canvasRef={canvasRef} isDesktop={isDesktop} />
     </Provider>,
   );
 
@@ -73,13 +71,12 @@ const setup = async ({
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
 
-  const rerender = (next: { isSafari?: boolean; isDesktop?: boolean }) =>
+  const rerender = (next: { isDesktop?: boolean }) =>
     act(() => {
       view.rerender(
         <Provider store={store}>
           <ImageCanvas
             canvasRef={canvasRef}
-            isSafari={next.isSafari ?? isSafari}
             isDesktop={next.isDesktop ?? isDesktop}
           />
         </Provider>,
@@ -119,26 +116,11 @@ describe('ImageCanvas 프리뷰 해상도', () => {
     expect(canvasRef.current?.height).toBe(CANVAS_PREVIEW_SIZE_DESKTOP);
   });
 
-  // 이번 변경의 핵심: 해상도가 더 이상 isSafari에 좌우되지 않는다.
-  it.each([
-    ['모바일', false, CANVAS_PREVIEW_SIZE],
-    ['데스크톱', true, CANVAS_PREVIEW_SIZE_DESKTOP],
-  ])('%s에서 isSafari 여부와 무관하게 같은 해상도를 쓴다', async (_label, isDesktop, expected) => {
-    const safari = await setup({ isSafari: true, isDesktop });
-    expect(safari.canvasRef.current?.width).toBe(expected);
-    cleanup();
-
-    const nonSafari = await setup({ isSafari: false, isDesktop });
-    expect(nonSafari.canvasRef.current?.width).toBe(expected);
-  });
-
   it('어떤 환경에서도 풀 해상도(2000px)로 프리뷰를 그리지 않는다', async () => {
-    for (const isSafari of [true, false]) {
-      for (const isDesktop of [true, false]) {
-        const { canvasRef } = await setup({ isSafari, isDesktop });
-        expect(canvasRef.current!.height).toBeLessThan(CANVAS_ACTUAL_SIZE);
-        cleanup();
-      }
+    for (const isDesktop of [true, false]) {
+      const { canvasRef } = await setup({ isDesktop });
+      expect(canvasRef.current!.height).toBeLessThan(CANVAS_ACTUAL_SIZE);
+      cleanup();
     }
   });
 
@@ -190,14 +172,11 @@ describe('ImageCanvas 설정값 환산', () => {
     expect(options.imageAreaHeight).toBe(CANVAS_PREVIEW_SIZE - expectedPadding * 2);
   });
 
-  it('isSafari는 useStackBlur 옵션으로 렌더러에 전달된다', async () => {
-    await setup({ isSafari: true });
-    expect(lastDrawOptions().useStackBlur).toBe(true);
-    cleanup();
-
-    drawSpy.mockClear();
-    await setup({ isSafari: false });
-    expect(lastDrawOptions().useStackBlur).toBe(false);
+  // 블러 구현은 렌더러가 ctx.filter 지원 여부로 직접 판단한다.
+  // 호출부가 브라우저를 추측해 넘기던 플래그는 없어야 한다.
+  it('블러 구현 선택 플래그를 렌더러에 넘기지 않는다', async () => {
+    await setup();
+    expect(lastDrawOptions()).not.toHaveProperty('useStackBlur');
   });
 });
 

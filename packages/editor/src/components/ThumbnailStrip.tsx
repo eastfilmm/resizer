@@ -19,10 +19,9 @@ import {
 import { ThumbnailItem } from './thumbnail-strip/ThumbnailItem';
 
 interface ThumbnailStripProps {
-  isSafari?: boolean;
 }
 
-export const ThumbnailStrip = ({ isSafari = false }: ThumbnailStripProps) => {
+export const ThumbnailStrip = () => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);
   const [selectedImageId, setSelectedImageId] = useAtom(selectedImageIdAtom);
   const activeImageId = selectedImageId ?? uploadedImages[0]?.id ?? null;
@@ -50,7 +49,6 @@ export const ThumbnailStrip = ({ isSafari = false }: ThumbnailStripProps) => {
             key={image.id}
             image={image}
             isSelected={activeImageId === image.id}
-            isSafari={isSafari}
             onSelect={setSelectedImageId}
           />
         ))}

@@ -21,7 +21,6 @@ export function drawImageWithEffects(
     shadowIntensity,
     shadowOffset,
     frameType,
-    useStackBlur = false,
     scaleFactor = 1,
   } = options;
 
@@ -37,7 +36,7 @@ export function drawImageWithEffects(
   }
 
   if (useGlassBlur) {
-    drawGlassBlurBackground(ctx, img, actualCanvasWidth, actualCanvasHeight, blurIntensity, bgColor, overlayOpacity, useStackBlur);
+    drawGlassBlurBackground(ctx, img, actualCanvasWidth, actualCanvasHeight, blurIntensity, bgColor, overlayOpacity);
   } else {
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, actualCanvasWidth, actualCanvasHeight);

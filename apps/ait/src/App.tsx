@@ -18,9 +18,6 @@ const NAV_HEIGHT = 200;
 
 export default function ClientPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // 토스 모바일 웹뷰: 항상 최적화된 프리뷰 경로(0.4배 축소 + RAF 스로틀) 사용.
-  // 풀해상도 다운로드는 renderImageToCanvas가 별도로 처리하므로 화질 영향 없음.
-  const isSafari = true;
   const isDesktop = useIsDesktop();
   const imageUrl = useAtomValue(imageUrlAtom);
   const hasImages = imageUrl !== null;
@@ -31,7 +28,7 @@ export default function ClientPage() {
       <Main>
         <Title>Insta Frame</Title>
         <CanvasWrapper>
-          <ImageCanvas canvasRef={canvasRef} isSafari={isSafari} isDesktop={isDesktop} />
+          <ImageCanvas canvasRef={canvasRef} isDesktop={isDesktop} />
           {hasImages && (
             <FloatingButtons>
               <ResetButton canvasRef={canvasRef} />
@@ -40,7 +37,7 @@ export default function ClientPage() {
             </FloatingButtons>
           )}
         </CanvasWrapper>
-        <ThumbnailStrip isSafari={isSafari} />
+        <ThumbnailStrip />
 
         <NavSpacer />
       </Main>

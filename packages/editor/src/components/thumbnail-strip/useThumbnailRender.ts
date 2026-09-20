@@ -12,12 +12,10 @@ import {
 import { THUMBNAIL_INNER_SIZE, THUMBNAIL_RENDER_SCALE } from './constants';
 interface UseThumbnailRenderOptions {
   objectUrl: string;
-  isSafari: boolean;
 }
 
 export const useThumbnailRender = ({
   objectUrl,
-  isSafari,
 }: UseThumbnailRenderOptions) => {
   const store = useStore();
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
@@ -68,10 +66,9 @@ export const useThumbnailRender = ({
       shadowOffset: settings.shadowOffset * scaleFactor,
       frameType: settings.frameType,
       scaleFactor,
-      useStackBlur: isSafari,
       polaroidDate: settings.polaroidDate,
     });
-  }, [aspectRatio, isSafari]);
+  }, [aspectRatio]);
 
   useEffect(() => {
     const img = new Image();

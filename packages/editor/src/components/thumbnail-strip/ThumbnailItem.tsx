@@ -8,15 +8,13 @@ import { useThumbnailRender } from './useThumbnailRender';
 interface ThumbnailItemProps {
   image: UploadedImage;
   isSelected: boolean;
-  isSafari: boolean;
   onSelect: (id: string) => void;
 }
 
 export const ThumbnailItem = memo(
-  ({ image, isSelected, isSafari, onSelect }: ThumbnailItemProps) => {
+  ({ image, isSelected, onSelect }: ThumbnailItemProps) => {
     const canvasRef = useThumbnailRender({
       objectUrl: image.objectUrl,
-      isSafari,
     });
 
     return (

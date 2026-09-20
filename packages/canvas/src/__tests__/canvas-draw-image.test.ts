@@ -28,7 +28,6 @@ describe('drawImageWithEffects', () => {
     shadowIntensity: 30,
     shadowOffset: 20,
     frameType: 'none',
-    useStackBlur: false,
     scaleFactor: 1,
     polaroidDate: '',
   };
@@ -322,14 +321,13 @@ describe('drawImageWithEffects', () => {
   // ─── Safari mode ───
 
   describe('Safari mode', () => {
-    it('works with StackBlur flag and scaled values', () => {
+    it('works with scaled values', () => {
       const result = drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
         actualCanvasWidth: 800,
         actualCanvasHeight: 800,
         imageAreaWidth: 800,
         imageAreaHeight: 800,
-        useStackBlur: true,
         scaleFactor: 0.4,
       });
       expect(result.width).toBeGreaterThan(0);
