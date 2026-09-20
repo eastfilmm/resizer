@@ -17,8 +17,9 @@ import {
   CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
   CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
 } from '@resizer/canvas';
-import type { ImagePosition } from '@resizer/canvas';
+import type { ImagePosition, DrawableImage } from '@resizer/canvas';
 import { useAspectRatio } from '../hooks/useAspectRatio';
+import { loadEditableImage } from '../utils/imageSource';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -32,7 +33,11 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
 
   // Refs to access current values in callbacks without re-triggering effects
   const settingsRef = useRef(store.get(imageSettingsAtom));
-  const imageRef = useRef<HTMLImageElement | null>(null);
+  const imageRef = useRef<DrawableImage | null>(null);
+  const loadedUrlRef = useRef<string | null>(null);
+  const imageUrlRef = useRef<string | null>(null);
+  // 로드가 끝났을 때 선택이 이미 바뀌었는지 판별하기 위해 최신 값을 유지한다
+  imageUrlRef.current = imageUrl;
   const imagePositionRef = useRef<ImagePosition | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,7 +48,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
   const SCALE_FACTOR = getPreviewScaleFactor(isDesktop);
 
   const redrawImage = useCallback(
-    (ctx: CanvasRenderingContext2D, img: HTMLImageElement | null) => {
+    (ctx: CanvasRenderingContext2D, img: DrawableImage | null) => {
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(
         settingsRef.current.canvasAspectRatio,
         true,
@@ -107,19 +112,20 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // If image is already loaded, redraw immediately to avoid flicker
-    if (imageRef.current && imageRef.current.src === imageUrl) {
+    // 이미 로드된 이미지면 깜빡임 없이 바로 다시 그린다
+    if (imageRef.current && loadedUrlRef.current === imageUrl) {
       redrawImage(ctx, imageRef.current);
       return;
     }
 
-    // Load new image
-    const newImg = new Image();
-    newImg.onload = () => {
-      imageRef.current = newImg;
-      redrawImage(ctx, newImg);
-    };
-    newImg.src = imageUrl;
+    // 축소·디코드된 소스를 공유 캐시에서 받는다(같은 URL은 한 번만 디코드된다)
+    loadEditableImage(imageUrl).then((image) => {
+      // 로드 중에 선택이 바뀌었으면 버린다
+      if (imageUrlRef.current !== imageUrl) return;
+      imageRef.current = image;
+      loadedUrlRef.current = imageUrl;
+      redrawImage(ctx, image);
+    });
   }, [imageUrl, canvasRef, redrawImage, isDesktop]);
 
   // Initialize canvas on mount (skip when image is already loaded to avoid double-clear flicker)
@@ -181,6 +187,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
       if (lastImageUrlRef.current !== imageUrl) {
         imageRef.current = null;
         imagePositionRef.current = null;
+        loadedUrlRef.current = null;
         lastImageUrlRef.current = imageUrl;
       }
       drawImageOnCanvas();
@@ -188,6 +195,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
       // Clear image reference when imageUrl is null (reset)
       imageRef.current = null;
       imagePositionRef.current = null;
+      loadedUrlRef.current = null;
       lastImageUrlRef.current = null;
       // Clear canvas and update display size
       if (canvasRef.current) {

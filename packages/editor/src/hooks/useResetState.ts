@@ -10,6 +10,7 @@ import {
   DEFAULT_IMAGE_SETTINGS,
 } from '../atoms/imageAtoms';
 import { resetCanvas } from '@resizer/canvas';
+import { releaseAllEditableImages } from '../utils/imageSource';
 
 interface UseResetStateProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -23,6 +24,7 @@ export const useResetState = ({ canvasRef }: UseResetStateProps) => {
 
   const resetState = useCallback(() => {
     uploadedImages.forEach((image) => URL.revokeObjectURL(image.objectUrl));
+    releaseAllEditableImages();
     setUploadedImages([]);
     setSelectedImageId(null);
 

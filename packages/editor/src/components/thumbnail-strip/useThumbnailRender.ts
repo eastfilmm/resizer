@@ -1,6 +1,8 @@
 'use client';
 
 import { useRafThrottle } from '@resizer/ui';
+import type { DrawableImage } from '@resizer/canvas';
+import { loadEditableImage } from '../../utils/imageSource';
 import { useCallback, useEffect, useRef } from 'react';
 import { useAtomValue, useStore } from 'jotai';
 import { canvasAspectRatioAtom, imageSettingsAtom } from '../../atoms/imageAtoms';
@@ -21,7 +23,7 @@ export const useThumbnailRender = ({
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
+  const imageRef = useRef<DrawableImage | null>(null);
   const settingsRef = useRef(store.get(imageSettingsAtom));
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { throttle } = useRafThrottle();
@@ -71,14 +73,18 @@ export const useThumbnailRender = ({
   }, [aspectRatio]);
 
   useEffect(() => {
-    const img = new Image();
-    img.onload = () => {
-      imageRef.current = img;
+    let active = true;
+
+    // 메인 캔버스와 같은 축소본을 공유한다. 썸네일마다 원본을 따로
+    // 디코드하면 사진 한 장당 수십 MB가 썸네일 수만큼 늘어난다.
+    loadEditableImage(objectUrl).then((image) => {
+      if (!active) return;
+      imageRef.current = image;
       renderThumbnail();
-    };
-    img.src = objectUrl;
+    });
 
     return () => {
+      active = false;
       imageRef.current = null;
     };
   }, [objectUrl, renderThumbnail]);

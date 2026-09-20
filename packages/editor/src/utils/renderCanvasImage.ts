@@ -1,17 +1,12 @@
 import { drawImageWithEffects, getCanvasDimensions } from '@resizer/canvas';
 import type { ImageSettings, AspectRatio } from '../atoms/imageAtoms';
+import { loadEditableImage } from './imageSource';
 
-export const loadImage = async (src: string): Promise<HTMLImageElement> => {
-  const img = new Image();
-  img.src = src;
-
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
-  });
-
-  return img;
-};
+/**
+ * 다운로드 렌더도 편집 화면과 같은 축소본을 쓴다.
+ * 소스는 2000px로 줄여둔 것이고 출력도 2000px이라 화질 손실이 없다.
+ */
+export const loadImage = (src: string): Promise<HTMLCanvasElement> => loadEditableImage(src);
 
 export const canvasToBlob = (canvas: HTMLCanvasElement): Promise<Blob> =>
   new Promise<Blob>((resolve, reject) => {

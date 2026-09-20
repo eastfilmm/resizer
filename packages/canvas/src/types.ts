@@ -1,4 +1,10 @@
 /**
+ * 렌더러가 이미지에서 실제로 쓰는 것은 크기와 drawImage 소스 자격뿐이다.
+ * HTMLImageElement로 좁히면 "원본을 축소해 캐시한 캔버스"를 넘길 수 없다.
+ */
+export type DrawableImage = CanvasImageSource & { width: number; height: number };
+
+/**
  * 캔버스 렌더링의 도메인 타입.
  *
  * 앱의 atom 정의(`imageAtoms`)가 아니라 여기가 원본이다. 두 앱(web/ait)이 같은

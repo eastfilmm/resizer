@@ -9,6 +9,7 @@ import {
   type UploadedImage,
 } from '../atoms/imageAtoms';
 import { createImageId } from '../utils/imageUtils';
+import { releaseEditableImage } from '../utils/imageSource';
 
 export const useImageUpload = () => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);
@@ -37,7 +38,10 @@ export const useImageUpload = () => {
         setSelectedImageId(newImages[0]?.id ?? null);
       } else {
         // 전체 교체
-        uploadedImages.forEach((image) => URL.revokeObjectURL(image.objectUrl));
+        uploadedImages.forEach((image) => {
+          URL.revokeObjectURL(image.objectUrl);
+          releaseEditableImage(image.objectUrl);
+        });
         setUploadedImages(newImages);
         setSelectedImageId(newImages[0]?.id ?? null);
       }

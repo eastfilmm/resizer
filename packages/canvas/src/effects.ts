@@ -1,3 +1,4 @@
+import type { DrawableImage } from './types';
 import { canvasRGB } from 'stackblur-canvas';
 
 /**
@@ -62,7 +63,7 @@ export function resetCanvasFilterSupportCache(): void {
 
 export function drawGlassBlurBackground(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
+  img: DrawableImage,
   canvasWidth: number,
   canvasHeight: number,
   intensity: number,

@@ -1,10 +1,10 @@
-import type { DrawImageOptions, ImagePosition } from './types';
+import type { DrawImageOptions, ImagePosition, DrawableImage } from './types';
 import { drawPolaroidFrame, drawThinFrame, drawMediumFilmFrame } from './frames';
 import { drawGlassBlurBackground } from './effects';
 
 export function drawImageWithEffects(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
+  img: DrawableImage,
   options: DrawImageOptions
 ): ImagePosition {
   const {

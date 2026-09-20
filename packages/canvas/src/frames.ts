@@ -1,8 +1,8 @@
-import type { ImagePosition } from './types';
+import type { ImagePosition, DrawableImage } from './types';
 
 export function drawPolaroidFrame(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
+  img: DrawableImage,
   canvasWidth: number,
   canvasHeight: number,
   bgColor: string,
@@ -123,7 +123,7 @@ export function drawPolaroidFrame(
 
 export function drawThinFrame(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
+  img: DrawableImage,
   canvasWidth: number,
   canvasHeight: number,
   bgColor: string,
@@ -173,7 +173,7 @@ export function drawThinFrame(
 
 export function drawMediumFilmFrame(
   ctx: CanvasRenderingContext2D,
-  img: HTMLImageElement,
+  img: DrawableImage,
   canvasWidth: number,
   canvasHeight: number,
   bgColor: string,
