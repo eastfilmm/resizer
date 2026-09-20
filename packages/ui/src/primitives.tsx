@@ -116,6 +116,11 @@ export const TextInput = styled.input`
   border: 1px solid ${COLOR_GRAY_BORDER};
   border-radius: 8px;
   outline: none;
+  /* iOS Safari는 자체 입력 필드 렌더링(내부 패딩·최소 높이)을 적용해
+     지정한 padding보다 몇 px 더 커진다. 고정 높이 컨테이너 안에서는
+     그만큼이 그대로 잘려 나가므로 플랫폼 기본값을 제거한다. */
+  -webkit-appearance: none;
+  appearance: none;
   transition: border-color 0.2s ease;
   box-sizing: border-box;
 
