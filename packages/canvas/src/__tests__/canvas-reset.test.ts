@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { resetCanvas } from '@/utils/canvas';
+import { resetCanvas } from '../index';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_DISPLAY_SIZE,
@@ -7,7 +7,7 @@ import {
   CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
   CANVAS_ACTUAL_SIZE_9_16_WIDTH,
   CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
-} from '@/constants/CanvasContents';
+} from '../constants';
 
 describe('resetCanvas', () => {
   let canvas: HTMLCanvasElement;

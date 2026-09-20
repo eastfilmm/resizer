@@ -7,7 +7,7 @@ import {
   drawImageWithEffects,
   getCanvasDimensions,
   getThumbnailCanvasSize,
-} from '@/utils/canvas';
+} from '@resizer/canvas';
 import { THUMBNAIL_INNER_SIZE, THUMBNAIL_RENDER_SCALE } from './constants';
 import { useRafThrottle } from '@/hooks/useRafThrottle';
 
@@ -69,7 +69,7 @@ export const useThumbnailRender = ({
       shadowOffset: settings.shadowOffset * scaleFactor,
       frameType: settings.frameType,
       scaleFactor,
-      isSafari,
+      useStackBlur: isSafari,
       polaroidDate: settings.polaroidDate,
     });
   }, [aspectRatio, isSafari]);

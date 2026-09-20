@@ -17,16 +17,16 @@ import {
   CANVAS_DISPLAY_SIZE_DESKTOP,
   CANVAS_PREVIEW_SIZE,
   CANVAS_PREVIEW_SIZE_DESKTOP,
-} from '@/constants/CanvasContents';
+} from '@resizer/canvas';
 import { MockImage } from '../setup';
 
 // drawImageWithEffects만 spy로 감싸고 나머지 캔버스 유틸은 실제 구현을 쓴다.
-vi.mock('@/utils/canvas', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/utils/canvas')>();
+vi.mock('@resizer/canvas', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@resizer/canvas')>();
   return { ...actual, drawImageWithEffects: vi.fn(actual.drawImageWithEffects) };
 });
 
-const { drawImageWithEffects } = await import('@/utils/canvas');
+const { drawImageWithEffects } = await import('@resizer/canvas');
 const drawSpy = vi.mocked(drawImageWithEffects);
 
 const OBJECT_URL = 'blob:test-image';
@@ -190,14 +190,14 @@ describe('ImageCanvas 설정값 환산', () => {
     expect(options.imageAreaHeight).toBe(CANVAS_PREVIEW_SIZE - expectedPadding * 2);
   });
 
-  it('isSafari는 블러 구현 선택용으로 계속 전달된다', async () => {
+  it('isSafari는 useStackBlur 옵션으로 렌더러에 전달된다', async () => {
     await setup({ isSafari: true });
-    expect(lastDrawOptions().isSafari).toBe(true);
+    expect(lastDrawOptions().useStackBlur).toBe(true);
     cleanup();
 
     drawSpy.mockClear();
     await setup({ isSafari: false });
-    expect(lastDrawOptions().isSafari).toBe(false);
+    expect(lastDrawOptions().useStackBlur).toBe(false);
   });
 });
 

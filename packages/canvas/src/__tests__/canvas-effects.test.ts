@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { drawGlassBlurBackground } from '@/utils/canvas';
+import { drawGlassBlurBackground } from '../index';
 
 describe('drawGlassBlurBackground', () => {
   let canvas: HTMLCanvasElement;
@@ -186,7 +186,7 @@ describe('drawGlassBlurBackground 스크래치 캔버스 재사용', () => {
         return el;
       }) as typeof document.createElement);
 
-    const { drawGlassBlurBackground: freshDraw } = await import('@/utils/canvas/effects');
+    const { drawGlassBlurBackground: freshDraw } = await import('../effects');
 
     // 1회차: 스크래치 캔버스 생성 + 사용
     freshDraw(ctx, img, 500, 500, 8, 'white', 0.3, false);

@@ -3,7 +3,7 @@ import {
   drawPolaroidFrame,
   drawThinFrame,
   drawMediumFilmFrame,
-} from '@/utils/canvas';
+} from '../index';
 
 describe('drawPolaroidFrame', () => {
   let canvas: HTMLCanvasElement;

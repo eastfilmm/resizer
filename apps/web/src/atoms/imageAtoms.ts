@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+import type { AspectRatio, BackgroundColor, FrameType } from '@resizer/canvas';
 import { focusAtom } from 'jotai-optics';
 
 // 네비게이션 활성 패널 타입
@@ -31,9 +32,8 @@ export const selectedImageAtom = atom((get) => {
 // 선택된 이미지 URL을 기존 단일 프리뷰 흐름에서 그대로 사용할 수 있도록 유지합니다.
 export const imageUrlAtom = atom((get) => get(selectedImageAtom)?.objectUrl ?? null);
 
-export type AspectRatio = '1:1' | '4:5' | '9:16';
-export type BackgroundColor = 'white' | 'black';
-export type FrameType = 'none' | 'polaroid' | 'thin' | 'mediumFilm';
+// 캔버스 렌더러가 원본을 갖는다. 기존 `@/atoms/imageAtoms` 임포트를 깨지 않도록 재노출한다.
+export type { AspectRatio, BackgroundColor, FrameType } from '@resizer/canvas';
 
 export interface ImageSettings {
   backgroundColor: BackgroundColor;

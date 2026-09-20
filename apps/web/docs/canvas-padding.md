@@ -22,15 +22,15 @@
 - 타입: `number`
 
 ### 렌더링 로직
-- `src/utils/canvas/dimensions.ts` 내부의 `getCanvasDimensions` 함수에서 패딩을 고려한 실제 이미지 배치 좌표 및 크기를 계산합니다.
+- `packages/canvas/src/dimensions.ts` 내부의 `getCanvasDimensions` 함수에서 패딩을 고려한 실제 이미지 배치 좌표 및 크기를 계산합니다.
 - 계산된 좌표는 `ImagePosition` 객체로 반환되어 실제 그리기 함수에서 사용됩니다.
 
 ## 관련 파일 목록
 
 - `src/atoms/imageAtoms.ts`: `paddingAtom` 선언.
 - `src/components/panels/LayoutPanel.tsx`: 패딩 조절 슬라이더 UI 포함.
-- `src/utils/canvas/dimensions.ts`: 패딩 기반 좌표 계산 로직.
-- `src/__tests__/utils/canvas-dimensions.test.ts`: 패딩 적용 시 크기 계산 테스트.
+- `packages/canvas/src/dimensions.ts`: 패딩 기반 좌표 계산 로직.
+- `packages/canvas/src/__tests__/canvas-dimensions.test.ts`: 패딩 적용 시 크기 계산 테스트.
 
 ## UI 위치
 하단 네비게이션 바의 **Layout** 패널 하단 슬라이더 섹션.

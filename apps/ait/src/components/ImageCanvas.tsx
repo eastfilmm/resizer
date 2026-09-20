@@ -1,19 +1,20 @@
-
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
 import { useAtomValue, useStore } from 'jotai';
 import { imageUrlAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import type { AspectRatio } from '@/atoms/imageAtoms';
-import { drawImageWithEffects, getCanvasDimensions, getCanvasDisplaySize } from '@/utils/canvas';
-import type { ImagePosition } from '@/utils/canvas';
-import { useSafariRafThrottle } from '@/hooks/useSafariRafThrottle';
 import {
+  drawImageWithEffects,
+  getCanvasDimensions,
+  getCanvasDisplaySize,
+  getPreviewScaleFactor,
   CANVAS_DISPLAY_SIZE,
   CANVAS_DISPLAY_SIZE_DESKTOP,
   CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
   CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
-  CANVAS_PREVIEW_SIZE,
-} from '@/constants/CanvasContents';
+} from '@resizer/canvas';
+import type { ImagePosition } from '@resizer/canvas';
+import { useRafThrottle } from '@/hooks/useRafThrottle';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 
 interface ImageCanvasProps {
@@ -34,20 +35,24 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
   const imagePositionRef = useRef<ImagePosition | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const { throttle: safariThrottle } = useSafariRafThrottle(isSafari);
+  const { throttle } = useRafThrottle();
 
-  // Scale factor: 800/2000 = 0.4 (Safari only)
-  const SCALE_FACTOR = isSafari ? CANVAS_PREVIEW_SIZE / 2000 : 1;
+  // 프리뷰는 브라우저와 무관하게 축소 해상도로 렌더한다 (모바일 0.4, 데스크톱 0.6).
+  // 다운로드는 renderCanvasImage에서 항상 2000px 풀 해상도로 별도 렌더한다.
+  const SCALE_FACTOR = getPreviewScaleFactor(isDesktop);
 
   // Keep aspectRatioRef in sync with state
   aspectRatioRef.current = aspectRatio;
 
   const redrawImage = useCallback(
     (ctx: CanvasRenderingContext2D, img: HTMLImageElement | null) => {
-      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatioRef.current, isSafari);
+      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(
+        aspectRatioRef.current,
+        true,
+        isDesktop
+      );
       const settings = settingsRef.current;
-      const padding = settings.padding;
-      const effectivePadding = isSafari ? padding * SCALE_FACTOR : padding;
+      const effectivePadding = settings.padding * SCALE_FACTOR;
       const imageAreaWidth = canvasWidth - effectivePadding * 2;
       const imageAreaHeight = canvasHeight - effectivePadding * 2;
 
@@ -60,14 +65,14 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
           padding: effectivePadding,
           bgColor: settings.backgroundColor,
           useGlassBlur: settings.glassBlurEnabled,
-          blurIntensity: settings.blurIntensity * (isSafari ? SCALE_FACTOR : 1),
+          blurIntensity: settings.blurIntensity * SCALE_FACTOR,
           overlayOpacity: settings.overlayOpacity,
           useShadow: settings.shadowEnabled,
-          shadowIntensity: settings.shadowIntensity * (isSafari ? SCALE_FACTOR : 1),
-          shadowOffset: settings.shadowOffset * (isSafari ? SCALE_FACTOR : 1),
+          shadowIntensity: settings.shadowIntensity * SCALE_FACTOR,
+          shadowOffset: settings.shadowOffset * SCALE_FACTOR,
           frameType: settings.frameType,
           scaleFactor: SCALE_FACTOR,
-          isSafari,
+          useStackBlur: isSafari,
           polaroidDate: settings.polaroidDate,
         });
       } else {
@@ -76,7 +81,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     },
-    [isSafari, SCALE_FACTOR]
+    [isSafari, isDesktop, SCALE_FACTOR]
   );
 
   const drawImageOnCanvas = useCallback(() => {
@@ -86,7 +91,11 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatioRef.current, isSafari);
+    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(
+      aspectRatioRef.current,
+      true,
+      isDesktop
+    );
     const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatioRef.current, isDesktop);
 
     // Set canvas actual size
@@ -114,7 +123,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
       redrawImage(ctx, newImg);
     };
     newImg.src = imageUrl;
-  }, [imageUrl, canvasRef, redrawImage, isSafari, isDesktop]);
+  }, [imageUrl, canvasRef, redrawImage, isDesktop]);
 
   // Initialize canvas on mount (skip when image is already loaded to avoid double-clear flicker)
   useEffect(() => {
@@ -122,7 +131,11 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, isSafari);
+        const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(
+          aspectRatio,
+          true,
+          isDesktop
+        );
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
 
@@ -130,9 +143,9 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     }
-  }, [canvasRef, aspectRatio, isSafari]);
+  }, [canvasRef, aspectRatio, isDesktop]);
 
-  // Handle effect changes imperatively with conditional RAF throttle for Safari
+  // 설정 변경은 rAF로 스로틀해 프레임당 최대 한 번만 다시 그린다
   useEffect(() => {
     const performRender = () => {
       if (canvasRef.current) {
@@ -153,13 +166,13 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
         containerRef.current.style.backgroundColor = newSettings.backgroundColor;
       }
 
-      safariThrottle(performRender);
+      throttle(performRender);
     });
 
     return () => {
       unsubscribe();
     };
-  }, [store, canvasRef, redrawImage, safariThrottle]);
+  }, [store, canvasRef, redrawImage, throttle]);
 
   // Track the current image URL to detect changes
   const lastImageUrlRef = useRef<string | null>(null);
@@ -184,7 +197,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          const { width, height } = getCanvasDimensions(aspectRatio, isSafari);
+          const { width, height } = getCanvasDimensions(aspectRatio, true, isDesktop);
           const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatio, isDesktop);
           canvas.width = width;
           canvas.height = height;
@@ -195,7 +208,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
         }
       }
     }
-  }, [imageUrl, aspectRatio, drawImageOnCanvas, isSafari, isDesktop]);
+  }, [imageUrl, aspectRatio, drawImageOnCanvas, canvasRef, isDesktop]);
 
   // Initialize container background color on mount
   useEffect(() => {

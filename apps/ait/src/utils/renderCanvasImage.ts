@@ -1,4 +1,4 @@
-import { drawImageWithEffects, getCanvasDimensions } from '@/utils/canvas';
+import { drawImageWithEffects, getCanvasDimensions } from '@resizer/canvas';
 import type { ImageSettings, AspectRatio } from '@/atoms/imageAtoms';
 
 export const loadImage = async (src: string): Promise<HTMLImageElement> => {

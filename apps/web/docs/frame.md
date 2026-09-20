@@ -24,7 +24,7 @@
 - 타입: `'none' | 'polaroid' | 'thin' | 'mediumFilm'`
 
 ### 렌더링 파이프라인
-- `src/utils/canvas/frames.ts`에서 각 프레임별 전용 그리기 함수 구현:
+- `packages/canvas/src/frames.ts`에서 각 프레임별 전용 그리기 함수 구현:
   - `drawPolaroidFrame()`
   - `drawThinFrame()`
   - `drawMediumFilmFrame()`
@@ -33,10 +33,10 @@
 ## 관련 파일 목록
 
 - `src/atoms/imageAtoms.ts`: `FrameType` 타입 정의 및 `frameTypeAtom` 선언.
-- `src/utils/canvas/frames.ts`: 실제 Canvas API 기반 프레임 렌더링 로직.
+- `packages/canvas/src/frames.ts`: 실제 Canvas API 기반 프레임 렌더링 로직.
 - `src/components/panels/FramePanel.tsx`: 프레임 선택 및 데이터 입력을 위한 UI 패널.
-- `src/utils/canvas/drawImage.ts`: 프레임 로직 오케스트레이션.
-- `src/__tests__/utils/canvas-frames.test.ts`: 프레임 렌더링 정확도 테스트.
+- `packages/canvas/src/drawImage.ts`: 프레임 로직 오케스트레이션.
+- `packages/canvas/src/__tests__/canvas-frames.test.ts`: 프레임 렌더링 정확도 테스트.
 
 ## UI 위치
 하단 네비게이션 바의 **Frame** 아이콘을 통해 진입하며, 가로 버튼 형태의 옵션 제공.

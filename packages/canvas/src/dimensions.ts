@@ -7,33 +7,43 @@ import {
   CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
   CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
   CANVAS_PREVIEW_SIZE,
-  CANVAS_ACTUAL_SIZE_4_5_WIDTH,
-  CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
-  CANVAS_PREVIEW_SIZE_4_5_WIDTH,
-  CANVAS_PREVIEW_SIZE_4_5_HEIGHT,
-  CANVAS_ACTUAL_SIZE_9_16_WIDTH,
-  CANVAS_ACTUAL_SIZE_9_16_HEIGHT,
-  CANVAS_PREVIEW_SIZE_9_16_WIDTH,
-  CANVAS_PREVIEW_SIZE_9_16_HEIGHT,
-} from '@/constants/CanvasContents';
-import type { AspectRatio, BackgroundColor } from '@/atoms/imageAtoms';
+  CANVAS_PREVIEW_SIZE_DESKTOP,
+} from './constants';
+import type { AspectRatio, BackgroundColor } from './types';
+
+// 캔버스 높이는 비율과 무관하게 고정이고, 너비만 비율에 따라 줄어든다.
+const ASPECT_RATIO_WIDTH_FACTOR: Record<AspectRatio, number> = {
+  '1:1': 1,
+  '4:5': 4 / 5,
+  '9:16': 9 / 16,
+};
+
+/**
+ * 프리뷰 렌더 해상도(높이 기준). 브라우저 종류와 무관하게 항상 적용된다.
+ * 다운로드는 항상 CANVAS_ACTUAL_SIZE로 렌더하므로 결과물 품질에는 영향이 없다.
+ */
+export function getPreviewCanvasHeight(isDesktop: boolean = false): number {
+  return isDesktop ? CANVAS_PREVIEW_SIZE_DESKTOP : CANVAS_PREVIEW_SIZE;
+}
+
+/**
+ * 2000px 기준으로 정의된 설정값(padding, blur, shadow 등)을 프리뷰 해상도로 환산하는 배율.
+ * 모바일 0.4, 데스크톱 0.6
+ */
+export function getPreviewScaleFactor(isDesktop: boolean = false): number {
+  return getPreviewCanvasHeight(isDesktop) / CANVAS_ACTUAL_SIZE;
+}
 
 export function getCanvasDimensions(
   aspectRatio: AspectRatio,
-  isSafari: boolean
+  usePreviewSize: boolean,
+  isDesktop: boolean = false
 ): { width: number; height: number } {
-  if (aspectRatio === '4:5') {
-    return isSafari
-      ? { width: CANVAS_PREVIEW_SIZE_4_5_WIDTH, height: CANVAS_PREVIEW_SIZE_4_5_HEIGHT }
-      : { width: CANVAS_ACTUAL_SIZE_4_5_WIDTH, height: CANVAS_ACTUAL_SIZE_4_5_HEIGHT };
-  }
-  if (aspectRatio === '9:16') {
-    return isSafari
-      ? { width: CANVAS_PREVIEW_SIZE_9_16_WIDTH, height: CANVAS_PREVIEW_SIZE_9_16_HEIGHT }
-      : { width: CANVAS_ACTUAL_SIZE_9_16_WIDTH, height: CANVAS_ACTUAL_SIZE_9_16_HEIGHT };
-  }
-  const size = isSafari ? CANVAS_PREVIEW_SIZE : CANVAS_ACTUAL_SIZE;
-  return { width: size, height: size };
+  const height = usePreviewSize ? getPreviewCanvasHeight(isDesktop) : CANVAS_ACTUAL_SIZE;
+  return {
+    width: Math.round(height * ASPECT_RATIO_WIDTH_FACTOR[aspectRatio]),
+    height,
+  };
 }
 
 export function getCanvasDisplaySize(

@@ -6,7 +6,10 @@
     "dev:web": "pnpm --filter web dev",
     "build:web": "pnpm --filter web build",
     "test:web": "pnpm --filter web test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "pnpm -r test",
+    "dev:ait": "pnpm --filter ait dev",
+    "build:ait": "pnpm --filter ait build"
   },
   "devDependencies": {
     "husky": "^9.1.7"

@@ -10,15 +10,13 @@ import {
   getCanvasDimensions,
   getCanvasDisplaySize,
   getPreviewScaleFactor,
-} from '@/utils/canvas';
-import type { ImagePosition } from '@/utils/canvas';
-import { useRafThrottle } from '@/hooks/useRafThrottle';
-import {
   CANVAS_DISPLAY_SIZE,
   CANVAS_DISPLAY_SIZE_DESKTOP,
   CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
   CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
-} from '@/constants/CanvasContents';
+} from '@resizer/canvas';
+import type { ImagePosition } from '@resizer/canvas';
+import { useRafThrottle } from '@/hooks/useRafThrottle';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 
 interface ImageCanvasProps {
@@ -76,7 +74,7 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
           shadowOffset: settings.shadowOffset * SCALE_FACTOR,
           frameType: settings.frameType,
           scaleFactor: SCALE_FACTOR,
-          isSafari,
+          useStackBlur: isSafari,
           polaroidDate: settings.polaroidDate,
         });
       } else {

@@ -40,16 +40,16 @@
 1. `docs/feature-name.md` 파일을 참조하여 구현
 2. **최신 아키텍처 패턴 준수**:
    - **State**: `imageAtoms.ts`의 `ImageSettings` 인터페이스에 속성을 추가하고 `focusAtom`을 생성하여 사용하세요.
-   - **Canvas**: `src/utils/canvas/` 내 적절한 모듈(`effects.ts`, `frames.ts` 등)에 로직을 구현하세요.
+   - **Canvas**: `packages/canvas/src/` 내 적절한 모듈(`effects.ts`, `frames.ts` 등)에 로직을 구현하세요.
    - **Components**: 모든 컴포넌트는 화살표 함수(`const Component = () => { ... }`)를 사용하세요.
 3. **토큰 최적화**: 파일 디렉토리 구조 활용
-   - `utils/canvas/` 디렉토리 내 필요한 파일만 선별적으로 읽기
+   - `packages/canvas/src/` 디렉토리 내 필요한 파일만 선별적으로 읽기
    - 유사 기능의 기존 패턴 참조 (예: `ShadowPanel.tsx` → `NewEffectPanel.tsx`)
 4. 기존 코드 패턴 준수 (styled-components, Jotai focusAtoms, hooks 등)
 
 **최적화 가이드**:
 - ✅ `imageSettingsAtom` 객체 전체를 구독하지 말고, `useAtom(derivedAtom)` 패턴을 사용하세요.
-- ✅ 캔버스 엔진 수정 시 `src/utils/canvas/index.ts`에 Export를 잊지 마세요.
+- ✅ 캔버스 엔진 수정 시 `packages/canvas/src/index.ts`에 Export를 잊지 마세요.
 - ✅ 컴포넌트 로직이 복잡해지면 `src/hooks/`로 분리하세요.
 
 **사용 예시**:

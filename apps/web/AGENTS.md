@@ -19,7 +19,7 @@ A Next.js web application for resizing images. Users can upload images, preview 
 - **Language**: TypeScript 5.x (Strict)
 - **UI**: React 19.x + styled-components 6.x
 - **State**: Jotai (using `imageSettingsAtom` + `focusAtom` from `jotai-optics`)
-- **Canvas Engine**: Modular architecture in `src/utils/canvas/`
+- **Canvas Engine**: Modular architecture in `packages/canvas/src/`
 - **Testing**: Vitest + Husky pre-commit hooks
 
 ---
@@ -33,7 +33,15 @@ Setting state is centralized in `imageSettingsAtom` in `src/atoms/imageAtoms.ts`
 
 ---
 
-## Canvas Engine (`src/utils/canvas/`)
+## Canvas Engine (`packages/canvas/src/`)
+
+Published as the workspace package `@resizer/canvas` and shared by **both** `apps/web` and
+`apps/ait`. It is plain TypeScript: no React, no styled-components, no app state. Environment
+decisions (browser sniffing, WebView detection) belong to the app and arrive as arguments —
+never add a branch like `isSafari` inside the package.
+
+There is no build step; `exports` points at `src/index.ts`. Next consumes it via
+`transpilePackages`, Vite via the workspace link.
 
 The rendering logic is split into focused modules:
 - `dimensions.ts`: Aspect ratio and size calculations.
@@ -47,6 +55,7 @@ The rendering logic is split into focused modules:
   1200px on desktop. `getPreviewScaleFactor(isDesktop)` (0.4 / 0.6) converts the 2000px-based
   settings (padding, blur, shadow) into preview space.
 - `isSafari` now only selects the blur implementation — not the resolution, not the throttle.
+  The app passes it to the renderer as the `useStackBlur` draw option.
 - Stackblur is used instead of CSS filters for Safari.
 - Setting changes are RAF-throttled in every browser via `useRafThrottle` (one redraw per frame).
 - Glass blur reuses module-scoped scratch canvases instead of allocating per frame.
@@ -87,7 +96,7 @@ pnpm build     # Build with Turbopack
 - **Adding an Effect**:
   1. Update `ImageSettings` in `imageAtoms.ts`.
   2. Create a `focusAtom`.
-  3. Implement drawing logic in `utils/canvas/`.
+  3. Implement drawing logic in `packages/canvas/src/`.
   4. Create a panel in `components/panels/`.
   5. Add to `NavigationBar.tsx` and `types.ts`.
   6. **Crucially**: Add tests in `src/__tests__/utils/`.

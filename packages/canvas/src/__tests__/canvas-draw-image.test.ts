@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { drawImageWithEffects } from '@/utils/canvas';
-import type { DrawImageOptions } from '@/utils/canvas';
+import { drawImageWithEffects } from '../index';
+import type { DrawImageOptions } from '../index';
 
 /**
  * Integration tests for drawImageWithEffects.
@@ -28,7 +28,7 @@ describe('drawImageWithEffects', () => {
     shadowIntensity: 30,
     shadowOffset: 20,
     frameType: 'none',
-    isSafari: false,
+    useStackBlur: false,
     scaleFactor: 1,
     polaroidDate: '',
   };
@@ -322,14 +322,14 @@ describe('drawImageWithEffects', () => {
   // ─── Safari mode ───
 
   describe('Safari mode', () => {
-    it('works with Safari flag and scaled values', () => {
+    it('works with StackBlur flag and scaled values', () => {
       const result = drawImageWithEffects(ctx, landscapeImg, {
         ...baseOptions,
         actualCanvasWidth: 800,
         actualCanvasHeight: 800,
         imageAreaWidth: 800,
         imageAreaHeight: 800,
-        isSafari: true,
+        useStackBlur: true,
         scaleFactor: 0.4,
       });
       expect(result.width).toBeGreaterThan(0);

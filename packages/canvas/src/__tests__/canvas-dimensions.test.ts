@@ -4,7 +4,7 @@ import {
   getCanvasDisplaySize,
   getPreviewScaleFactor,
   getThumbnailCanvasSize,
-} from '@/utils/canvas';
+} from '../index';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_PREVIEW_SIZE,
@@ -21,7 +21,7 @@ import {
   CANVAS_DISPLAY_SIZE_DESKTOP,
   CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
   CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
-} from '@/constants/CanvasContents';
+} from '../constants';
 
 describe('getCanvasDimensions', () => {
   describe('1:1 aspect ratio', () => {

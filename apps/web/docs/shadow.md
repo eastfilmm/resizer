@@ -21,15 +21,15 @@
 - `shadowEnabledAtom`, `shadowIntensityAtom`, `shadowOffsetAtom`을 사용하여 상태 관리.
 
 ### 렌더링 로직
-- `src/utils/canvas/effects.ts` 내의 `applyShadow()` 함수(또는 그리기 로직 내 인라인 처리)에서 Canvas API(`shadowColor`, `shadowBlur` 등)를 사용하여 구현됩니다.
+- `packages/canvas/src/effects.ts` 내의 `applyShadow()` 함수(또는 그리기 로직 내 인라인 처리)에서 Canvas API(`shadowColor`, `shadowBlur` 등)를 사용하여 구현됩니다.
 - 전체 리렌더링 시 성능 최적화를 위해 Safari 환경에서는 적절한 스케일링이 적용됩니다.
 
 ## 관련 파일 목록
 
 - `src/atoms/imageAtoms.ts`: 그림자 관련 Atom들.
-- `src/utils/canvas/effects.ts`: 그림자 렌더링 헬퍼.
+- `packages/canvas/src/effects.ts`: 그림자 렌더링 헬퍼.
 - `src/components/panels/ShadowPanel.tsx`: 토글 및 인디케이터 UI.
-- `src/__tests__/utils/canvas-effects.test.ts`: 그림자 위치 오프셋 및 렌더링 테스트.
+- `packages/canvas/src/__tests__/canvas-effects.test.ts`: 그림자 위치 오프셋 및 렌더링 테스트.
 
 ## UI 위치
 하단 네비게이션 바의 **Shadow** 아이콘 패널.

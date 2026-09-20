@@ -7,7 +7,7 @@ import {
   imageSettingsAtom,
   DEFAULT_IMAGE_SETTINGS,
 } from '@/atoms/imageAtoms';
-import { resetCanvas } from '@/utils/canvas';
+import { resetCanvas } from '@resizer/canvas';
 
 interface UseResetStateProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;

@@ -78,29 +78,39 @@ apps/web/
     │   ├── useIsSafari.ts         # 브라우저 감지
     │   └── useResetState.ts       # 상태 초기화
     ├── utils/
-    │   ├── canvas/                # 모듈화된 캔버스 렌더링 엔진
-    │   │   ├── index.ts           # Public API
-    │   │   ├── types.ts           # DrawImageOptions, ImagePosition
-    │   │   ├── dimensions.ts      # 비율/크기 계산
-    │   │   ├── frames.ts          # 프레임 그리기 (Polaroid, Thin, Film)
-    │   │   ├── effects.ts         # Glass Blur + Shadow
-    │   │   └── drawImage.ts       # 메인 오케스트레이터
+    │   ├── renderCanvasImage.ts   # 다운로드용 2000px 풀 해상도 렌더
+    │   ├── imageUtils.ts
     │   └── siteConfig.ts          # 베이스 URL 생성
     ├── constants/
-    │   └── CanvasContents.ts      # 해상도, 고정 크기, 스토리지 키
+    │   └── theme.ts
     ├── types/
     │   └── styled-components.d.ts
     ├── lib/
     │   └── styled-components-registry.tsx  # SSR 설정
-    └── __tests__/                 # Vitest 테스트 스위트 (88+ 케이스)
-        ├── setup.ts
+    └── __tests__/                 # 앱 레벨 테스트 (24 케이스)
+        ├── setup.ts               # jest-dom + @resizer/canvas/test-setup
+        ├── components/
+        │   └── ImageCanvas.test.tsx
         └── utils/
-            ├── canvas-dimensions.test.ts
-            ├── canvas-draw-image.test.ts
-            ├── canvas-effects.test.ts
-            ├── canvas-frames.test.ts
-            ├── canvas-reset.test.ts
             └── image-atoms.test.ts
+```
+
+캔버스 렌더러는 별도 워크스페이스 패키지입니다.
+
+```
+packages/canvas/
+├── package.json               # @resizer/canvas (빌드 없음, exports → src/index.ts)
+├── vitest.config.ts
+└── src/
+    ├── index.ts               # Public API
+    ├── types.ts               # AspectRatio/BackgroundColor/FrameType, DrawImageOptions
+    ├── constants.ts           # 2000px 기준 해상도·표시 크기 상수
+    ├── dimensions.ts          # 비율/크기/프리뷰 배율 계산
+    ├── frames.ts              # 프레임 그리기 (Polaroid, Thin, Film)
+    ├── effects.ts             # Glass Blur (StackBlur / 네이티브 ctx.filter)
+    ├── drawImage.ts           # 메인 오케스트레이터
+    ├── test-setup.ts          # jsdom Canvas 2D 목
+    └── __tests__/             # 렌더러 테스트 (106 케이스)
 ```
 
 ## apps/mobile (Expo React Native 앱)
@@ -133,8 +143,10 @@ apps/mobile/
 
 ## 주요 디렉토리 상세 설명
 
-### `src/utils/canvas/` (캔버스 엔진)
-과거 단일 파일로 관리되던 캔버스 로직이 5개의 전문 모듈로 분리되었습니다.
+### `packages/canvas/src/` (캔버스 엔진 — 워크스페이스 패키지)
+`@resizer/canvas`로 web과 ait가 함께 씁니다. React·상태·플랫폼 API에 의존하지 않는 순수
+TypeScript이며, 캔버스 치수 상수(`constants.ts`)와 도메인 타입(`AspectRatio`,
+`BackgroundColor`, `FrameType`)의 원본도 여기에 있습니다. 앱의 `imageAtoms`는 이를 재노출합니다.
 - **`drawImage.ts`**: 전체 렌더링 흐름을 제어하는 메인 함수
 - **`frames.ts`**: Polaroid, Thin, Film 프레임의 그리기 로직
 - **`dimensions.ts`**: 브라우저별 권장 해상도와 비율별 캔버스 크기 계산
@@ -146,8 +158,10 @@ apps/mobile/
 ### `src/hooks/` (커스텀 훅)
 UI 컴포넌트 내부에 복잡하게 얽혀 있던 로직이 분리되어 가독성과 재사용성을 높였습니다.
 
-### `src/__tests__/` (테스트)
-캔버스 렌더링 파이프라인의 모든 주요 조건과 분기를 테스트하는 88개 이상의 테스트 케이스가 포함되어 있습니다.
+### 테스트
+캔버스 렌더러 테스트는 `packages/canvas/src/__tests__/`(106케이스), 앱 컴포넌트·atom 테스트는
+`apps/web/src/__tests__/`(24케이스)에 있습니다. jsdom용 Canvas 2D 목은 패키지가 소유하며
+`@resizer/canvas/test-setup`으로 노출됩니다. `pnpm test`가 전체를 실행합니다.
 
 ## 문서 관리 규정
 

@@ -22,7 +22,7 @@
 - `glassBlurAtom`, `blurIntensityAtom`, `overlayOpacityAtom`이 각각 `imageSettingsAtom`의 하위 속성을 관리합니다.
 
 ### 렌더링 로직
-- `src/utils/canvas/effects.ts` 내의 `drawGlassBlurBackground()` 함수에서 구현됩니다.
+- `packages/canvas/src/effects.ts` 내의 `drawGlassBlurBackground()` 함수에서 구현됩니다.
 - **Edge Clamp**: 블러 적용 시 가장자리가 어두워지는 비네팅을 방지하기 위해 픽셀 복제 기법을 사용하여 여유 공간을 확보한 뒤 블러를 처리합니다.
 - **프리뷰 축소 렌더**: 프리뷰는 모든 브라우저에서 축소 해상도(모바일 800px / 데스크톱 1200px)로 그려지며, `blurIntensity`에도 동일한 배율(`getPreviewScaleFactor`)이 곱해집니다. 다운로드는 2000px 풀 해상도로 별도 렌더됩니다.
 - **Safari 최적화**: Safari에서는 CSS filter 대신 JS 연산 기반 블러(StackBlur)를 사용합니다.
@@ -31,9 +31,9 @@
 ## 관련 파일 목록
 
 - `src/atoms/imageAtoms.ts`: 관련 3종 Atom 정의.
-- `src/utils/canvas/effects.ts`: 핵심 렌더링 및 Edge Clamp 로직.
+- `packages/canvas/src/effects.ts`: 핵심 렌더링 및 Edge Clamp 로직.
 - `src/components/panels/GlassBlurPanel.tsx`: 토글 및 슬라이더 UI.
-- `src/__tests__/utils/canvas-effects.test.ts`: 블러 배경 생성 및 Tint 적용 테스트.
+- `packages/canvas/src/__tests__/canvas-effects.test.ts`: 블러 배경 생성 및 Tint 적용 테스트.
 
 ## UI 위치
 하단 네비게이션 바의 **Glass Blur** 아이콘 패널.
