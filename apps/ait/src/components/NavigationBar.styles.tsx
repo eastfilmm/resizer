@@ -63,12 +63,18 @@ export const NavButtonsWrapper = styled.div`
   z-index: 1;
 `;
 
-export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: boolean; $isClickable: boolean }>`
+export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: boolean; $isClickable: boolean; $isHovered: boolean }>`
   flex: 1;
   height: 100%;
   border: none;
   outline: none;
-  background-color: transparent;
+  /* CSS :hover 대신 포인터 이벤트로 관리한다. :hover는 브라우저가 소유해서
+     포인터가 움직여야만 재평가되는데, 재클릭으로 패널을 닫으면 $isActive만
+     풀리고 포인터는 그대로라 회색 잔상이 남는다. */
+  background-color: ${props =>
+    props.$isHovered && !props.$isActive && props.$isClickable
+      ? 'rgba(0, 0, 0, 0.05)'
+      : 'transparent'};
   cursor: ${props => props.$isClickable ? 'pointer' : 'default'};
   display: flex;
   flex-direction: column;
@@ -88,10 +94,6 @@ export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: b
     border-radius: 50%;
     background-color: ${props => props.$isEnabled ? COLOR_PRIMARY : 'transparent'};
     transition: background-color 0.2s ease;
-  }
-
-  &:hover {
-    background-color: ${props => (props.$isActive || !props.$isClickable) ? 'transparent' : 'rgba(0, 0, 0, 0.05)'};
   }
 
   &:active {
