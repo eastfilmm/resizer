@@ -7,7 +7,7 @@ import {
   COLOR_GRAY_BORDER,
   COLOR_GRAY_PLACEHOLDER,
   COLOR_GRAY_BG_DISABLED,
-} from '@/constants/theme';
+} from './theme';
 
 // Panel Container
 export const PanelContainer = styled.div<{ $direction?: 'column' | 'row' }>`

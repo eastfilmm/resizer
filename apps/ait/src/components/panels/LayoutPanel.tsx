@@ -1,24 +1,11 @@
 
+import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER, PanelContainer, PanelLabel, PanelLabelWrapper, SliderSection, SliderLabelRow, SliderLabel, TitleAndInputWrapper, FocusReveal, RangeSlider } from '@resizer/ui';
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
-import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER } from '@/constants/theme';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { paddingAtom } from '@/atoms/imageAtoms';
 import type { AspectRatio } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
-import {
-  PanelContainer,
-  PanelLabel,
-  PanelLabelWrapper,
-  SliderSection,
-  SliderLabelRow,
-  SliderLabel,
-  SliderValue,
-  TitleAndInputWrapper,
-} from './shared';
-import { FocusReveal } from '@/components/FocusReveal';
-import { RangeSlider } from '@/components/RangeSlider';
-
 const AspectRatioOptions = styled.div`
   display: flex;
   gap: 8px;

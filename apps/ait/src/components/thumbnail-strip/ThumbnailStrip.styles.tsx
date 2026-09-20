@@ -1,7 +1,6 @@
+import { COLOR_PRIMARY, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER } from '@resizer/ui';
 import styled from 'styled-components';
 import { THUMBNAIL_SLOT_SIZE } from './constants';
-import { COLOR_PRIMARY, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER } from '@/constants/theme';
-
 export const Container = styled.div`
   width: 100%;
   max-width: 320px;

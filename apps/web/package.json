@@ -12,8 +12,8 @@
     "test:seo": "node scripts/test-seo.js"
   },
   "dependencies": {
-    "@base-ui-components/react": "1.0.0-rc.0",
     "@resizer/canvas": "workspace:*",
+    "@resizer/ui": "workspace:*",
     "@vercel/analytics": "^1.6.1",
     "@vercel/speed-insights": "^2.0.0",
     "jotai": "^2.16.1",

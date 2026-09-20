@@ -1,7 +1,6 @@
 
+import { COLOR_PRIMARY, COLOR_GRAY_TEXT } from '@resizer/ui';
 import styled from 'styled-components';
-import { COLOR_PRIMARY, COLOR_GRAY_TEXT } from '@/constants/theme';
-
 export const Container = styled.div`
   position: fixed;
   bottom: 0;

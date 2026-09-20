@@ -1,3 +1,4 @@
+import { useRafThrottle } from '@resizer/ui';
 import styled from 'styled-components';
 import { RefObject, useEffect, useCallback, useRef } from 'react';
 import { useAtomValue, useStore } from 'jotai';
@@ -14,7 +15,6 @@ import {
   CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
 } from '@resizer/canvas';
 import type { ImagePosition } from '@resizer/canvas';
-import { useRafThrottle } from '@/hooks/useRafThrottle';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
 
 interface ImageCanvasProps {
@@ -30,7 +30,6 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
 
   // Refs to access current values in callbacks without re-triggering effects
   const settingsRef = useRef(store.get(imageSettingsAtom));
-  const aspectRatioRef = useRef(aspectRatio);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const imagePositionRef = useRef<ImagePosition | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -41,13 +40,10 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
   // 다운로드는 renderCanvasImage에서 항상 2000px 풀 해상도로 별도 렌더한다.
   const SCALE_FACTOR = getPreviewScaleFactor(isDesktop);
 
-  // Keep aspectRatioRef in sync with state
-  aspectRatioRef.current = aspectRatio;
-
   const redrawImage = useCallback(
     (ctx: CanvasRenderingContext2D, img: HTMLImageElement | null) => {
       const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(
-        aspectRatioRef.current,
+        settingsRef.current.canvasAspectRatio,
         true,
         isDesktop
       );
@@ -92,11 +88,11 @@ export default function ImageCanvas({ canvasRef, isSafari = false, isDesktop = f
     if (!ctx) return;
 
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(
-      aspectRatioRef.current,
+      settingsRef.current.canvasAspectRatio,
       true,
       isDesktop
     );
-    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(aspectRatioRef.current, isDesktop);
+    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(settingsRef.current.canvasAspectRatio, isDesktop);
 
     // Set canvas actual size
     canvas.width = canvasWidth;

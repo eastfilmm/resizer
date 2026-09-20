@@ -1,5 +1,6 @@
 'use client';
 
+import { IconButton, ButtonIcon } from '@resizer/ui';
 import styled from 'styled-components';
 import { RefObject } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -9,7 +10,6 @@ import {
   uploadedImagesAtom,
   type UploadedImage,
 } from '@/atoms/imageAtoms';
-import { IconButton, ButtonIcon } from '@/components/styled/Button';
 import { createImageId } from '@/utils/imageUtils';
 
 interface ImageUploaderProps {

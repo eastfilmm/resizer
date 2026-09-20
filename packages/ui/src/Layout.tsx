@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { COLOR_GRAY_TEXT } from '@/constants/theme';
+import { COLOR_GRAY_TEXT } from './theme';
 
 export const Container = styled.div`
   height: 100vh;

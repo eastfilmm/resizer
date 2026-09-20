@@ -1,3 +1,4 @@
+import { useRafThrottle } from '@resizer/ui';
 import { useCallback, useEffect, useRef } from 'react';
 import { useAtomValue, useStore } from 'jotai';
 import { canvasAspectRatioAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
@@ -7,8 +8,6 @@ import {
   getThumbnailCanvasSize,
 } from '@resizer/canvas';
 import { THUMBNAIL_INNER_SIZE, THUMBNAIL_RENDER_SCALE } from './constants';
-import { useRafThrottle } from '@/hooks/useRafThrottle';
-
 interface UseThumbnailRenderOptions {
   objectUrl: string;
   isSafari: boolean;

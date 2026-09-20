@@ -1,10 +1,10 @@
 'use client';
 
+import { IconButton, ButtonIcon } from '@resizer/ui';
 import { useCallback } from 'react';
 import { useAtomValue } from 'jotai';
 import { uploadedImagesAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
-import { IconButton, ButtonIcon } from '@/components/styled/Button';
 import { renderImageToCanvas, canvasToBlob } from '@/utils/renderCanvasImage';
 
 const getPngFileName = (fileName: string, index: number) => {

@@ -1,9 +1,9 @@
+import { IconButton, ButtonIcon } from '@resizer/ui';
 import { useCallback } from 'react';
 import { useAtomValue } from 'jotai';
 import { saveBase64Data } from '@apps-in-toss/web-framework';
 import { uploadedImagesAtom, imageSettingsAtom } from '@/atoms/imageAtoms';
 import { useAspectRatio } from '@/hooks/useAspectRatio';
-import { IconButton, ButtonIcon } from '@/components/styled/Button';
 import { renderImageToBlob, renderImageToCanvas } from '@/utils/renderCanvasImage';
 
 // App in Toss 환경에서 기기 갤러리 저장을 지원하는지 확인

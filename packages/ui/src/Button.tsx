@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { COLOR_PRIMARY, COLOR_PRIMARY_DARK, COLOR_GRAY } from '@/constants/theme';
+import { COLOR_PRIMARY, COLOR_PRIMARY_DARK, COLOR_GRAY } from './theme';
 
 interface ButtonProps {
   $variant?: 'primary' | 'secondary' | 'danger' | 'blue';

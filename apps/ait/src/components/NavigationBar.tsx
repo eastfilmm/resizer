@@ -1,4 +1,5 @@
 
+import { useClickOutside, FocusReveal } from '@resizer/ui';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { LayoutPanel } from './panels/LayoutPanel';
 import { FramePanel } from './panels/FramePanel';
@@ -6,7 +7,6 @@ import { BackgroundPanel } from './panels/BackgroundPanel';
 import { GlassBlurPanel } from './panels/GlassBlurPanel';
 import { ShadowPanel } from './panels/ShadowPanel';
 import { useAtom, useAtomValue } from 'jotai';
-import { useClickOutside } from '@/hooks/useClickOutside';
 import { usePanelTransition } from '@/hooks/usePanelTransition';
 import {
   activeNavPanelAtom,
@@ -29,8 +29,6 @@ import {
   ButtonLabel,
   NavIcon,
 } from './NavigationBar.styles';
-import { FocusReveal } from '@/components/FocusReveal';
-
 function isPanelAllowedInFrameMode(
   panelId: string,
   frameType: string,

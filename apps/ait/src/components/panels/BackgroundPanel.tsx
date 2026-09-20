@@ -1,9 +1,8 @@
 
+import { PanelContainer, PanelLabel, ToggleSwitch } from '@resizer/ui';
 import { useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { backgroundColorAtom } from '@/atoms/imageAtoms';
-import { PanelContainer, PanelLabel, PanelLabelWrapper, ToggleSwitch } from './shared';
-
 export const BackgroundPanel = () => {
   const backgroundColor = useAtomValue(backgroundColorAtom);
   const setBackgroundColor = useSetAtom(backgroundColorAtom);

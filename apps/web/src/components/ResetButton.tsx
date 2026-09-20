@@ -1,11 +1,10 @@
 'use client';
 
+import { IconButton, ButtonIcon } from '@resizer/ui';
 import { RefObject } from 'react';
 import { useAtomValue } from 'jotai';
 import { canResetAtom } from '@/atoms/imageAtoms';
 import { useResetState } from '@/hooks/useResetState';
-import { IconButton, ButtonIcon } from '@/components/styled/Button';
-
 interface ResetButtonProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
 }

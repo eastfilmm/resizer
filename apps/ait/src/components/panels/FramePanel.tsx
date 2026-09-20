@@ -1,13 +1,7 @@
 
+import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG, PanelContainer, PanelLabel, PanelLabelWrapper, TextInput, TitleAndInputWrapper } from '@resizer/ui';
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
-import {
-  COLOR_PRIMARY,
-  COLOR_PRIMARY_BG,
-  COLOR_GRAY_TEXT,
-  COLOR_GRAY_BORDER,
-  COLOR_GRAY_BG,
-} from '@/constants/theme';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
   frameTypeAtom,
@@ -17,14 +11,6 @@ import {
   prevBackgroundColorAtom,
 } from '@/atoms/imageAtoms';
 import type { FrameType } from '@/atoms/imageAtoms';
-import {
-  PanelContainer,
-  PanelLabel,
-  PanelLabelWrapper,
-  TextInput,
-  TitleAndInputWrapper,
-} from './shared';
-
 const FRAME_DEFAULT_PADDING = 80;
 
 export const FramePanel = memo(() => {

@@ -1,9 +1,9 @@
 'use client';
 
+import { useClickOutside, FocusReveal } from '@resizer/ui';
 import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useAtom, useAtomValue } from 'jotai';
-import { useClickOutside } from '@/hooks/useClickOutside';
 import { usePanelTransition } from '@/hooks/usePanelTransition';
 import {
   activeNavPanelAtom,
@@ -26,8 +26,6 @@ import {
   ButtonLabel,
   NavIcon,
 } from './NavigationBar.styles';
-import { FocusReveal } from '@/components/FocusReveal';
-
 const panelLoading = () => null;
 
 const LayoutPanel = dynamic(

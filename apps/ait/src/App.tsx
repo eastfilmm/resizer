@@ -1,17 +1,15 @@
 
+import { Container, Main, useIsDesktop } from '@resizer/ui';
 import { useRef } from 'react';
 import { useAtomValue } from 'jotai';
 import { imageUrlAtom } from '@/atoms/imageAtoms';
 import styled from 'styled-components';
-import { Container, Main } from '@/components/styled/Layout';
 import ImageCanvas from '@/components/ImageCanvas';
 import { ResetButton } from '@/components/ResetButton';
 import { DownloadButton } from '@/components/DownloadButton';
 import { ShareButton } from '@/components/ShareButton';
 import { ThumbnailStrip } from '@/components/ThumbnailStrip';
 import { NavigationBar } from '@/components/NavigationBar';
-import { useIsDesktop } from '@/hooks/useIsDesktop';
-
 const NAV_HEIGHT = 200;
 
 export default function ClientPage() {

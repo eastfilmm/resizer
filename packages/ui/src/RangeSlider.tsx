@@ -2,7 +2,7 @@
 
 import { Slider } from '@base-ui-components/react/slider';
 import styled from 'styled-components';
-import { COLOR_PRIMARY, COLOR_GRAY_BORDER } from '@/constants/theme';
+import { COLOR_PRIMARY, COLOR_GRAY_BORDER } from './theme';
 
 interface RangeSliderProps {
   value: number;

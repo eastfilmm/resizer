@@ -1,5 +1,6 @@
 'use client';
 
+import { PanelContainer, PanelRow, PanelLabel, ToggleSwitch, SliderSection, SliderLabelRow, SliderLabel, FocusReveal, RangeSlider } from '@resizer/ui';
 import { useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
@@ -7,18 +8,6 @@ import {
   shadowIntensityAtom,
   shadowOffsetAtom,
 } from '@/atoms/imageAtoms';
-import {
-  PanelContainer,
-  PanelRow,
-  PanelLabel,
-  ToggleSwitch,
-  SliderSection,
-  SliderLabelRow,
-  SliderLabel,
-} from './shared';
-import { FocusReveal } from '@/components/FocusReveal';
-import { RangeSlider } from '@/components/RangeSlider';
-
 export const ShadowPanel = () => {
   const shadowEnabled = useAtomValue(shadowEnabledAtom);
   const setShadowEnabled = useSetAtom(shadowEnabledAtom);
