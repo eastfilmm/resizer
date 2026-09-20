@@ -16,20 +16,29 @@ export const Container = styled.div`
   z-index: 100;
 `;
 
-export const PanelContainer = styled.div<{ $height: number }>`
+/**
+ * 패널 높이는 내용이 정한다.
+ *
+ * 예전에는 PANEL_HEIGHTS에 패널별 높이를 px로 박아두고 내용 높이와 손으로
+ * 맞췄는데, 여유가 6~10px밖에 없어서 플랫폼마다 폰트·입력 필드 렌더링이
+ * 조금만 달라져도 내용이 잘렸다(iOS에서 날짜 입력란 하단이 날아가던 문제).
+ *
+ * grid-template-rows를 0fr <-> 1fr로 전환하면 하드코딩 없이 auto 높이
+ * 애니메이션이 된다. 내용이 얼마나 필요하든 브라우저가 계산하므로 넘칠 수 없다.
+ */
+export const PanelContainer = styled.div<{ $isOpen: boolean }>`
   background: #ffffff;
-  overflow: hidden;
-  height: ${props => props.$height}px;
-  transition: height ${PANEL_HEIGHT_MS}ms ${PANEL_EASING};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: ${props => props.$height > 0 ? '0 -2px 10px rgba(0, 0, 0, 0.1)' : 'none'};
+  display: grid;
+  grid-template-rows: ${props => (props.$isOpen ? '1fr' : '0fr')};
+  transition: grid-template-rows ${PANEL_HEIGHT_MS}ms ${PANEL_EASING};
+  box-shadow: ${props => props.$isOpen ? '0 -2px 10px rgba(0, 0, 0, 0.1)' : 'none'};
 `;
 
 export const PanelContentWrapper = styled.div<{ $isVisible: boolean }>`
+  /* grid 항목은 기본 min-height가 auto라 0fr로 줄어들지 않는다. */
+  min-height: 0;
+  overflow: hidden;
   width: 100%;
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

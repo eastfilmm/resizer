@@ -56,14 +56,6 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'shadow', label: 'Shadow', icon: '/shadow.svg' },
 ];
 
-const PANEL_HEIGHTS: Record<Exclude<NavPanelType, null>, number> = {
-  layout: 132,
-  frame: 180,
-  background: 56,
-  glassblur: 132,
-  shadow: 132,
-};
-
 interface NavButtonProps {
   item: NavItem;
   isActive: boolean;
@@ -199,17 +191,10 @@ export const NavigationBar = () => {
     return NAV_ITEMS.findIndex((item) => item.id === activePanel);
   }, [activePanel]);
 
-  const framePanelHeight = frameType === 'polaroid' ? 180 : 100;
-  const panelHeight = activePanel
-    ? activePanel === 'frame'
-      ? framePanelHeight
-      : PANEL_HEIGHTS[activePanel]
-    : 0;
-
   return (
     <Container ref={containerRef}>
       <FocusReveal.Root>
-        <PanelContainer $height={panelHeight}>
+        <PanelContainer $isOpen={activePanel !== null}>
           <PanelContentWrapper $isVisible={isContentVisible}>
             <PanelContent activePanel={displayedPanel} />
           </PanelContentWrapper>

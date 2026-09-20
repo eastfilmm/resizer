@@ -155,19 +155,25 @@ export const FramePanel = memo(() => {
 
 FramePanel.displayName = 'FramePanel';
 
+/**
+ * 날짜 입력란. 높이를 84px로 박아두면 iOS처럼 입력 필드가 몇 px 더 큰
+ * 환경에서 하단이 잘린다. 바깥 패널과 같은 방식으로 내용이 높이를 정하게 한다.
+ *
+ * opacity는 height와 같은 속도로 맞춘다. 더 빨리 끝내면 컨테이너가 절반만
+ * 열린 시점에 입력란이 이미 또렷해져 두 동작이 따로 노는 것처럼 보인다.
+ */
 const DateSection = styled.div<{ $isOpen: boolean }>`
   width: 100%;
-  overflow: hidden;
-  height: ${(props) => (props.$isOpen ? '84px' : '0')};
+  display: grid;
+  grid-template-rows: ${(props) => (props.$isOpen ? '1fr' : '0fr')};
   opacity: ${(props) => (props.$isOpen ? 1 : 0)};
-  /* opacity를 height보다 빨리 끝내면(0.15s vs 0.3s) 컨테이너가 60%만 열린
-     시점에 입력란이 이미 또렷해져 두 동작이 따로 노는 것처럼 보인다.
-     높이가 열리는 속도 그대로 함께 또렷해지도록 맞춘다. */
   transition:
-    height ${PANEL_HEIGHT_MS}ms ${PANEL_EASING},
+    grid-template-rows ${PANEL_HEIGHT_MS}ms ${PANEL_EASING},
     opacity ${PANEL_HEIGHT_MS}ms ${PANEL_EASING};
 
   > * {
+    min-height: 0;
+    overflow: hidden;
     padding-top: 16px;
   }
 `;
