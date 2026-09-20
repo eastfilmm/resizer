@@ -1,5 +1,5 @@
 
-import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER, PanelContainer, PanelLabel, PanelLabelWrapper, SliderSection, SliderLabelRow, SliderLabel, TitleAndInputWrapper, FocusReveal, RangeSlider } from '@resizer/ui';
+import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG, COLOR_GRAY_PLACEHOLDER, PanelContainer, PanelLabel, PanelLabelWrapper, SliderSection, SliderLabelRow, SliderLabel, TitleAndInputWrapper, FocusReveal, RangeSlider, useClickClearedHover } from '@resizer/ui';
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -12,7 +12,7 @@ const AspectRatioOptions = styled.div`
   width: 100%;
 `;
 
-const AspectRatioButton = styled.button<{ $isActive: boolean }>`
+const AspectRatioButton = styled.button<{ $isActive: boolean; $isHovered: boolean }>`
   height: 42px;
   flex: 1;
   display: flex;
@@ -20,19 +20,26 @@ const AspectRatioButton = styled.button<{ $isActive: boolean }>`
   justify-content: center;
   gap: 8px;
   padding: 12px 16px;
-  border: 1px solid ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_BORDER)};
+  border: 1px solid
+    ${(props) =>
+      props.$isActive || props.$isHovered ? COLOR_PRIMARY : COLOR_GRAY_BORDER};
   border-radius: 8px;
-  background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY_BG : 'white')};
+  background-color: ${(props) =>
+    props.$isActive
+      ? COLOR_PRIMARY_BG
+      : props.$isHovered
+        ? COLOR_GRAY_BG
+        : 'white'};
   color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_TEXT)};
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 
-  &:hover {
-    border-color: ${COLOR_PRIMARY};
-    background-color: ${(props) => (props.$isActive ? COLOR_PRIMARY_BG : COLOR_GRAY_BG)};
-  }
 
   &:active {
     transform: scale(0.98);
@@ -56,13 +63,19 @@ export const LayoutPanel = memo(() => {
   const setPadding = useSetAtom(paddingAtom);
   const { aspectRatio, updateAspectRatio } = useAspectRatio();
 
+  const { hoveredKey, hoverProps, containerProps, clearHover } =
+    useClickClearedHover<AspectRatio>();
+
   const handleAspectRatioChange = useCallback(
     (ratio: AspectRatio) => {
+      // 클릭 후 hover 잔상이 남지 않도록 비운다.
+      clearHover();
+
       if (aspectRatio !== ratio) {
         updateAspectRatio(ratio);
       }
     },
-    [aspectRatio, updateAspectRatio],
+    [aspectRatio, updateAspectRatio, clearHover],
   );
 
   const handlePaddingChange = useCallback(
@@ -77,9 +90,11 @@ export const LayoutPanel = memo(() => {
         <PanelLabelWrapper $textAlign="left">
           <PanelLabel>Canvas Ratio</PanelLabel>
         </PanelLabelWrapper>
-        <AspectRatioOptions>
+        <AspectRatioOptions {...containerProps}>
           <AspectRatioButton
             $isActive={aspectRatio === '1:1'}
+            $isHovered={hoveredKey === '1:1'}
+            {...hoverProps('1:1')}
             onClick={() => handleAspectRatioChange('1:1')}
           >
             <RatioIcon $ratio="1:1" $isActive={aspectRatio === '1:1'} />
@@ -87,6 +102,8 @@ export const LayoutPanel = memo(() => {
           </AspectRatioButton>
           <AspectRatioButton
             $isActive={aspectRatio === '4:5'}
+            $isHovered={hoveredKey === '4:5'}
+            {...hoverProps('4:5')}
             onClick={() => handleAspectRatioChange('4:5')}
           >
             <RatioIcon $ratio="4:5" $isActive={aspectRatio === '4:5'} />
@@ -94,6 +111,8 @@ export const LayoutPanel = memo(() => {
           </AspectRatioButton>
           <AspectRatioButton
             $isActive={aspectRatio === '9:16'}
+            $isHovered={hoveredKey === '9:16'}
+            {...hoverProps('9:16')}
             onClick={() => handleAspectRatioChange('9:16')}
           >
             <RatioIcon $ratio="9:16" $isActive={aspectRatio === '9:16'} />

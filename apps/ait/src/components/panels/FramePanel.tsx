@@ -1,5 +1,5 @@
 
-import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG, PanelContainer, PanelLabel, PanelLabelWrapper, TextInput, TitleAndInputWrapper } from '@resizer/ui';
+import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, COLOR_GRAY_BG, PanelContainer, PanelLabel, PanelLabelWrapper, TextInput, TitleAndInputWrapper, useClickClearedHover, PANEL_HEIGHT_MS, PANEL_EASING } from '@resizer/ui';
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
@@ -24,8 +24,14 @@ export const FramePanel = memo(() => {
   const prevBackgroundColor = useAtomValue(prevBackgroundColorAtom);
   const setPrevBackgroundColor = useSetAtom(prevBackgroundColorAtom);
 
+  const { hoveredKey, hoverProps, containerProps, clearHover } =
+    useClickClearedHover<FrameType>();
+
   const handleFrameToggle = useCallback(
     (type: FrameType) => {
+      // 클릭으로 해제할 때 hover 잔상(파란 보더)이 남지 않도록 비운다.
+      clearHover();
+
       if (frameType === type) {
         // 이미 활성화된 프레임을 다시 누르면 끔
         setFrameType('none');
@@ -64,6 +70,7 @@ export const FramePanel = memo(() => {
       }
     },
     [
+      clearHover,
       frameType,
       setFrameType,
       setPadding,
@@ -93,21 +100,27 @@ export const FramePanel = memo(() => {
         <PanelLabelWrapper $textAlign="left">
           <PanelLabel>Frame</PanelLabel>
         </PanelLabelWrapper>
-        <FrameOptions>
+        <FrameOptions {...containerProps}>
           <FrameButton
             $isActive={frameType === 'polaroid'}
+            $isHovered={hoveredKey === 'polaroid'}
+            {...hoverProps('polaroid')}
             onClick={() => handleFrameToggle('polaroid')}
           >
             Polaroid
           </FrameButton>
           <FrameButton
             $isActive={frameType === 'thin'}
+            $isHovered={hoveredKey === 'thin'}
+            {...hoverProps('thin')}
             onClick={() => handleFrameToggle('thin')}
           >
             Thin
           </FrameButton>
           <FrameButton
             $isActive={frameType === 'mediumFilm'}
+            $isHovered={hoveredKey === 'mediumFilm'}
+            {...hoverProps('mediumFilm')}
             onClick={() => handleFrameToggle('mediumFilm')}
           >
             Film
@@ -147,9 +160,12 @@ const DateSection = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
   height: ${(props) => (props.$isOpen ? '84px' : '0')};
   opacity: ${(props) => (props.$isOpen ? 1 : 0)};
+  /* opacity를 height보다 빨리 끝내면(0.15s vs 0.3s) 컨테이너가 60%만 열린
+     시점에 입력란이 이미 또렷해져 두 동작이 따로 노는 것처럼 보인다.
+     높이가 열리는 속도 그대로 함께 또렷해지도록 맞춘다. */
   transition:
-    height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.15s ease;
+    height ${PANEL_HEIGHT_MS}ms ${PANEL_EASING},
+    opacity ${PANEL_HEIGHT_MS}ms ${PANEL_EASING};
 
   > * {
     padding-top: 16px;
@@ -162,7 +178,7 @@ const FrameOptions = styled.div`
   width: 100%;
 `;
 
-const FrameButton = styled.button<{ $isActive: boolean }>`
+const FrameButton = styled.button<{ $isActive: boolean; $isHovered: boolean }>`
   height: 42px;
   flex: 1 1 0;
   min-width: 0;
@@ -172,21 +188,25 @@ const FrameButton = styled.button<{ $isActive: boolean }>`
   gap: 8px;
   padding: 12px 16px;
   border: 1px solid
-    ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_BORDER)};
+    ${(props) =>
+      props.$isActive || props.$isHovered ? COLOR_PRIMARY : COLOR_GRAY_BORDER};
   border-radius: 8px;
   background-color: ${(props) =>
-    props.$isActive ? COLOR_PRIMARY_BG : 'white'};
+      props.$isActive
+        ? COLOR_PRIMARY_BG
+        : props.$isHovered
+          ? COLOR_GRAY_BG
+          : 'white'};
   color: ${(props) => (props.$isActive ? COLOR_PRIMARY : COLOR_GRAY_TEXT)};
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 
-  &:hover {
-    border-color: ${COLOR_PRIMARY};
-    background-color: ${(props) =>
-      props.$isActive ? COLOR_PRIMARY_BG : COLOR_GRAY_BG};
-  }
 
   &:active {
     transform: scale(0.98);

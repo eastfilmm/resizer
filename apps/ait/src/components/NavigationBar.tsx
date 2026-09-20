@@ -1,6 +1,6 @@
 
-import { useClickOutside, FocusReveal } from '@resizer/ui';
-import { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { useClickOutside, FocusReveal, useClickClearedHover } from '@resizer/ui';
+import { memo, useCallback, useMemo, useRef } from 'react';
 import { LayoutPanel } from './panels/LayoutPanel';
 import { FramePanel } from './panels/FramePanel';
 import { BackgroundPanel } from './panels/BackgroundPanel';
@@ -72,7 +72,10 @@ interface NavButtonProps {
   isClickable: boolean;
   isHovered: boolean;
   onClick: (id: Exclude<NavPanelType, null>) => void;
-  onHoverChange: (id: Exclude<NavPanelType, null>, hovered: boolean) => void;
+  hoverProps: {
+    onPointerEnter: () => void;
+    onPointerLeave: () => void;
+  };
 }
 
 const NavButton = memo(
@@ -84,21 +87,12 @@ const NavButton = memo(
     isClickable,
     isHovered,
     onClick,
-    onHoverChange,
+    hoverProps,
   }: NavButtonProps) => {
     const handleClick = useCallback(() => {
       if (!isClickable) return;
       onClick(item.id);
     }, [onClick, item.id, isClickable]);
-
-    const handlePointerEnter = useCallback(() => {
-      if (!isClickable) return;
-      onHoverChange(item.id, true);
-    }, [onHoverChange, item.id, isClickable]);
-
-    const handlePointerLeave = useCallback(() => {
-      onHoverChange(item.id, false);
-    }, [onHoverChange, item.id]);
 
     return (
       <NavButtonStyled
@@ -107,8 +101,7 @@ const NavButton = memo(
         $isClickable={isClickable}
         $isHovered={isHovered}
         onClick={handleClick}
-        onPointerEnter={handlePointerEnter}
-        onPointerLeave={handlePointerLeave}
+        {...(isClickable ? hoverProps : {})}
         disabled={!isClickable}
       >
         <NavIcon
@@ -157,16 +150,8 @@ export const NavigationBar = () => {
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
   const frameType = useAtomValue(frameTypeAtom);
 
-  const [hoveredId, setHoveredId] = useState<Exclude<NavPanelType, null> | null>(null);
-
-  const handleHoverChange = useCallback(
-    (id: Exclude<NavPanelType, null>, hovered: boolean) => {
-      setHoveredId((prev) => (hovered ? id : prev === id ? null : prev));
-    },
-    [],
-  );
-
-  const clearHover = useCallback(() => setHoveredId(null), []);
+  const { hoveredKey, hoverProps, containerProps, clearHover } =
+    useClickClearedHover<Exclude<NavPanelType, null>>();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const { displayedPanel, isContentVisible } = usePanelTransition(activePanel);
@@ -197,10 +182,10 @@ export const NavigationBar = () => {
       if (!isPanelAllowedInFrameMode(id, frameType)) return;
       // 클릭으로 닫을 때 hover 잔상이 남지 않도록 비운다.
       // 다시 칠해지려면 포인터가 실제로 움직여야 한다.
-      setHoveredId(null);
+      clearHover();
       setActivePanel((prev) => (prev === id ? null : id));
     },
-    [setActivePanel, frameType],
+    [setActivePanel, frameType, clearHover],
   );
 
   useClickOutside(
@@ -231,7 +216,7 @@ export const NavigationBar = () => {
         </PanelContainer>
       </FocusReveal.Root>
 
-      <NavContainer onPointerLeave={clearHover}>
+      <NavContainer {...containerProps}>
         <SliderBackground $activeIndex={activeIndex} />
         <NavButtonsWrapper>
           {NAV_ITEMS.map((item) => {
@@ -246,9 +231,9 @@ export const NavigationBar = () => {
                 isEnabled={activeStates[item.id]}
                 isDimmed={isDimmed}
                 isClickable={isClickable}
-                isHovered={hoveredId === item.id}
+                isHovered={hoveredKey === item.id}
                 onClick={handleNavClick}
-                onHoverChange={handleHoverChange}
+                hoverProps={hoverProps(item.id)}
               />
             );
           })}

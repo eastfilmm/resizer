@@ -16,6 +16,7 @@ export * from './Button';
 export * from './Layout';
 
 // 범용 훅
+export { useClickClearedHover } from './hooks/useClickClearedHover';
 export { useClickOutside } from './hooks/useClickOutside';
 export { useIsDesktop } from './hooks/useIsDesktop';
 export { useIsSafari } from './hooks/useIsSafari';
