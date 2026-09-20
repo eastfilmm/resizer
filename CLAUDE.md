@@ -52,7 +52,9 @@ pnpm start        # Expo 개발 서버
 
 ## Safari 최적화
 
-- 프리뷰: `SCALE_FACTOR = 0.4` (메모리 제한 대응)
+- 프리뷰는 **모든 브라우저**에서 축소 해상도로 렌더 (모바일 800px / 데스크톱 1200px)
+  - `getPreviewScaleFactor(isDesktop)` → 모바일 0.4, 데스크톱 0.6
+  - `isSafari`는 이제 블러 구현(StackBlur)과 rAF 스로틀 선택에만 사용
 - StackBlur 사용 (CSS 필터 대신)
 - 다운로드는 항상 2000px 풀 해상도 렌더링
 

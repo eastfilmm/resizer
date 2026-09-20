@@ -42,8 +42,11 @@ The rendering logic is split into focused modules:
 - `drawImage.ts`: Orchestrator (Main Entry Point).
 - `types.ts`: Shared canvas-related interfaces.
 
-### Safari Optimization
-- Safari uses a `SCALE_FACTOR` (0.4) for preview to stay within memory limits.
+### Preview Resolution / Safari Optimization
+- The preview renders at a reduced resolution in **every** browser: 800px height on mobile,
+  1200px on desktop. `getPreviewScaleFactor(isDesktop)` (0.4 / 0.6) converts the 2000px-based
+  settings (padding, blur, shadow) into preview space.
+- `isSafari` now only selects the blur implementation and the RAF throttle — not the resolution.
 - Stackblur is used instead of CSS filters for Safari.
 - Transitions are throttled using RAF in `ImageCanvas.tsx`.
 - **Download** always triggers a full-resolution (2000px height) render.

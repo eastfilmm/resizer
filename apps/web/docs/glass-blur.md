@@ -24,7 +24,8 @@
 ### 렌더링 로직
 - `src/utils/canvas/effects.ts` 내의 `drawGlassBlurBackground()` 함수에서 구현됩니다.
 - **Edge Clamp**: 블러 적용 시 가장자리가 어두워지는 비네팅을 방지하기 위해 픽셀 복제 기법을 사용하여 여유 공간을 확보한 뒤 블러를 처리합니다.
-- **Safari 최적화**: Safari 브라우저에서는 성능을 위해 `SCALE_FACTOR` (0.4)가 적용된 상태로 렌더링되며, CSS filter 대신 JS 연산 기반 블러를 사용합니다.
+- **프리뷰 축소 렌더**: 프리뷰는 모든 브라우저에서 축소 해상도(모바일 800px / 데스크톱 1200px)로 그려지며, `blurIntensity`에도 동일한 배율(`getPreviewScaleFactor`)이 곱해집니다. 다운로드는 2000px 풀 해상도로 별도 렌더됩니다.
+- **Safari 최적화**: Safari에서는 CSS filter 대신 JS 연산 기반 블러(StackBlur)를 사용합니다.
 
 ## 관련 파일 목록
 

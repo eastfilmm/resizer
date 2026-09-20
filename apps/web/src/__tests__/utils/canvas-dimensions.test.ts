@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { getCanvasDimensions, getCanvasDisplaySize, getThumbnailCanvasSize } from '@/utils/canvas';
+import {
+  getCanvasDimensions,
+  getCanvasDisplaySize,
+  getPreviewScaleFactor,
+  getThumbnailCanvasSize,
+} from '@/utils/canvas';
 import {
   CANVAS_ACTUAL_SIZE,
   CANVAS_PREVIEW_SIZE,
+  CANVAS_PREVIEW_SIZE_DESKTOP,
   CANVAS_ACTUAL_SIZE_4_5_WIDTH,
   CANVAS_ACTUAL_SIZE_4_5_HEIGHT,
   CANVAS_PREVIEW_SIZE_4_5_WIDTH,
@@ -19,27 +25,27 @@ import {
 
 describe('getCanvasDimensions', () => {
   describe('1:1 aspect ratio', () => {
-    it('returns actual size for non-Safari', () => {
+    it('returns full resolution when usePreviewSize is false', () => {
       const result = getCanvasDimensions('1:1', false);
       expect(result).toEqual({ width: CANVAS_ACTUAL_SIZE, height: CANVAS_ACTUAL_SIZE });
     });
 
-    it('returns preview size for Safari', () => {
+    it('returns preview resolution when usePreviewSize is true', () => {
       const result = getCanvasDimensions('1:1', true);
       expect(result).toEqual({ width: CANVAS_PREVIEW_SIZE, height: CANVAS_PREVIEW_SIZE });
     });
 
     it('returns square dimensions (width === height)', () => {
-      const nonSafari = getCanvasDimensions('1:1', false);
-      expect(nonSafari.width).toBe(nonSafari.height);
+      const full = getCanvasDimensions('1:1', false);
+      expect(full.width).toBe(full.height);
 
-      const safari = getCanvasDimensions('1:1', true);
-      expect(safari.width).toBe(safari.height);
+      const preview = getCanvasDimensions('1:1', true);
+      expect(preview.width).toBe(preview.height);
     });
   });
 
   describe('4:5 aspect ratio', () => {
-    it('returns actual size for non-Safari', () => {
+    it('returns full resolution when usePreviewSize is false', () => {
       const result = getCanvasDimensions('4:5', false);
       expect(result).toEqual({
         width: CANVAS_ACTUAL_SIZE_4_5_WIDTH,
@@ -47,7 +53,7 @@ describe('getCanvasDimensions', () => {
       });
     });
 
-    it('returns preview size for Safari', () => {
+    it('returns preview resolution when usePreviewSize is true', () => {
       const result = getCanvasDimensions('4:5', true);
       expect(result).toEqual({
         width: CANVAS_PREVIEW_SIZE_4_5_WIDTH,
@@ -62,7 +68,7 @@ describe('getCanvasDimensions', () => {
   });
 
   describe('9:16 aspect ratio', () => {
-    it('returns actual size for non-Safari', () => {
+    it('returns full resolution when usePreviewSize is false', () => {
       const result = getCanvasDimensions('9:16', false);
       expect(result).toEqual({
         width: CANVAS_ACTUAL_SIZE_9_16_WIDTH,
@@ -70,7 +76,7 @@ describe('getCanvasDimensions', () => {
       });
     });
 
-    it('returns preview size for Safari', () => {
+    it('returns preview resolution when usePreviewSize is true', () => {
       const result = getCanvasDimensions('9:16', true);
       expect(result).toEqual({
         width: CANVAS_PREVIEW_SIZE_9_16_WIDTH,
@@ -84,23 +90,68 @@ describe('getCanvasDimensions', () => {
     });
   });
 
-  describe('Safari vs non-Safari relationship', () => {
-    it('Safari dimensions are smaller than non-Safari for all ratios', () => {
+  describe('preview vs full resolution relationship', () => {
+    it('preview dimensions are smaller than full resolution for all ratios', () => {
       const ratios: ('1:1' | '4:5' | '9:16')[] = ['1:1', '4:5', '9:16'];
       for (const ratio of ratios) {
-        const safari = getCanvasDimensions(ratio, true);
-        const nonSafari = getCanvasDimensions(ratio, false);
-        expect(safari.width).toBeLessThan(nonSafari.width);
-        expect(safari.height).toBeLessThan(nonSafari.height);
+        const preview = getCanvasDimensions(ratio, true);
+        const full = getCanvasDimensions(ratio, false);
+        expect(preview.width).toBeLessThan(full.width);
+        expect(preview.height).toBeLessThan(full.height);
       }
     });
 
-    it('Safari preview is 0.4x of actual for 1:1', () => {
-      const safari = getCanvasDimensions('1:1', true);
-      const nonSafari = getCanvasDimensions('1:1', false);
-      expect(safari.width / nonSafari.width).toBe(0.4);
-      expect(safari.height / nonSafari.height).toBe(0.4);
+    it('mobile preview is 0.4x of actual for 1:1', () => {
+      const preview = getCanvasDimensions('1:1', true);
+      const full = getCanvasDimensions('1:1', false);
+      expect(preview.width / full.width).toBe(0.4);
+      expect(preview.height / full.height).toBe(0.4);
     });
+  });
+
+  describe('desktop preview tier', () => {
+    it('uses the desktop preview size when isDesktop is true', () => {
+      const result = getCanvasDimensions('1:1', true, true);
+      expect(result).toEqual({
+        width: CANVAS_PREVIEW_SIZE_DESKTOP,
+        height: CANVAS_PREVIEW_SIZE_DESKTOP,
+      });
+    });
+
+    it('is larger than the mobile preview but smaller than full resolution', () => {
+      const ratios: ('1:1' | '4:5' | '9:16')[] = ['1:1', '4:5', '9:16'];
+      for (const ratio of ratios) {
+        const mobile = getCanvasDimensions(ratio, true, false);
+        const desktop = getCanvasDimensions(ratio, true, true);
+        const full = getCanvasDimensions(ratio, false);
+        expect(desktop.height).toBeGreaterThan(mobile.height);
+        expect(desktop.height).toBeLessThan(full.height);
+      }
+    });
+
+    it('keeps the aspect ratio of each preset', () => {
+      expect(getCanvasDimensions('4:5', true, true)).toEqual({ width: 960, height: 1200 });
+      expect(getCanvasDimensions('9:16', true, true)).toEqual({ width: 675, height: 1200 });
+    });
+
+    it('ignores isDesktop when rendering at full resolution', () => {
+      expect(getCanvasDimensions('1:1', false, true)).toEqual(getCanvasDimensions('1:1', false, false));
+    });
+  });
+});
+
+describe('getPreviewScaleFactor', () => {
+  it('is 0.4 on mobile and 0.6 on desktop', () => {
+    expect(getPreviewScaleFactor(false)).toBe(0.4);
+    expect(getPreviewScaleFactor(true)).toBe(0.6);
+  });
+
+  it('matches the ratio between the preview canvas and the full-resolution canvas', () => {
+    for (const isDesktop of [false, true]) {
+      const preview = getCanvasDimensions('1:1', true, isDesktop);
+      const full = getCanvasDimensions('1:1', false);
+      expect(getPreviewScaleFactor(isDesktop)).toBe(preview.height / full.height);
+    }
   });
 });
 

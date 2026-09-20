@@ -1,7 +1,12 @@
 // Canvas dimension constants
 export const CANVAS_ACTUAL_SIZE = 2000;
 export const CANVAS_DISPLAY_SIZE = 320;
+
+// Preview render resolution (all browsers, not just Safari).
+// Download always renders at CANVAS_ACTUAL_SIZE, so this only affects preview sharpness.
+// Mobile: 320px display x 2.5 = 800 / Desktop: 600px display x 2 = 1200
 export const CANVAS_PREVIEW_SIZE = 800;
+export const CANVAS_PREVIEW_SIZE_DESKTOP = 1200;
 
 // Desktop display sizes (1.875x scale for screens >= 768px)
 export const CANVAS_DISPLAY_SIZE_DESKTOP = 600;
