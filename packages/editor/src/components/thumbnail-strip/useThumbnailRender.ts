@@ -19,10 +19,12 @@ const DEBOUNCE_MS = 300;
 
 interface UseThumbnailRenderOptions {
   objectUrl: string;
+  photoDate?: string;
 }
 
 export const useThumbnailRender = ({
   objectUrl,
+  photoDate,
 }: UseThumbnailRenderOptions) => {
   const store = useStore();
   const aspectRatio = useAtomValue(canvasAspectRatioAtom);
@@ -56,9 +58,9 @@ export const useThumbnailRender = ({
     drawImageWithEffects(
       ctx,
       imageRef.current,
-      toDrawOptions(store.get(imageSettingsAtom), size, scaleFactor),
+      toDrawOptions(store.get(imageSettingsAtom), { photoDate }, size, scaleFactor),
     );
-  }, [aspectRatio, store]);
+  }, [aspectRatio, photoDate, store]);
 
   useEffect(() => {
     let active = true;

@@ -31,7 +31,7 @@ export const DownloadButton = () => {
   const platform = usePlatform();
 
   const renderImage = useCallback(async (uploadedImage: typeof uploadedImages[0], index: number) => {
-    const canvas = await renderImageToCanvas(uploadedImage.objectUrl, settings, aspectRatio);
+    const canvas = await renderImageToCanvas(uploadedImage, settings, aspectRatio);
     return { canvas, fileName: getPngFileName(uploadedImage.fileName, index) };
   }, [aspectRatio, settings]);
 

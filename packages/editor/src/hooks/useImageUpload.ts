@@ -1,52 +1,47 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useStore } from 'jotai';
 import {
   MAX_UPLOADED_IMAGES,
   selectedImageIdAtom,
   uploadedImagesAtom,
-  type UploadedImage,
 } from '../atoms/imageAtoms';
-import { createImageId } from '../utils/imageUtils';
+import { createUploadedImage } from '../utils/imageUtils';
 import { releaseEditableImage } from '../utils/imageSource';
+import { usePhotoDates } from './usePhotoDates';
 
 export const useImageUpload = () => {
-  const uploadedImages = useAtomValue(uploadedImagesAtom);
-  const setUploadedImages = useSetAtom(uploadedImagesAtom);
-  const setSelectedImageId = useSetAtom(selectedImageIdAtom);
+  const store = useStore();
+  const readPhotoDates = usePhotoDates();
 
   const handleFiles = useCallback(
     (files: File[]) => {
-      const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+      const imageFiles = files
+        .filter((file) => file.type.startsWith('image/'))
+        .slice(0, MAX_UPLOADED_IMAGES);
       if (imageFiles.length === 0) return;
 
-      const newImages: UploadedImage[] = imageFiles
-        .slice(0, MAX_UPLOADED_IMAGES)
-        .map((file) => ({
-          id: createImageId(),
-          fileName: file.name,
-          objectUrl: URL.createObjectURL(file),
-        }));
-
+      const newImages = imageFiles.map(createUploadedImage);
+      const uploadedImages = store.get(uploadedImagesAtom);
       const total = uploadedImages.length + newImages.length;
 
       if (total <= MAX_UPLOADED_IMAGES) {
         // append
-        const merged = [...uploadedImages, ...newImages];
-        setUploadedImages(merged);
-        setSelectedImageId(newImages[0]?.id ?? null);
+        store.set(uploadedImagesAtom, [...uploadedImages, ...newImages]);
       } else {
         // 전체 교체
         uploadedImages.forEach((image) => {
           URL.revokeObjectURL(image.objectUrl);
           releaseEditableImage(image.objectUrl);
         });
-        setUploadedImages(newImages);
-        setSelectedImageId(newImages[0]?.id ?? null);
+        store.set(uploadedImagesAtom, newImages);
       }
+      store.set(selectedImageIdAtom, newImages[0]?.id ?? null);
+
+      readPhotoDates(newImages, imageFiles);
     },
-    [uploadedImages, setUploadedImages, setSelectedImageId],
+    [store, readPhotoDates],
   );
 
   return handleFiles;

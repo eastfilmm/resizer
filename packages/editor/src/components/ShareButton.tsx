@@ -23,13 +23,13 @@ export const ShareButton = () => {
 
     // 네이티브 환경(RN WebView / App in Toss)
     if (platform.isNativeAvailable()) {
-      const canvas = await renderImageToCanvas(uploadedImages[0].objectUrl, settings, aspectRatio);
+      const canvas = await renderImageToCanvas(uploadedImages[0], settings, aspectRatio);
       await platform.shareImageNatively({ canvas, fileName: 'insta-frame.png' });
       return;
     }
 
     // 브라우저 폴백: Web Share API
-    const blobs = await Promise.all(uploadedImages.map((img) => renderImageToBlob(img.objectUrl, settings, aspectRatio)));
+    const blobs = await Promise.all(uploadedImages.map((img) => renderImageToBlob(img, settings, aspectRatio)));
     const files = blobs.map((blob, i) => new File([blob], `photo-${i + 1}.png`, { type: 'image/png' }));
 
     try {

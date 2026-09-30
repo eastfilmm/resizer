@@ -247,6 +247,18 @@ describe('ImageCanvas 재드로우 배선', () => {
     expect(lastDrawOptions().actualCanvasWidth).toBe(CANVAS_PREVIEW_SIZE_DESKTOP);
   });
 
+  // 촬영일은 업로드 뒤에 비동기로 채워진다. 설정은 그대로여도 다시 그려야 한다.
+  it('선택된 사진의 촬영일이 늦게 도착하면 그 날짜로 다시 그린다', async () => {
+    const { store } = await setup({ settings: { frameType: 'polaroid' } });
+    expect(lastDrawOptions().polaroidDate).toBe('');
+
+    await act(async () => {
+      store.set(uploadedImagesAtom, (prev) => prev.map((img) => ({ ...img, photoDate: '2023.07.14' })));
+    });
+
+    expect(lastDrawOptions().polaroidDate).toBe('2023.07.14');
+  });
+
   it('이미지가 없으면 프리뷰 크기 캔버스를 배경색으로만 채운다', async () => {
     const { canvasRef } = await setup({ withImage: false, isDesktop: true });
 

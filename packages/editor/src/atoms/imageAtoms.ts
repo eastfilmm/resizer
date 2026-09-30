@@ -12,6 +12,8 @@ export interface UploadedImage {
   id: string;
   fileName: string;
   objectUrl: string;
+  /** EXIF 촬영일(YYYY.MM.DD). 업로드 시 한 번 읽어 둔다. 없으면 undefined. */
+  photoDate?: string;
 }
 
 export const MAX_UPLOADED_IMAGES = 5;
@@ -46,7 +48,11 @@ export interface ImageSettings {
   shadowOffset: number;
   canvasAspectRatio: AspectRatio;
   frameType: FrameType;
-  polaroidDate: string;
+  /**
+   * 폴라로이드 날짜. null이면 사진마다 자기 촬영일(UploadedImage.photoDate)을 쓰고,
+   * 사용자가 입력하면 그 값을 모든 사진에 쓴다. 빈 문자열은 날짜를 지운 상태.
+   */
+  polaroidDate: string | null;
 }
 
 export const DEFAULT_IMAGE_SETTINGS: ImageSettings = {
@@ -60,7 +66,7 @@ export const DEFAULT_IMAGE_SETTINGS: ImageSettings = {
   shadowOffset: 20,
   canvasAspectRatio: '1:1',
   frameType: 'none',
-  polaroidDate: '',
+  polaroidDate: null,
 };
 
 export const imageSettingsAtom = atom<ImageSettings>(DEFAULT_IMAGE_SETTINGS);

@@ -52,16 +52,17 @@ describe('toggleFrame', () => {
   });
 
   describe('Polaroid 날짜', () => {
-    it('켤 때 입력한 날짜를 건드리지 않는다', () => {
-      const next = toggleFrame(state({ polaroidDate: '1999.12.31' }), 'polaroid');
-
-      expect(next.settings.polaroidDate).toBe('1999.12.31');
+    it('켤 때 날짜를 건드리지 않는다 (입력이 없으면 사진별 촬영일을 따른다)', () => {
+      expect(toggleFrame(state(), 'polaroid').settings.polaroidDate).toBeNull();
+      expect(toggleFrame(state({ polaroidDate: '1999.12.31' }), 'polaroid').settings.polaroidDate).toBe(
+        '1999.12.31',
+      );
     });
 
-    it('다른 프레임으로 바꾸면 날짜를 비운다', () => {
+    it('다른 프레임으로 바꾸면 입력값을 버리고 촬영일로 돌아간다', () => {
       const next = toggleFrame(state({ frameType: 'polaroid', polaroidDate: '1999.12.31' }), 'thin');
 
-      expect(next.settings.polaroidDate).toBe('');
+      expect(next.settings.polaroidDate).toBeNull();
     });
   });
 });

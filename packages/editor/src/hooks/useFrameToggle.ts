@@ -23,7 +23,9 @@ interface FrameToggleState {
  *
  * - 켜진 프레임을 다시 누르면 끈다.
  * - Thin/Film은 배경을 흰색으로 고정하고, 원래 색은 기억했다가 벗어날 때 복원한다.
- * - Polaroid는 배경을 건드리지 않는다. 다른 프레임으로 바꾸면 날짜를 비운다.
+ * - Polaroid는 배경을 건드리지 않는다. 날짜는 직접 입력하지 않았다면 사진마다
+ *   자기 촬영일이 찍힌다(resolvePolaroidDate). 다른 프레임으로 바꾸면 입력값을
+ *   버리고 다시 촬영일을 따르게 한다.
  */
 export const toggleFrame = (
   { settings, prevBackgroundColor }: FrameToggleState,
@@ -48,7 +50,7 @@ export const toggleFrame = (
 
   if (type !== 'polaroid') {
     return {
-      settings: { ...activated, polaroidDate: '', backgroundColor: 'white' },
+      settings: { ...activated, polaroidDate: null, backgroundColor: 'white' },
       prevBackgroundColor:
         settings.backgroundColor !== 'white' ? settings.backgroundColor : prevBackgroundColor,
     };

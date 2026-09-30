@@ -15,6 +15,7 @@ export const ThumbnailItem = memo(
   ({ image, isSelected, onSelect }: ThumbnailItemProps) => {
     const canvasRef = useThumbnailRender({
       objectUrl: image.objectUrl,
+      photoDate: image.photoDate,
     });
 
     return (

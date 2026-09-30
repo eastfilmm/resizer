@@ -1,5 +1,5 @@
 import { drawImageWithEffects, getCanvasDimensions } from '@resizer/canvas';
-import type { ImageSettings, AspectRatio } from '../atoms/imageAtoms';
+import type { ImageSettings, AspectRatio, UploadedImage } from '../atoms/imageAtoms';
 import { loadEditableImage } from './imageSource';
 import { toDrawOptions } from './drawOptions';
 
@@ -18,21 +18,21 @@ export const canvasToBlob = (canvas: HTMLCanvasElement): Promise<Blob> =>
   });
 
 export const renderImageToBlob = async (
-  objectUrl: string,
+  image: UploadedImage,
   settings: ImageSettings,
   aspectRatio: AspectRatio,
 ): Promise<Blob> => {
-  const canvas = await renderImageToCanvas(objectUrl, settings, aspectRatio);
+  const canvas = await renderImageToCanvas(image, settings, aspectRatio);
   return canvasToBlob(canvas);
 };
 
 export const renderImageToCanvas = async (
-  objectUrl: string,
+  image: UploadedImage,
   settings: ImageSettings,
   aspectRatio: AspectRatio,
 ): Promise<HTMLCanvasElement> => {
   const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(aspectRatio, false);
-  const img = await loadImage(objectUrl);
+  const img = await loadImage(image.objectUrl);
 
   const canvas = document.createElement('canvas');
   canvas.width = canvasWidth;
@@ -44,7 +44,7 @@ export const renderImageToCanvas = async (
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  drawImageWithEffects(ctx, img, toDrawOptions(settings, canvas, 1));
+  drawImageWithEffects(ctx, img, toDrawOptions(settings, image, canvas, 1));
 
   return canvas;
 };

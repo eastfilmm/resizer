@@ -1,5 +1,6 @@
 import type { DrawImageOptions } from '@resizer/canvas';
-import type { ImageSettings } from '../atoms/imageAtoms';
+import type { ImageSettings, UploadedImage } from '../atoms/imageAtoms';
+import { resolvePolaroidDate } from './imageUtils';
 
 interface CanvasSize {
   width: number;
@@ -15,6 +16,7 @@ interface CanvasSize {
  */
 export const toDrawOptions = (
   settings: ImageSettings,
+  image: Pick<UploadedImage, 'photoDate'> | null | undefined,
   canvas: CanvasSize,
   scale: number,
 ): DrawImageOptions => {
@@ -35,6 +37,6 @@ export const toDrawOptions = (
     shadowOffset: settings.shadowOffset * scale,
     frameType: settings.frameType,
     scaleFactor: scale,
-    polaroidDate: settings.polaroidDate,
+    polaroidDate: resolvePolaroidDate(settings, image),
   };
 };

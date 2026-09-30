@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useEffect, useCallback, useRef } from 'react';
 import type { RefObject } from 'react';
 import { useAtomValue, useStore } from 'jotai';
-import { imageUrlAtom, imageSettingsAtom } from '../atoms/imageAtoms';
+import { imageUrlAtom, imageSettingsAtom, selectedImageAtom } from '../atoms/imageAtoms';
 import type { AspectRatio } from '../atoms/imageAtoms';
 import {
   drawImageWithEffects,
@@ -31,6 +31,8 @@ interface ImageCanvasProps {
 export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanvasProps) {
   const store = useStore();
   const imageUrl = useAtomValue(imageUrlAtom);
+  // 촬영일은 업로드 뒤에 늦게 도착한다. 도착하면 폴라로이드 날짜를 다시 그려야 한다.
+  const photoDate = useAtomValue(selectedImageAtom)?.photoDate;
   const { aspectRatio } = useAspectRatio();
 
   const imageRef = useRef<DrawableImage | null>(null);
@@ -51,7 +53,11 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
       const size = getCanvasDimensions(settings.canvasAspectRatio, true, isDesktop);
 
       if (img) {
-        drawImageWithEffects(ctx, img, toDrawOptions(settings, size, SCALE_FACTOR));
+        drawImageWithEffects(
+          ctx,
+          img,
+          toDrawOptions(settings, store.get(selectedImageAtom), size, SCALE_FACTOR),
+        );
       } else {
         // Fill background with solid color (no image loaded)
         ctx.fillStyle = settings.backgroundColor;
@@ -171,6 +177,14 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
       }
     }
   }, [imageUrl, aspectRatio, drawImageOnCanvas, canvasRef, isDesktop, store]);
+
+  // 선택된 사진의 촬영일이 늦게 도착하면 다시 그린다. 위 effect가 사진 교체를
+  // 먼저 처리하므로 여기서는 이미 이 사진이 로드된 경우만 본다.
+  useEffect(() => {
+    if (!imageRef.current || loadedUrlRef.current !== imageUrl) return;
+    const ctx = canvasRef.current?.getContext('2d');
+    if (ctx) redrawImage(ctx, imageRef.current);
+  }, [photoDate, imageUrl, canvasRef, redrawImage]);
 
   // Initialize container background color on mount
   useEffect(() => {

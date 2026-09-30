@@ -4,14 +4,18 @@ import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, CO
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { frameTypeAtom, polaroidDateAtom } from '../../atoms/imageAtoms';
+import { frameTypeAtom, polaroidDateAtom, selectedImageAtom } from '../../atoms/imageAtoms';
 import type { FrameType } from '../../atoms/imageAtoms';
 import { useFrameToggle } from '../../hooks/useFrameToggle';
+import { resolvePolaroidDate } from '../../utils/imageUtils';
 
 export const FramePanel = memo(() => {
   const frameType = useAtomValue(frameTypeAtom);
-  const polaroidDate = useAtomValue(polaroidDateAtom);
+  const inputDate = useAtomValue(polaroidDateAtom);
   const setPolaroidDate = useSetAtom(polaroidDateAtom);
+  const selectedImage = useAtomValue(selectedImageAtom);
+  // 직접 입력하지 않았으면 선택된 사진의 촬영일을 보여준다.
+  const polaroidDate = resolvePolaroidDate({ polaroidDate: inputDate }, selectedImage);
   const toggleFrame = useFrameToggle();
 
   const { hoveredKey, hoverProps, containerProps, clearHover } =
