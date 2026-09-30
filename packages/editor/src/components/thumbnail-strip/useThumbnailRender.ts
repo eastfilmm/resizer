@@ -1,6 +1,5 @@
 'use client';
 
-import { useRafThrottle } from '@resizer/ui';
 import type { DrawableImage } from '@resizer/canvas';
 import { loadEditableImage } from '../../utils/imageSource';
 import { useCallback, useEffect, useRef } from 'react';
@@ -11,7 +10,13 @@ import {
   getCanvasDimensions,
   getThumbnailCanvasSize,
 } from '@resizer/canvas';
+import { toDrawOptions } from '../../utils/drawOptions';
+import { useRedrawOnSettingsChange } from '../../hooks/useRedrawOnSettingsChange';
 import { THUMBNAIL_INNER_SIZE, THUMBNAIL_RENDER_SCALE } from './constants';
+
+// 썸네일은 급하지 않다. 슬라이더를 끌 동안은 메인 캔버스에 프레임을 양보한다.
+const DEBOUNCE_MS = 300;
+
 interface UseThumbnailRenderOptions {
   objectUrl: string;
 }
@@ -24,9 +29,6 @@ export const useThumbnailRender = ({
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imageRef = useRef<DrawableImage | null>(null);
-  const settingsRef = useRef(store.get(imageSettingsAtom));
-  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { throttle } = useRafThrottle();
 
   const renderThumbnail = useCallback(() => {
     if (!canvasRef.current || !imageRef.current) return;
@@ -42,8 +44,6 @@ export const useThumbnailRender = ({
     );
     const fullResCanvas = getCanvasDimensions(aspectRatio, false);
     const scaleFactor = size.height / fullResCanvas.height;
-    const settings = settingsRef.current;
-    const padding = settings.padding * scaleFactor;
 
     canvas.width = size.width;
     canvas.height = size.height;
@@ -53,24 +53,12 @@ export const useThumbnailRender = ({
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    drawImageWithEffects(ctx, imageRef.current, {
-      actualCanvasWidth: size.width,
-      actualCanvasHeight: size.height,
-      imageAreaWidth: size.width - padding * 2,
-      imageAreaHeight: size.height - padding * 2,
-      padding,
-      bgColor: settings.backgroundColor,
-      useGlassBlur: settings.glassBlurEnabled,
-      blurIntensity: settings.blurIntensity * scaleFactor,
-      overlayOpacity: settings.overlayOpacity,
-      useShadow: settings.shadowEnabled,
-      shadowIntensity: settings.shadowIntensity * scaleFactor,
-      shadowOffset: settings.shadowOffset * scaleFactor,
-      frameType: settings.frameType,
-      scaleFactor,
-      polaroidDate: settings.polaroidDate,
-    });
-  }, [aspectRatio]);
+    drawImageWithEffects(
+      ctx,
+      imageRef.current,
+      toDrawOptions(store.get(imageSettingsAtom), size, scaleFactor),
+    );
+  }, [aspectRatio, store]);
 
   useEffect(() => {
     let active = true;
@@ -89,34 +77,7 @@ export const useThumbnailRender = ({
     };
   }, [objectUrl, renderThumbnail]);
 
-  useEffect(() => {
-    const DEBOUNCE_MS = 300;
-
-    const performRender = () => {
-      throttle(renderThumbnail);
-    };
-
-    const unsubscribe = store.sub(imageSettingsAtom, () => {
-      settingsRef.current = store.get(imageSettingsAtom);
-
-      if (debounceTimerRef.current !== null) {
-        clearTimeout(debounceTimerRef.current);
-      }
-
-      debounceTimerRef.current = setTimeout(() => {
-        debounceTimerRef.current = null;
-        performRender();
-      }, DEBOUNCE_MS);
-    });
-
-    return () => {
-      unsubscribe();
-      if (debounceTimerRef.current !== null) {
-        clearTimeout(debounceTimerRef.current);
-        debounceTimerRef.current = null;
-      }
-    };
-  }, [throttle, renderThumbnail, store]);
+  useRedrawOnSettingsChange(renderThumbnail, { debounceMs: DEBOUNCE_MS });
 
   useEffect(() => {
     renderThumbnail();

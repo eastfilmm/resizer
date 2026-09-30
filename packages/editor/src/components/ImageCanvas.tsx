@@ -1,6 +1,6 @@
 'use client';
 
-import { useRafThrottle, DESKTOP_MEDIA_QUERY } from '@resizer/ui';
+import { DESKTOP_MEDIA_QUERY } from '@resizer/ui';
 import styled from 'styled-components';
 import { useEffect, useCallback, useRef } from 'react';
 import type { RefObject } from 'react';
@@ -17,9 +17,11 @@ import {
   CANVAS_DISPLAY_SIZE_4_5_WIDTH_DESKTOP,
   CANVAS_DISPLAY_SIZE_9_16_WIDTH_DESKTOP,
 } from '@resizer/canvas';
-import type { ImagePosition, DrawableImage } from '@resizer/canvas';
+import type { DrawableImage } from '@resizer/canvas';
 import { useAspectRatio } from '../hooks/useAspectRatio';
+import { useRedrawOnSettingsChange } from '../hooks/useRedrawOnSettingsChange';
 import { loadEditableImage } from '../utils/imageSource';
+import { toDrawOptions } from '../utils/drawOptions';
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -31,18 +33,13 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
   const imageUrl = useAtomValue(imageUrlAtom);
   const { aspectRatio } = useAspectRatio();
 
-  // Refs to access current values in callbacks without re-triggering effects
-  const settingsRef = useRef(store.get(imageSettingsAtom));
   const imageRef = useRef<DrawableImage | null>(null);
   const loadedUrlRef = useRef<string | null>(null);
   // 로드가 끝났을 때 더 최신 요청이 시작됐는지 판별하는 토큰.
   // 최신 URL을 렌더 중에 ref로 복사하던 방식은 캐시 적중 시 .then()이
   // effect보다 먼저 실행돼 어긋날 수 있었다. 요청 시작 시점에 번호를 매긴다.
   const loadRequestIdRef = useRef(0);
-  const imagePositionRef = useRef<ImagePosition | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const { throttle } = useRafThrottle();
 
   // 프리뷰는 브라우저와 무관하게 축소 해상도로 렌더한다 (모바일 0.4, 데스크톱 0.6).
   // 다운로드는 renderCanvasImage에서 항상 2000px 풀 해상도로 별도 렌더한다.
@@ -50,41 +47,18 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
 
   const redrawImage = useCallback(
     (ctx: CanvasRenderingContext2D, img: DrawableImage | null) => {
-      const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(
-        settingsRef.current.canvasAspectRatio,
-        true,
-        isDesktop
-      );
-      const settings = settingsRef.current;
-      const effectivePadding = settings.padding * SCALE_FACTOR;
-      const imageAreaWidth = canvasWidth - effectivePadding * 2;
-      const imageAreaHeight = canvasHeight - effectivePadding * 2;
+      const settings = store.get(imageSettingsAtom);
+      const size = getCanvasDimensions(settings.canvasAspectRatio, true, isDesktop);
 
       if (img) {
-        imagePositionRef.current = drawImageWithEffects(ctx, img, {
-          actualCanvasWidth: canvasWidth,
-          actualCanvasHeight: canvasHeight,
-          imageAreaWidth,
-          imageAreaHeight,
-          padding: effectivePadding,
-          bgColor: settings.backgroundColor,
-          useGlassBlur: settings.glassBlurEnabled,
-          blurIntensity: settings.blurIntensity * SCALE_FACTOR,
-          overlayOpacity: settings.overlayOpacity,
-          useShadow: settings.shadowEnabled,
-          shadowIntensity: settings.shadowIntensity * SCALE_FACTOR,
-          shadowOffset: settings.shadowOffset * SCALE_FACTOR,
-          frameType: settings.frameType,
-          scaleFactor: SCALE_FACTOR,
-          polaroidDate: settings.polaroidDate,
-        });
+        drawImageWithEffects(ctx, img, toDrawOptions(settings, size, SCALE_FACTOR));
       } else {
         // Fill background with solid color (no image loaded)
         ctx.fillStyle = settings.backgroundColor;
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        ctx.fillRect(0, 0, size.width, size.height);
       }
     },
-    [isDesktop, SCALE_FACTOR]
+    [isDesktop, SCALE_FACTOR, store]
   );
 
   const drawImageOnCanvas = useCallback(() => {
@@ -94,12 +68,13 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const { canvasAspectRatio } = store.get(imageSettingsAtom);
     const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(
-      settingsRef.current.canvasAspectRatio,
+      canvasAspectRatio,
       true,
       isDesktop
     );
-    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(settingsRef.current.canvasAspectRatio, isDesktop);
+    const { width: displayWidth, height: displayHeight } = getCanvasDisplaySize(canvasAspectRatio, isDesktop);
 
     // Set canvas actual size
     canvas.width = canvasWidth;
@@ -128,7 +103,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
       loadedUrlRef.current = imageUrl;
       redrawImage(ctx, image);
     });
-  }, [imageUrl, canvasRef, redrawImage, isDesktop]);
+  }, [imageUrl, canvasRef, redrawImage, isDesktop, store]);
 
   // Initialize canvas on mount (skip when image is already loaded to avoid double-clear flicker)
   useEffect(() => {
@@ -144,40 +119,22 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
 
-        ctx.fillStyle = settingsRef.current.backgroundColor;
+        ctx.fillStyle = store.get(imageSettingsAtom).backgroundColor;
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     }
-  }, [canvasRef, aspectRatio, isDesktop]);
+  }, [canvasRef, aspectRatio, isDesktop, store]);
 
-  // 설정 변경은 rAF로 스로틀해 프레임당 최대 한 번만 다시 그린다
-  useEffect(() => {
-    const performRender = () => {
-      if (canvasRef.current) {
-        const ctx = canvasRef.current.getContext('2d');
-        if (ctx) {
-          redrawImage(ctx, imageRef.current);
-        }
-      }
-    };
-
-    const unsubscribe = store.sub(imageSettingsAtom, () => {
-      // Update refs
-      const newSettings = store.get(imageSettingsAtom);
-      settingsRef.current = newSettings;
-
-      // Update container background color imperatively (no re-render)
+  // 설정이 바뀌면 프레임당 한 번 다시 그린다. 컨테이너 배경도 리렌더 없이 맞춘다.
+  useRedrawOnSettingsChange(
+    useCallback(() => {
       if (containerRef.current) {
-        containerRef.current.style.backgroundColor = newSettings.backgroundColor;
+        containerRef.current.style.backgroundColor = store.get(imageSettingsAtom).backgroundColor;
       }
-
-      throttle(performRender);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [store, canvasRef, redrawImage, throttle]);
+      const ctx = canvasRef.current?.getContext('2d');
+      if (ctx) redrawImage(ctx, imageRef.current);
+    }, [store, canvasRef, redrawImage]),
+  );
 
   // Track the current image URL to detect changes
   const lastImageUrlRef = useRef<string | null>(null);
@@ -188,7 +145,6 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
       // Only clear cache if the URL itself changed
       if (lastImageUrlRef.current !== imageUrl) {
         imageRef.current = null;
-        imagePositionRef.current = null;
         loadedUrlRef.current = null;
         lastImageUrlRef.current = imageUrl;
       }
@@ -196,7 +152,6 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
     } else {
       // Clear image reference when imageUrl is null (reset)
       imageRef.current = null;
-      imagePositionRef.current = null;
       loadedUrlRef.current = null;
       lastImageUrlRef.current = null;
       // Clear canvas and update display size
@@ -210,19 +165,19 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
           canvas.height = height;
           canvas.style.width = `${displayWidth}px`;
           canvas.style.height = `${displayHeight}px`;
-          ctx.fillStyle = settingsRef.current.backgroundColor;
+          ctx.fillStyle = store.get(imageSettingsAtom).backgroundColor;
           ctx.fillRect(0, 0, width, height);
         }
       }
     }
-  }, [imageUrl, aspectRatio, drawImageOnCanvas, canvasRef, isDesktop]);
+  }, [imageUrl, aspectRatio, drawImageOnCanvas, canvasRef, isDesktop, store]);
 
   // Initialize container background color on mount
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.style.backgroundColor = settingsRef.current.backgroundColor;
+      containerRef.current.style.backgroundColor = store.get(imageSettingsAtom).backgroundColor;
     }
-  }, []);
+  }, [store]);
 
   return (
     <CanvasContainer

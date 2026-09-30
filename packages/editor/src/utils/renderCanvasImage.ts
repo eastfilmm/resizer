@@ -1,6 +1,7 @@
 import { drawImageWithEffects, getCanvasDimensions } from '@resizer/canvas';
 import type { ImageSettings, AspectRatio } from '../atoms/imageAtoms';
 import { loadEditableImage } from './imageSource';
+import { toDrawOptions } from './drawOptions';
 
 /**
  * 다운로드 렌더도 편집 화면과 같은 축소본을 쓴다.
@@ -43,25 +44,7 @@ export const renderImageToCanvas = async (
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
-  const imageAreaWidth = canvasWidth - settings.padding * 2;
-  const imageAreaHeight = canvasHeight - settings.padding * 2;
-
-  drawImageWithEffects(ctx, img, {
-    actualCanvasWidth: canvasWidth,
-    actualCanvasHeight: canvasHeight,
-    imageAreaWidth,
-    imageAreaHeight,
-    padding: settings.padding,
-    bgColor: settings.backgroundColor,
-    useGlassBlur: settings.glassBlurEnabled,
-    blurIntensity: settings.blurIntensity,
-    overlayOpacity: settings.overlayOpacity,
-    useShadow: settings.shadowEnabled,
-    shadowIntensity: settings.shadowIntensity,
-    shadowOffset: settings.shadowOffset,
-    frameType: settings.frameType,
-    polaroidDate: settings.polaroidDate,
-  });
+  drawImageWithEffects(ctx, img, toDrawOptions(settings, canvas, 1));
 
   return canvas;
 };
