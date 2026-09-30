@@ -4,26 +4,15 @@ import { COLOR_PRIMARY, COLOR_PRIMARY_BG, COLOR_GRAY_TEXT, COLOR_GRAY_BORDER, CO
 import styled from 'styled-components';
 import { memo, useCallback } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import {
-  frameTypeAtom,
-  paddingAtom,
-  polaroidDateAtom,
-  backgroundColorAtom,
-  prevBackgroundColorAtom,
-} from '../../atoms/imageAtoms';
+import { frameTypeAtom, polaroidDateAtom } from '../../atoms/imageAtoms';
 import type { FrameType } from '../../atoms/imageAtoms';
-const FRAME_DEFAULT_PADDING = 80;
+import { useFrameToggle } from '../../hooks/useFrameToggle';
 
 export const FramePanel = memo(() => {
   const frameType = useAtomValue(frameTypeAtom);
-  const setFrameType = useSetAtom(frameTypeAtom);
-  const setPadding = useSetAtom(paddingAtom);
   const polaroidDate = useAtomValue(polaroidDateAtom);
   const setPolaroidDate = useSetAtom(polaroidDateAtom);
-  const backgroundColor = useAtomValue(backgroundColorAtom);
-  const setBackgroundColor = useSetAtom(backgroundColorAtom);
-  const prevBackgroundColor = useAtomValue(prevBackgroundColorAtom);
-  const setPrevBackgroundColor = useSetAtom(prevBackgroundColorAtom);
+  const toggleFrame = useFrameToggle();
 
   const { hoveredKey, hoverProps, containerProps, clearHover } =
     useClickClearedHover<FrameType>();
@@ -32,55 +21,9 @@ export const FramePanel = memo(() => {
     (type: FrameType) => {
       // 클릭으로 해제할 때 hover 잔상(파란 보더)이 남지 않도록 비운다.
       clearHover();
-
-      if (frameType === type) {
-        // 이미 활성화된 프레임을 다시 누르면 끔
-        setFrameType('none');
-        setPadding(0);
-
-        // 'thin'이나 'mediumFilm' 기능에서 해제될 때 이전 색상 복원
-        if (type !== 'polaroid' && prevBackgroundColor) {
-          setBackgroundColor(prevBackgroundColor);
-          setPrevBackgroundColor(null);
-        }
-      } else {
-        // 새 프레임 활성화 (상호배제 자동)
-        setFrameType(type);
-        setPadding(FRAME_DEFAULT_PADDING);
-
-        // Polaroid가 아닌 프레임은 date 초기화 & 배경 white 고정
-        if (type !== 'polaroid') {
-          setPolaroidDate('');
-
-          // 현재 배경색이 흰색이 아닐 때만 저장
-          if (backgroundColor !== 'white') {
-            setPrevBackgroundColor(backgroundColor);
-          }
-          setBackgroundColor('white');
-        } else {
-          // Polaroid 프레임을 선택할 때는 배경색을 강제하지 않으므로 변경하지 않음 (Thin/Film -> Polaroid 전환 시 복원)
-          if (
-            frameType !== 'none' &&
-            frameType !== 'polaroid' &&
-            prevBackgroundColor
-          ) {
-            setBackgroundColor(prevBackgroundColor);
-            setPrevBackgroundColor(null);
-          }
-        }
-      }
+      toggleFrame(type);
     },
-    [
-      clearHover,
-      frameType,
-      setFrameType,
-      setPadding,
-      setPolaroidDate,
-      backgroundColor,
-      setBackgroundColor,
-      prevBackgroundColor,
-      setPrevBackgroundColor,
-    ],
+    [clearHover, toggleFrame],
   );
 
   const handleDateChange = useCallback(
