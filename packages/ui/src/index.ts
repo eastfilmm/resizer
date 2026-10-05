@@ -14,6 +14,7 @@ export { Collapsible } from './Collapsible';
 // styled 원자
 export * from './primitives';
 export * from './Button';
+export { ColorSwatch, SwatchStrip } from './ColorSwatch';
 export * from './icons';
 export * from './Layout';
 

@@ -1,4 +1,5 @@
 import {
+  BACKGROUND_COLOR_FILL,
   CANVAS_ACTUAL_SIZE,
   CANVAS_DISPLAY_SIZE,
   CANVAS_DISPLAY_SIZE_4_5_WIDTH,
@@ -101,6 +102,6 @@ export function resetCanvas(
   canvas.style.width = `${displaySize}px`;
   canvas.style.height = `${displaySize}px`;
 
-  ctx.fillStyle = backgroundColor;
+  ctx.fillStyle = BACKGROUND_COLOR_FILL[backgroundColor];
   ctx.fillRect(0, 0, actualWidth, actualHeight);
 }

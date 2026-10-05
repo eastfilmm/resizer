@@ -8,6 +8,7 @@ import { useAtomValue, useStore } from 'jotai';
 import { imageUrlAtom, imageSettingsAtom, selectedImageAtom } from '../atoms/imageAtoms';
 import type { AspectRatio } from '../atoms/imageAtoms';
 import {
+  BACKGROUND_COLOR_FILL,
   drawImageWithEffects,
   getCanvasDimensions,
   getCanvasDisplaySize,
@@ -22,6 +23,10 @@ import { useAspectRatio } from '../hooks/useAspectRatio';
 import { useRedrawOnSettingsChange } from '../hooks/useRedrawOnSettingsChange';
 import { loadEditableImage } from '../utils/imageSource';
 import { toDrawOptions } from '../utils/drawOptions';
+
+/** 지금 설정된 배경색을 실제로 칠할 색으로 읽는다. */
+const readBackgroundFill = (store: ReturnType<typeof useStore>) =>
+  BACKGROUND_COLOR_FILL[store.get(imageSettingsAtom).backgroundColor];
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -60,7 +65,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
         );
       } else {
         // Fill background with solid color (no image loaded)
-        ctx.fillStyle = settings.backgroundColor;
+        ctx.fillStyle = BACKGROUND_COLOR_FILL[settings.backgroundColor];
         ctx.fillRect(0, 0, size.width, size.height);
       }
     },
@@ -125,7 +130,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
 
-        ctx.fillStyle = store.get(imageSettingsAtom).backgroundColor;
+        ctx.fillStyle = readBackgroundFill(store);
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       }
     }
@@ -135,7 +140,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
   useRedrawOnSettingsChange(
     useCallback(() => {
       if (containerRef.current) {
-        containerRef.current.style.backgroundColor = store.get(imageSettingsAtom).backgroundColor;
+        containerRef.current.style.backgroundColor = readBackgroundFill(store);
       }
       const ctx = canvasRef.current?.getContext('2d');
       if (ctx) redrawImage(ctx, imageRef.current);
@@ -171,7 +176,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
           canvas.height = height;
           canvas.style.width = `${displayWidth}px`;
           canvas.style.height = `${displayHeight}px`;
-          ctx.fillStyle = store.get(imageSettingsAtom).backgroundColor;
+          ctx.fillStyle = readBackgroundFill(store);
           ctx.fillRect(0, 0, width, height);
         }
       }
@@ -189,7 +194,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
   // Initialize container background color on mount
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.style.backgroundColor = store.get(imageSettingsAtom).backgroundColor;
+      containerRef.current.style.backgroundColor = readBackgroundFill(store);
     }
   }, [store]);
 

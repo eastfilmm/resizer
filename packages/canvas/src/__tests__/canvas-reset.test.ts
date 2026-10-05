@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { resetCanvas } from '../index';
 import {
+  BACKGROUND_COLOR_FILL,
   CANVAS_ACTUAL_SIZE,
   CANVAS_DISPLAY_SIZE,
   CANVAS_ACTUAL_SIZE_4_5_WIDTH,
@@ -33,7 +34,7 @@ describe('resetCanvas', () => {
 
   it('fills canvas with white background by default', () => {
     resetCanvas(canvas);
-    expect(ctx.fillStyle).toBe('white');
+    expect(ctx.fillStyle).toBe(BACKGROUND_COLOR_FILL.white);
     const fillRectCall = ctx.calls.find((c: any) => c.method === 'fillRect');
     expect(fillRectCall).toBeTruthy();
     expect(fillRectCall.args).toEqual([0, 0, CANVAS_ACTUAL_SIZE, CANVAS_ACTUAL_SIZE]);
@@ -41,7 +42,12 @@ describe('resetCanvas', () => {
 
   it('fills canvas with black background when specified', () => {
     resetCanvas(canvas, 'black');
-    expect(ctx.fillStyle).toBe('black');
+    expect(ctx.fillStyle).toBe(BACKGROUND_COLOR_FILL.black);
+  });
+
+  it('fills canvas with the palette color for colored backgrounds', () => {
+    resetCanvas(canvas, 'blue');
+    expect(ctx.fillStyle).toBe(BACKGROUND_COLOR_FILL.blue);
   });
 
   it('uses 4:5 dimensions when aspectRatio option is 4:5', () => {

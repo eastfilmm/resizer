@@ -11,7 +11,16 @@ export type DrawableImage = CanvasImageSource & { width: number; height: number 
  * 렌더러를 쓰는 이상 비율·배경색·프레임 종류는 앱이 아니라 렌더러의 어휘다.
  */
 export type AspectRatio = '1:1' | '4:5' | '9:16';
-export type BackgroundColor = 'white' | 'black';
+export type BackgroundColor =
+  | 'white'
+  | 'black'
+  | 'red'
+  | 'orange'
+  | 'yellow'
+  | 'green'
+  | 'blue'
+  | 'indigo'
+  | 'violet';
 export type FrameType = 'none' | 'polaroid' | 'thin' | 'mediumFilm';
 
 export interface ImagePosition {

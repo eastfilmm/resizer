@@ -1,3 +1,5 @@
+import type { BackgroundColor } from './types';
+
 // Canvas dimension constants
 export const CANVAS_ACTUAL_SIZE = 2000;
 export const CANVAS_DISPLAY_SIZE = 320;
@@ -26,3 +28,16 @@ export const CANVAS_ACTUAL_SIZE_9_16_HEIGHT = 2000;
 export const CANVAS_DISPLAY_SIZE_9_16_WIDTH = 180;
 export const CANVAS_PREVIEW_SIZE_9_16_WIDTH = 450;
 export const CANVAS_PREVIEW_SIZE_9_16_HEIGHT = 800;
+
+/** 배경색 이름 → 실제 칠할 색. 설정에는 이름을 저장하고 그릴 때만 바꾼다. */
+export const BACKGROUND_COLOR_FILL: Record<BackgroundColor, string> = {
+  white: '#FFFFFF',
+  black: '#000000',
+  red: '#E53935',
+  orange: '#FB8C00',
+  yellow: '#FDD835',
+  green: '#43A047',
+  blue: '#1E88E5',
+  indigo: '#3949AB',
+  violet: '#8E24AA',
+};
