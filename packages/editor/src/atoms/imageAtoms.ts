@@ -39,6 +39,8 @@ export type { AspectRatio, BackgroundColor, FrameType } from '@resizer/canvas';
 
 export interface ImageSettings {
   backgroundColor: BackgroundColor;
+  /** 배경색에 흰색을 섞는 정도(0~100). 0이면 원색 그대로. 기본 50(부드러운 톤에서 시작). */
+  backgroundSoftness: number;
   glassBlurEnabled: boolean;
   blurIntensity: number;
   overlayOpacity: number;
@@ -57,6 +59,7 @@ export interface ImageSettings {
 
 export const DEFAULT_IMAGE_SETTINGS: ImageSettings = {
   backgroundColor: 'white',
+  backgroundSoftness: 50,
   glassBlurEnabled: false,
   blurIntensity: 30,
   overlayOpacity: 0.3,
@@ -72,6 +75,7 @@ export const DEFAULT_IMAGE_SETTINGS: ImageSettings = {
 export const imageSettingsAtom = atom<ImageSettings>(DEFAULT_IMAGE_SETTINGS);
 
 export const backgroundColorAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('backgroundColor'));
+export const backgroundSoftnessAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('backgroundSoftness'));
 export const glassBlurAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('glassBlurEnabled'));
 export const blurIntensityAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('blurIntensity'));
 export const overlayOpacityAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('overlayOpacity'));

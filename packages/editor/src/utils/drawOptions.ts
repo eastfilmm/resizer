@@ -1,4 +1,4 @@
-import { BACKGROUND_COLOR_FILL, type DrawImageOptions } from '@resizer/canvas';
+import { getBackgroundFill, type DrawImageOptions } from '@resizer/canvas';
 import type { ImageSettings, UploadedImage } from '../atoms/imageAtoms';
 import { resolvePolaroidDate } from './imageUtils';
 
@@ -28,7 +28,7 @@ export const toDrawOptions = (
     imageAreaWidth: canvas.width - padding * 2,
     imageAreaHeight: canvas.height - padding * 2,
     padding,
-    bgColor: BACKGROUND_COLOR_FILL[settings.backgroundColor],
+    bgColor: getBackgroundFill(settings.backgroundColor, settings.backgroundSoftness),
     useGlassBlur: settings.glassBlurEnabled,
     blurIntensity: settings.blurIntensity * scale,
     overlayOpacity: settings.overlayOpacity,

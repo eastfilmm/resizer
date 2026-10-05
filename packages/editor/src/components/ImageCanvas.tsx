@@ -8,7 +8,7 @@ import { useAtomValue, useStore } from 'jotai';
 import { imageUrlAtom, imageSettingsAtom, selectedImageAtom } from '../atoms/imageAtoms';
 import type { AspectRatio } from '../atoms/imageAtoms';
 import {
-  BACKGROUND_COLOR_FILL,
+  getBackgroundFill,
   drawImageWithEffects,
   getCanvasDimensions,
   getCanvasDisplaySize,
@@ -25,8 +25,10 @@ import { loadEditableImage } from '../utils/imageSource';
 import { toDrawOptions } from '../utils/drawOptions';
 
 /** 지금 설정된 배경색을 실제로 칠할 색으로 읽는다. */
-const readBackgroundFill = (store: ReturnType<typeof useStore>) =>
-  BACKGROUND_COLOR_FILL[store.get(imageSettingsAtom).backgroundColor];
+const readBackgroundFill = (store: ReturnType<typeof useStore>) => {
+  const { backgroundColor, backgroundSoftness } = store.get(imageSettingsAtom);
+  return getBackgroundFill(backgroundColor, backgroundSoftness);
+};
 
 interface ImageCanvasProps {
   canvasRef: RefObject<HTMLCanvasElement | null>;
@@ -65,7 +67,7 @@ export default function ImageCanvas({ canvasRef, isDesktop = false }: ImageCanva
         );
       } else {
         // Fill background with solid color (no image loaded)
-        ctx.fillStyle = BACKGROUND_COLOR_FILL[settings.backgroundColor];
+        ctx.fillStyle = getBackgroundFill(settings.backgroundColor, settings.backgroundSoftness);
         ctx.fillRect(0, 0, size.width, size.height);
       }
     },
