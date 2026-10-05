@@ -41,17 +41,16 @@ import {
   ButtonLabel,
   NavIcon,
 } from './NavigationBar.styles';
+/**
+ * 프레임이 켜져 있을 때 쓸 수 있는 패널. 배경색은 어느 프레임에서든 바꿀 수 있다.
+ * Glass Blur·Shadow는 프레임을 그리는 렌더러가 적용하지 않으므로 막아 둔다.
+ */
 function isPanelAllowedInFrameMode(
   panelId: string,
   frameType: string,
 ): boolean {
   if (frameType === 'none') return true;
-  if (frameType === 'polaroid') {
-    return (
-      panelId === 'layout' || panelId === 'frame' || panelId === 'background'
-    );
-  }
-  return panelId === 'layout' || panelId === 'frame';
+  return panelId === 'layout' || panelId === 'frame' || panelId === 'background';
 }
 
 type NavItem = {
@@ -169,9 +168,7 @@ export const NavigationBar = () => {
         aspectRatio !== DEFAULT_IMAGE_SETTINGS.canvasAspectRatio ||
         padding !== DEFAULT_IMAGE_SETTINGS.padding,
       frame: frameType !== 'none',
-      background:
-        backgroundColor !== 'white' &&
-        isPanelAllowedInFrameMode('background', frameType),
+      background: backgroundColor !== 'white',
       glassblur: glassBlur && isPanelAllowedInFrameMode('glassblur', frameType),
       shadow: shadowEnabled && isPanelAllowedInFrameMode('shadow', frameType),
     }),

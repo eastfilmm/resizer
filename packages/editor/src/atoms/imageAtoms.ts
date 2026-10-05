@@ -94,8 +94,6 @@ export const canvasAspectRatioAtom = focusAtom(imageSettingsAtom, (optic) => opt
 export const frameTypeAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('frameType'));
 export const polaroidDateAtom = focusAtom(imageSettingsAtom, (optic) => optic.prop('polaroidDate'));
 
-export const prevBackgroundColorAtom = atom<BackgroundColor | null>(null);
-
 export const canResetAtom = atom((get) => {
   const hasImage = get(uploadedImagesAtom).length > 0;
   const currentSettings = get(imageSettingsAtom);
