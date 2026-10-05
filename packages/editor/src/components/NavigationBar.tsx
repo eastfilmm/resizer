@@ -60,8 +60,8 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'frame', label: 'Frame', icon: PolaroidIcon },
   { id: 'layout', label: 'Layout', icon: LayoutIcon },
+  { id: 'frame', label: 'Frame', icon: PolaroidIcon },
   { id: 'glassblur', label: 'Glass Blur', icon: GlassBlurIcon },
   { id: 'shadow', label: 'Shadow', icon: ShadowIcon },
   { id: 'background', label: 'Background', icon: BackgroundIcon },
