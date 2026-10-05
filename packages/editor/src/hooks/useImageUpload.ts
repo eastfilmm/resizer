@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { useStore } from 'jotai';
 import {
+  activeNavPanelAtom,
   MAX_UPLOADED_IMAGES,
   selectedImageIdAtom,
   uploadedImagesAtom,
@@ -38,6 +39,8 @@ export const useImageUpload = () => {
         store.set(uploadedImagesAtom, newImages);
       }
       store.set(selectedImageIdAtom, newImages[0]?.id ?? null);
+      // 올리자마자 첫 단계(비율·여백)부터 고를 수 있게 Layout 패널을 연다
+      store.set(activeNavPanelAtom, 'layout');
 
       readPhotoDates(newImages, imageFiles);
     },

@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import type { RefObject } from 'react';
 import { useAtomValue, useSetAtom } from 'jotai';
 import {
+  activeNavPanelAtom,
   MAX_UPLOADED_IMAGES,
   selectedImageIdAtom,
   uploadedImagesAtom,
@@ -21,6 +22,7 @@ export const ImageUploader = ({ fileInputRef }: ImageUploaderProps) => {
   const uploadedImages = useAtomValue(uploadedImagesAtom);
   const setUploadedImages = useSetAtom(uploadedImagesAtom);
   const setSelectedImageId = useSetAtom(selectedImageIdAtom);
+  const setActivePanel = useSetAtom(activeNavPanelAtom);
   const readPhotoDates = usePhotoDates();
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,6 +35,7 @@ export const ImageUploader = ({ fileInputRef }: ImageUploaderProps) => {
     setUploadedImages(nextImages);
     setSelectedImageId(nextImages[0]?.id ?? null);
     readPhotoDates(nextImages, files);
+    if (nextImages.length > 0) setActivePanel('layout');
 
     if (fileInputRef.current && nextImages.length === 0) {
       fileInputRef.current.value = '';

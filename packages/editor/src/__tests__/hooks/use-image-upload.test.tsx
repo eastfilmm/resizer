@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createStore, Provider } from 'jotai';
 import type { ReactNode } from 'react';
-import { uploadedImagesAtom } from '../../atoms/imageAtoms';
+import { activeNavPanelAtom, uploadedImagesAtom } from '../../atoms/imageAtoms';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import { buildJpeg } from '../exifFixture';
 
@@ -66,4 +66,23 @@ describe('useImageUpload', () => {
     await new Promise((resolve) => setTimeout(resolve, 20));
     expect(store.get(uploadedImagesAtom)).toEqual([]);
   });
+
+  it('사진을 올리면 Layout 패널을 연다', () => {
+    const { store, upload } = setup();
+    store.set(activeNavPanelAtom, null);
+
+    upload([plain('a.jpg')]);
+
+    expect(store.get(activeNavPanelAtom)).toBe('layout');
+  });
+
+  it('이미지가 아닌 파일만 고르면 패널을 건드리지 않는다', () => {
+    const { store, upload } = setup();
+    store.set(activeNavPanelAtom, 'shadow');
+
+    upload([new File(['x'], 'notes.txt', { type: 'text/plain' })]);
+
+    expect(store.get(activeNavPanelAtom)).toBe('shadow');
+  });
 });
+
