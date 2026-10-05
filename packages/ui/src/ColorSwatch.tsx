@@ -4,16 +4,17 @@ import styled from 'styled-components';
 import { COLOR_GRAY_BORDER, COLOR_PRIMARY } from './theme';
 
 /**
- * 색 칸을 틈 없이 한 줄로 이어 붙인 띠. 바깥 테두리와 모서리는 띠가 갖는다.
- * 흰 칸도 경계가 보이도록 다른 버튼과 같은 연회색 테두리를 둔다.
+ * 색 칸을 틈 없이 한 줄로 이어 붙인 띠. 둥근 모서리는 띠가 잘라 만든다.
+ *
+ * 띠에는 테두리를 두지 않는다. 바깥 테두리가 있으면 색 칸은 그 안에서 끊겨
+ * 보이는데 흰 칸만 테두리와 한 덩어리로 읽혀 더 커 보인다. 배경과 구분이
+ * 필요한 밝은 칸은 ColorSwatch의 $isOutlined로 칸 안쪽에 선을 긋는다.
  */
 export const SwatchStrip = styled.div`
   display: flex;
   width: 100%;
-  /* 테두리까지 포함해 32px. 선택 보더는 칸 안쪽(inset)에 그려서 높이를 늘리지 않는다 */
-  box-sizing: border-box;
+  /* 선택 보더·외곽선은 칸 안쪽(inset)에 그려서 높이를 늘리지 않는다 */
   height: 32px;
-  border: 1px solid ${COLOR_GRAY_BORDER};
   border-radius: 8px;
   overflow: hidden;
 `;
@@ -25,6 +26,9 @@ export const SwatchStrip = styled.div`
  * 커지거나 내용이 줄어 옆 칸이 밀린다. 파란 칸 위에서도 보이도록 안쪽에 1px
  * 흰 줄을 한 겹 더 두른다.
  *
+ * $isOutlined: 패널 배경과 같은 흰 칸처럼 경계가 안 보이는 칸에만 안쪽 1px
+ * 회색 선을 둔다. 칸 크기는 다른 칸과 똑같이 유지된다.
+ *
  * 색은 클래스가 아니라 인라인 style로 넣는다. styled-components는 보간 값이
  * 달라질 때마다 CSS 규칙을 새로 만들어 넣으므로, 색이 자주 바뀌면 규칙이
  * 쌓이고 스타일 재계산이 잦아진다.
@@ -35,6 +39,7 @@ export const ColorSwatch = styled.button.attrs<{ $color: string }>((props) => ({
 }))<{
   $color: string;
   $isSelected?: boolean;
+  $isOutlined?: boolean;
 }>`
   position: relative;
   flex: 1 1 0;
@@ -42,6 +47,7 @@ export const ColorSwatch = styled.button.attrs<{ $color: string }>((props) => ({
   height: 100%;
   padding: 0;
   border: none;
+  box-shadow: ${(props) => (props.$isOutlined ? `inset 0 0 0 1px ${COLOR_GRAY_BORDER}` : 'none')};
   cursor: pointer;
 
   &::after {
@@ -54,12 +60,14 @@ export const ColorSwatch = styled.button.attrs<{ $color: string }>((props) => ({
     transition: box-shadow 0.2s ease;
   }
 
-  /* 띠의 둥근 모서리를 선택 보더도 따라가게 한다 */
+  /* 띠의 둥근 모서리를 외곽선·선택 보더도 따라가게 한다 */
+  &:first-child,
   &:first-child::after {
-    border-radius: 7px 0 0 7px;
+    border-radius: 8px 0 0 8px;
   }
+  &:last-child,
   &:last-child::after {
-    border-radius: 0 7px 7px 0;
+    border-radius: 0 8px 8px 0;
   }
 
   &:focus-visible {

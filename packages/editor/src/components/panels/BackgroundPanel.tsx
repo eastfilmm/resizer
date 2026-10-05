@@ -67,6 +67,8 @@ export const BackgroundPanel = () => {
                 aria-checked={backgroundColor === color}
                 $color={BACKGROUND_COLOR_FILL[color]}
                 $isSelected={backgroundColor === color}
+              // 흰 칸은 패널 배경과 같아서 경계선이 있어야 칸으로 보인다
+              $isOutlined={color === 'white'}
                 onClick={() => setBackgroundColor(color)}
               />
             ))}
