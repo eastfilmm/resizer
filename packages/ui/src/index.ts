@@ -1,5 +1,5 @@
 // 디자인 시스템 — 도메인(atoms/캔버스)을 모르는 UI 조각만 모은다.
-// 도메인이 필요한 패널·NavigationBar 등은 앱 쪽에 남는다.
+// 도메인이 필요한 패널·NavigationBar 등은 @resizer/editor에 있다.
 
 export * from './theme';
 export * from './motion';
@@ -9,6 +9,7 @@ export { RangeSlider } from './RangeSlider';
 
 // 동작 컴포넌트
 export { FocusReveal } from './FocusReveal';
+export { Collapsible } from './Collapsible';
 
 // styled 원자
 export * from './primitives';
