@@ -104,7 +104,7 @@ export const NavButtonStyled = styled.button<{ $isActive: boolean; $isEnabled: b
   &::after {
     content: '';
     position: absolute;
-    bottom: 6px;
+    bottom: 5px;
     width: 6px;
     height: 6px;
     border-radius: 50%;
