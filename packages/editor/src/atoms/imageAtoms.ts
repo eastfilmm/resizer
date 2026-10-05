@@ -37,6 +37,9 @@ export const imageUrlAtom = atom((get) => get(selectedImageAtom)?.objectUrl ?? n
 // 캔버스 렌더러가 원본을 갖는다. 기존 `@/atoms/imageAtoms` 임포트를 깨지 않도록 재노출한다.
 export type { AspectRatio, BackgroundColor, FrameType } from '@resizer/canvas';
 
+/** 고를 수 있는 프레임 종류('none'은 꺼진 상태라 제외). */
+export type SelectableFrameType = Exclude<FrameType, 'none'>;
+
 export interface ImageSettings {
   backgroundColor: BackgroundColor;
   /** 배경색에 흰색을 섞는 정도(0~100). 0이면 원색 그대로. 기본 50(부드러운 톤에서 시작). */
@@ -50,6 +53,8 @@ export interface ImageSettings {
   shadowOffset: number;
   canvasAspectRatio: AspectRatio;
   frameType: FrameType;
+  /** 마지막으로 켰던 프레임. 스위치로 다시 켤 때 이 프레임으로 켠다. */
+  lastFrameType: SelectableFrameType;
   /**
    * 폴라로이드 날짜. null이면 사진마다 자기 촬영일(UploadedImage.photoDate)을 쓰고,
    * 사용자가 입력하면 그 값을 모든 사진에 쓴다. 빈 문자열은 날짜를 지운 상태.
@@ -69,6 +74,7 @@ export const DEFAULT_IMAGE_SETTINGS: ImageSettings = {
   shadowOffset: 20,
   canvasAspectRatio: '1:1',
   frameType: 'none',
+  lastFrameType: 'polaroid',
   polaroidDate: null,
 };
 

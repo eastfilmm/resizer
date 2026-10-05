@@ -49,15 +49,15 @@ describe('FramePanel 날짜', () => {
     expect(store.get(imageSettingsAtom).polaroidDate).toBe('');
   });
 
-  it('지운 날짜는 Polaroid를 껐다 켜도 돌아오지 않는다', async () => {
+  it('지운 날짜는 스위치로 껐다 켜도 돌아오지 않는다', async () => {
     const { mount } = setup();
     mount();
-    const polaroid = screen.getByRole('button', { name: 'Polaroid' });
-    await userEvent.click(polaroid);
+    await userEvent.click(screen.getByRole('button', { name: 'Polaroid' }));
     await userEvent.click(screen.getByRole('button', { name: '×' }));
 
-    await userEvent.click(polaroid);
-    await userEvent.click(polaroid);
+    const frameSwitch = screen.getByRole('switch', { name: 'Frame' });
+    await userEvent.click(frameSwitch);
+    await userEvent.click(frameSwitch);
 
     expect(dateInput().value).toBe('');
   });
@@ -73,5 +73,32 @@ describe('FramePanel 날짜', () => {
     mount();
 
     expect(dateInput().value).toBe('1999.12.31');
+  });
+
+  it('스위치로 끄고 켜면 마지막에 쓴 프레임으로 다시 켜진다', async () => {
+    const { store, mount } = setup();
+    mount();
+    const frameSwitch = screen.getByRole('switch', { name: 'Frame' });
+    expect(frameSwitch).toHaveAttribute('aria-checked', 'false');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Thin' }));
+    expect(frameSwitch).toHaveAttribute('aria-checked', 'true');
+
+    await userEvent.click(frameSwitch);
+    expect(store.get(imageSettingsAtom).frameType).toBe('none');
+
+    await userEvent.click(frameSwitch);
+    expect(store.get(imageSettingsAtom).frameType).toBe('thin');
+  });
+
+  it('켜진 프레임 버튼을 다시 눌러도 꺼지지 않는다', async () => {
+    const { store, mount } = setup();
+    mount();
+    const polaroid = screen.getByRole('button', { name: 'Polaroid' });
+
+    await userEvent.click(polaroid);
+    await userEvent.click(polaroid);
+
+    expect(store.get(imageSettingsAtom).frameType).toBe('polaroid');
   });
 });
