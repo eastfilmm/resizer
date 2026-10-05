@@ -61,10 +61,10 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'layout', label: 'Layout', icon: LayoutIcon },
+  { id: 'background', label: 'Background', icon: BackgroundIcon },
   { id: 'frame', label: 'Frame', icon: PolaroidIcon },
   { id: 'glassblur', label: 'Glass Blur', icon: GlassBlurIcon },
   { id: 'shadow', label: 'Shadow', icon: ShadowIcon },
-  { id: 'background', label: 'Background', icon: BackgroundIcon },
 ];
 
 interface NavButtonProps {
