@@ -47,6 +47,7 @@ export interface ImageSettings {
   glassBlurEnabled: boolean;
   blurIntensity: number;
   overlayOpacity: number;
+  /** 사진 바깥 여백(2000px 기준). 업로드하자마자 여백이 있도록 기본 80. */
   padding: number;
   shadowEnabled: boolean;
   shadowIntensity: number;
@@ -68,7 +69,7 @@ export const DEFAULT_IMAGE_SETTINGS: ImageSettings = {
   glassBlurEnabled: false,
   blurIntensity: 30,
   overlayOpacity: 0.3,
-  padding: 0,
+  padding: 80,
   shadowEnabled: false,
   shadowIntensity: 30,
   shadowOffset: 20,

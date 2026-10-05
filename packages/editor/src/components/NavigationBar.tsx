@@ -21,6 +21,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import { usePanelTransition } from '../hooks/usePanelTransition';
 import {
   activeNavPanelAtom,
+  DEFAULT_IMAGE_SETTINGS,
   backgroundColorAtom,
   glassBlurAtom,
   shadowEnabledAtom,
@@ -163,7 +164,10 @@ export const NavigationBar = () => {
   // Memoize active states (when the blue dot should appear)
   const activeStates = useMemo(
     () => ({
-      layout: aspectRatio !== '1:1' || padding > 0,
+      // 기본값(1:1, 여백 80)에서 바꿨을 때만 점을 켠다
+      layout:
+        aspectRatio !== DEFAULT_IMAGE_SETTINGS.canvasAspectRatio ||
+        padding !== DEFAULT_IMAGE_SETTINGS.padding,
       frame: frameType !== 'none',
       background:
         backgroundColor !== 'white' &&

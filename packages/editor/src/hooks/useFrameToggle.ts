@@ -11,8 +11,6 @@ import {
   type SelectableFrameType,
 } from '../atoms/imageAtoms';
 
-export const FRAME_DEFAULT_PADDING = 80;
-
 interface FrameToggleState {
   settings: ImageSettings;
   /** Thin/Film이 배경을 흰색으로 고정하기 전 색. 프레임을 벗어날 때 되돌린다. */
@@ -23,6 +21,8 @@ interface FrameToggleState {
  * 프레임을 켜고 끄는 기본 전이. 버튼·스위치는 아래 selectFrame/setFrameEnabled를 쓴다.
  *
  * - 켜진 프레임을 다시 넘기면 끈다. 켤 때는 lastFrameType에 기억한다.
+ * - 여백(padding)은 건드리지 않는다. 기본 여백이 있고, 사용자가 Layout에서
+ *   맞춘 값이 프레임을 켜고 꺼도 유지돼야 한다.
  * - Thin/Film은 배경을 흰색으로 고정하고, 원래 색은 기억했다가 벗어날 때 복원한다.
  * - Polaroid는 배경을 건드리지 않는다. 날짜는 직접 입력하지 않았다면 사진마다
  *   자기 촬영일이 찍힌다(resolvePolaroidDate). 다른 프레임으로 바꾸면 입력값을
@@ -40,7 +40,6 @@ export const toggleFrame = (
       settings: {
         ...settings,
         frameType: 'none',
-        padding: 0,
         ...(restore && { backgroundColor: prevBackgroundColor }),
       },
       prevBackgroundColor: restore ? null : prevBackgroundColor,
@@ -50,7 +49,6 @@ export const toggleFrame = (
   const activated = {
     ...settings,
     frameType: type,
-    padding: FRAME_DEFAULT_PADDING,
     ...(type !== 'none' && { lastFrameType: type }),
   };
 

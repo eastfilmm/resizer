@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_IMAGE_SETTINGS, type ImageSettings } from '../../atoms/imageAtoms';
-import { FRAME_DEFAULT_PADDING, selectFrame, setFrameEnabled, toggleFrame } from '../../hooks/useFrameToggle';
+import { selectFrame, setFrameEnabled, toggleFrame } from '../../hooks/useFrameToggle';
 
 const state = (settings: Partial<ImageSettings> = {}, prevBackgroundColor: ImageSettings['backgroundColor'] | null = null) => ({
   settings: { ...DEFAULT_IMAGE_SETTINGS, ...settings },
@@ -8,18 +8,14 @@ const state = (settings: Partial<ImageSettings> = {}, prevBackgroundColor: Image
 });
 
 describe('toggleFrame', () => {
-  it('프레임을 켜면 기본 여백을 준다', () => {
-    const next = toggleFrame(state(), 'thin');
+  it('프레임을 켜고 꺼도 사용자가 맞춘 여백은 그대로다', () => {
+    const on = toggleFrame(state({ padding: 30 }), 'thin');
+    expect(on.settings.frameType).toBe('thin');
+    expect(on.settings.padding).toBe(30);
 
-    expect(next.settings.frameType).toBe('thin');
-    expect(next.settings.padding).toBe(FRAME_DEFAULT_PADDING);
-  });
-
-  it('켜진 프레임을 다시 누르면 끄고 여백을 없앤다', () => {
-    const next = toggleFrame(state({ frameType: 'polaroid', padding: 80 }), 'polaroid');
-
-    expect(next.settings.frameType).toBe('none');
-    expect(next.settings.padding).toBe(0);
+    const off = toggleFrame(on, 'thin');
+    expect(off.settings.frameType).toBe('none');
+    expect(off.settings.padding).toBe(30);
   });
 
   describe('Thin/Film 배경', () => {
@@ -105,7 +101,6 @@ describe('setFrameEnabled (스위치)', () => {
     );
 
     expect(next.settings.frameType).toBe('none');
-    expect(next.settings.padding).toBe(0);
     expect(next.settings.backgroundColor).toBe('blue');
   });
 
